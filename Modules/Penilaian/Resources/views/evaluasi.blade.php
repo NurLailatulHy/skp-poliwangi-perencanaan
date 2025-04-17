@@ -72,7 +72,7 @@
                                         <span class="badge {{ $badgeClass }}">{{ $item['status'] }}</span>
                                     </td>
                                     <td>{{ $item['predikatKinerja'] }}</td>
-                                    <td><button onclick="window.location.href='{{ url('penilaian/evaluasi/' . $item['id'] . '/detail') }}'" type="button" class="btn btn-primary"><i class="nav-icon fas fa-pencil-alt "></i></button></td>
+                                    <td><button onclick="window.location.href='{{ url('skp/penilaian/evaluasi/' . $item['id'] . '/detail') }}'" type="button" class="btn btn-primary"><i class="nav-icon fas fa-pencil-alt "></i></button></td>
                                     {{-- <td><a href="{{ route('evaluasi-detail', $item['id']) }}" class="btn btn-primary"><i class="nav-icon fas fa-pencil-alt "></i></a></td> --}}
                                 </tr>
                             @endforeach
