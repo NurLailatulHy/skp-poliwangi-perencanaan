@@ -1,0 +1,3 @@
+[submodule "modules/Pengaturan"]
+	path = modules/Pengaturan
+	url = https://github.com/cutisurattugas/ModulPengaturan.git
