@@ -16,8 +16,6 @@ class SkpDatabaseSeeder extends Seeder
     public function run()
     {
         Model::unguard();
-
-        // $this->call("OthersTableSeeder");
         Menu::where('modul', 'PerencanaanSKP')->delete();
         $menu =  Menu::create([
             'modul' => 'PerencanaanSKP',

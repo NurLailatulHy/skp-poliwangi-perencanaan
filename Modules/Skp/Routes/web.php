@@ -1,5 +1,5 @@
 <?php
-
+use Illuminate\Support\Facades\Route;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -13,4 +13,8 @@
 
 Route::prefix('skp')->group(function() {
     Route::get('/', 'SkpController@index');
+    Route::prefix('penilaian')->group(function() {
+        Route::get('/evaluasi', 'PenilaianController@evaluasi');
+        Route::get('/evaluasi/{pegawaiId}/detail', 'PenilaianController@evaluasiDetail');
+    });
 });
