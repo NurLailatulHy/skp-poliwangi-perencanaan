@@ -5,7 +5,7 @@ namespace Modules\Penilaian\Database\Seeders;
 use Illuminate\Database\Seeder;
 use Illuminate\Database\Eloquent\Model;
 
-class PenilaianDatabaseSeeder extends Seeder
+class TimKerjaTableSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -16,9 +16,7 @@ class PenilaianDatabaseSeeder extends Seeder
     {
         Model::unguard();
 
-        $this->call(MenuPenilaianTableSeeder::class);
-        $this->call(RencanaTableSeeder::class);
-        // $this->call(UserTableSeeder::class);
+        // $this->call("OthersTableSeeder");
 
     }
 }

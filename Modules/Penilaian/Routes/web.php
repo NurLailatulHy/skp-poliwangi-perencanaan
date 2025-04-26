@@ -16,5 +16,15 @@ Route::group(['middleware' => ['auth', 'permission']], function() {
         Route::get('/', 'PenilaianController@index');
         Route::get('/evaluasi', 'PenilaianController@evaluasi');
         Route::get('/evaluasi/{pegawaiId}/detail', 'PenilaianController@evaluasiDetail');
+        Route::prefix('realisasi')->group(function() {
+            Route::get('/', 'PenilaianController@realisasi');
+            Route::post('/update-realisasi/{id}', 'PenilaianController@updateRealisasi');
+        });
+        Route::get('/rencana', 'PenilaianController@rencana');
+        Route::get('/kinerja-organisasi', 'PenilaianController@kinerjaOrganisasi');
+        Route::prefix('tim-kerja')->group(function() {
+            Route::get('/', 'PenilaianController@timKerja');
+            Route::post('/store', 'PenilaianController@storeTimKerja');
+        });
     });
 });

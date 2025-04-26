@@ -3,9 +3,33 @@
 @section('title', 'Dasbor Simlitabmas')
 
 @section('content_header')
-    <h1 class="m-0 text-dark">Realisasi</h1>
+    <h1 class="m-0 text-dark">Rencana</h1>
 @stop
 @php
+    $users = [
+        [
+            'id' => 1,
+            'name' => 'Widura Sasangka',
+            'jabatan' => 'Analis Kinerja',
+            'status' => 'Belum Dievaluasi',
+            'predikatKinerja' => '-',
+        ],
+        [
+            'id' => 2,
+            'name' => 'Hasta Sasangka',
+            'jabatan' => 'Pimpinana',
+            'status' => 'Belum Ajukan Realisasi',
+            'predikatKinerja' => '-',
+        ],
+        [
+            'id' => 3,
+            'name' => 'Widura Hasta',
+            'jabatan' => 'Pimpinana',
+            'status' => 'Sudah Dievaluasi',
+            'predikatKinerja' => '-',
+        ],
+    ];
+
     $hasilKerja = [
         [
             'id' => 1,
@@ -19,13 +43,18 @@
             'realisasi' => 'Draft manual book aplikasi untuk modul penyusunan rencana SKP telah selesai pada bulan April sesuai dengan proses bisnis aplikasi',
             'umpan_balik' => ''
         ]
-    ];
-    $pejabatPenilai = $anggota->timKerjaAnggota[0];
+    ]
 @endphp
 @section('content')
     <div class="row">
         <div class="col-12">
             <div class="card">
+                {{-- <div class="w-100 d-flex justify-content-between align-items-center p-4">
+                    <div class="alert alert-success m-0" role="alert">
+                        This is a success alert—check it out!
+                    </div>
+                    <button id="proses-umpan-balik-button" class="btn btn-primary ml-1">Batalkan Evaluasi</button>
+                </div> --}}
                 @php
                     switch (true) {
                         case 'Belum Dievaluasi':
@@ -59,12 +88,12 @@
                           <tr>
                             <th scope="row">1</th>
                             <td>Nama</td>
-                            <td>{{ $pegawai->nama }}</td>
+                            <td>Mark</td>
                           </tr>
                           <tr>
                             <th scope="row">2</th>
                             <td>NIP</td>
-                            <td></td>
+                            <td>362155401190</td>
                           </tr>
                           <tr>
                             <th scope="row">3</th>
@@ -79,7 +108,7 @@
                           <tr>
                             <th scope="row">5</th>
                             <td>Unit Kerja</td>
-                            <td>{{ $pejabatPenilai->unit->nama }}</td>
+                            <td>362155401190</td>
                           </tr>
                         </tbody>
                     </table>
@@ -94,27 +123,27 @@
                             <tr>
                               <th scope="row">1</th>
                               <td>Nama</td>
-                              <td>{{ $pejabatPenilai->ketua->pegawai }}</td>
+                              <td>Mark</td>
                             </tr>
                             <tr>
                               <th scope="row">2</th>
                               <td>NIP</td>
-                              <td></td>
+                              <td>362155401190</td>
                             </tr>
                             <tr>
                               <th scope="row">3</th>
                               <td>Pangkat / Gol</td>
-                              <td></td>
+                              <td>362155401190</td>
                             </tr>
                             <tr>
                               <th scope="row">4</th>
                               <td>Jabatan</td>
-                              <td>{{ $pejabatPenilai->ketua->jabatan->nama_jabatan }}</td>
+                              <td>362155401190</td>
                             </tr>
                             <tr>
                               <th scope="row">5</th>
                               <td>Unit Kerja</td>
-                              <td>{{ $pejabatPenilai->unit->nama }}</td>
+                              <td>362155401190</td>
                             </tr>
                         </tbody>
                     </table>
@@ -266,6 +295,63 @@
                                     <tr>
                                         <td colspan="5">Not Found</td>
                                     </tr>
+                                    {{-- <tr>
+                                        <th scope="row">{{ $index + 1 }}</th>
+                                        <td>
+                                            <p>{{ $item['capaian'] }}</p>
+                                            <span>Ukuran keberhasilan / Indikator Kinerja Individu, dan Target :</span>
+                                            <ul>
+                                                @foreach ($item['indikator'] as $indikator)
+                                                    <li>{{ $indikator['teks'] }}</li>
+                                                @endforeach
+                                            </ul>
+                                        </td>
+                                        <td>
+                                            <span>Realisasi :</span>
+                                            <p>{{ $item['realisasi'] }}</p>
+                                        </td>
+                                        <td>
+                                            <span>Umpan Balik :</span>
+                                            <p>{{ $item['umpan_balik'] }}</p>
+                                        </td>
+                                        <td>
+                                            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModalCenter">
+                                                <i class="nav-icon fas fa-pencil-alt "></i>
+                                            </button>
+                                            <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                                                <div class="modal-dialog modal-dialog-centered" role="document">
+                                                    <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title" id="exampleModalLongTitle">Isi Realisasi</h5>
+                                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                        <span aria-hidden="true">&times;</span>
+                                                        </button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <form>
+                                                            <div class="d-flex align-items-center">
+                                                                <div class="mr-1" style="width:30%">Hasil Kerja</div>
+                                                                <div class="flex-grow" style="width: 100%">
+                                                                <input type="text" class="form-control" id="inputPassword" placeholder="Hasil Kerja">
+                                                                </div>
+                                                            </div>
+                                                            <div class="d-flex align-items-start">
+                                                                <div class="mr-1" style="width:30%">Realisasi</div>
+                                                                <div class="" style="width: 100%">
+                                                                    <textarea placeholder="Realisasi" style="height: 70px; width: 100%; padding: 10px; overflow-y: auto; resize: vertical;"></textarea>
+                                                                </div>
+                                                            </div>
+                                                        </form>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                                        <button type="button" class="btn btn-primary">Save changes</button>
+                                                    </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr> --}}
                                 @endforeach
                             </tbody>
                         </tbody>
