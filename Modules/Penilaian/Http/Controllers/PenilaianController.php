@@ -26,16 +26,6 @@ class PenilaianController extends Controller
         return view('penilaian::index');
     }
 
-    public function evaluasi() {
-        return view('penilaian::evaluasi');
-    }
-
-    public function evaluasiDetail($id) {
-        return view('penilaian::evaluasi-detail', [
-            'id' => $id
-        ]);
-    }
-
     public function realisasi(){
         $authUser = Auth::user();
         $userId = $authUser->id;

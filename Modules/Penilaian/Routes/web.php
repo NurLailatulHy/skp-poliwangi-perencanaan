@@ -14,8 +14,9 @@ use Illuminate\Support\Facades\Route;
 Route::group(['middleware' => ['auth', 'permission']], function() {
     Route::prefix('penilaian')->group(function() {
         Route::get('/', 'PenilaianController@index');
-        Route::get('/evaluasi', 'PenilaianController@evaluasi');
-        Route::get('/evaluasi/{pegawaiId}/detail', 'PenilaianController@evaluasiDetail');
+        Route::get('/evaluasi', 'EvaluasiController@evaluasi');
+        Route::get('/evaluasi/{pegawaiId}/detail', 'EvaluasiController@evaluasiDetail');
+        Route::get('/data-pegawai', 'EvaluasiController@index');
         Route::prefix('realisasi')->group(function() {
             Route::get('/', 'PenilaianController@realisasi');
             Route::post('/update-realisasi/{id}', 'PenilaianController@updateRealisasi');
