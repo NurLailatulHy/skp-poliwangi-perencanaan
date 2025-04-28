@@ -6,13 +6,38 @@
     <h1 class="m-0 text-dark">Evaluasi SKP</h1>
 @stop
 @php
-    $pejabatPenilai = $pegawaiYangDinilai->timKerjaAnggota[0] ?? null;
+    $users = [
+        [
+            'id' => 1,
+            'name' => 'Widura Sasangka',
+            'jabatan' => 'Analis Kinerja',
+            'status' => 'Belum Dievaluasi',
+            'predikatKinerja' => '-',
+        ],
+        [
+            'id' => 2,
+            'name' => 'Hasta Sasangka',
+            'jabatan' => 'Pimpinana',
+            'status' => 'Belum Ajukan Realisasi',
+            'predikatKinerja' => '-',
+        ],
+        [
+            'id' => 3,
+            'name' => 'Widura Hasta',
+            'jabatan' => 'Pimpinana',
+            'status' => 'Sudah Dievaluasi',
+            'predikatKinerja' => '-',
+        ],
+    ];
 @endphp
 @section('content')
     <div class="row">
         <div class="col-12">
             <div class="card">
                 <div class="w-100 d-flex justify-content-between align-items-center p-4">
+                    <div class="alert alert-success m-0" role="alert">
+                        This is a success alert—check it out!
+                    </div>
                     <button id="proses-umpan-balik-button" class="btn btn-primary ml-1">Batalkan Evaluasi</button>
                 </div>
                 <div class="bg-white d-flex p-4">
@@ -27,27 +52,27 @@
                           <tr>
                             <th scope="row">1</th>
                             <td>Nama</td>
-                            <td>{{ $pegawaiYangDinilai->nama }}</td>
+                            <td>Mark</td>
                           </tr>
                           <tr>
                             <th scope="row">2</th>
                             <td>NIP</td>
-                            <td>{{ $pegawaiYangDinilai->nip }}</td>
+                            <td>362155401190</td>
                           </tr>
                           <tr>
                             <th scope="row">3</th>
                             <td>Pangkat / Gol</td>
-                            <td>IV</td>
+                            <td>362155401190</td>
                           </tr>
                           <tr>
                             <th scope="row">4</th>
                             <td>Jabatan</td>
-                            <td>-</td>
+                            <td>362155401190</td>
                           </tr>
                           <tr>
                             <th scope="row">5</th>
                             <td>Unit Kerja</td>
-                            <td>{{ $pegawaiYangDinilai->anggota->timKerja->unit->nama }}</td>
+                            <td>362155401190</td>
                           </tr>
                         </tbody>
                     </table>
@@ -62,27 +87,27 @@
                             <tr>
                               <th scope="row">1</th>
                               <td>Nama</td>
-                              <td>{{ $pejabatPenilai->ketua->pegawai }}</td>
+                              <td>Mark</td>
                             </tr>
                             <tr>
                               <th scope="row">2</th>
                               <td>NIP</td>
-                              <td>{{ $pejabatPenilai->ketua->nip }}</td>
+                              <td>362155401190</td>
                             </tr>
                             <tr>
                               <th scope="row">3</th>
                               <td>Pangkat / Gol</td>
-                              <td>-</td>
+                              <td>362155401190</td>
                             </tr>
                             <tr>
                               <th scope="row">4</th>
                               <td>Jabatan</td>
-                              <td>-</td>
+                              <td>362155401190</td>
                             </tr>
                             <tr>
                               <th scope="row">5</th>
                               <td>Unit Kerja</td>
-                              <td>{{ $pejabatPenilai->unit->nama }}</td>
+                              <td>362155401190</td>
                             </tr>
                         </tbody>
                     </table>
@@ -305,5 +330,8 @@
 @push('js')
 <script>
     const prosesUmpanBalikButton = document.querySelector('#proses-umpan-balik-button');
+    // prosesUmpanBalikButton.addEventListener('click', () => {
+    //     prosesUmpanBalikButton.
+    // })
 </script>
 @endpush

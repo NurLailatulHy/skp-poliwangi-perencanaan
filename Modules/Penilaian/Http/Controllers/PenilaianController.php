@@ -57,7 +57,7 @@ class PenilaianController extends Controller
         return view('penilaian::rencana', compact('rencana'));
     }
 
-    public function kinerjaOrganisasi(){
+    public function kinerjaOrganisasi() {
         return view('penilaian::kinerjaOrganisasi');
     }
 
@@ -73,8 +73,8 @@ class PenilaianController extends Controller
     //             'parent_tim_kerja_id' => $request->parent_tim_kerja_id ?? null,
     //             'nama_tim_kerja' => $request->nama_tim_kerja
     //         ]);
-    //         // dd($timKerja);
-    //                     // return response()->json($timKerja);
+                // dd($timKerja);
+                // return response()->json($timKerja);
     //         return redirect()->back()->with('success', 'berhasil menyimpan.');
     //     } catch (\Throwable $th) {
     //         return redirect()->back()->with('failed', $th->getMessage());

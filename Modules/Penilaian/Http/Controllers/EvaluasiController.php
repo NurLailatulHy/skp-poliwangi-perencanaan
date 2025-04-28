@@ -21,10 +21,17 @@ class EvaluasiController extends Controller
         return view('penilaian::evaluasi');
     }
 
-    public function evaluasiDetail($id) {
-        return view('penilaian::evaluasi-detail', [
-            'id' => $id
-        ]);
+    public function evaluasiDetail(Request $request, $id) {
+        $params = $request->query('params');
+        $pegawai = Pegawai::find($id);
+        $pegawaiYangDinilai = Pegawai::with([
+            'timKerjaAnggota.ketua.jabatan',
+            'timKerjaAnggota.unit',
+            'anggota.timKerja.unit'
+        ])->where('id', '=', $pegawai->id)->first();
+
+        if($params == 'json') return response()->json($pegawaiYangDinilai);
+        else return view('penilaian::evaluasi-detail', compact('id', 'pegawaiYangDinilai'));
     }
 
     public function index(Request $request)

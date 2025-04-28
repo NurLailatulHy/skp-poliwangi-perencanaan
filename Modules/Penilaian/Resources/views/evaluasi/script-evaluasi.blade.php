@@ -54,7 +54,7 @@
                     searchable: false,
                     render: function(data, type, row) {
                         return `
-                            <button onclick="window.location.href=''" type="button" class="btn btn-primary"><i class="nav-icon fas fa-pencil-alt "></i></button>
+                            <button onclick="window.location.href='/penilaian/evaluasi/${row.id}/detail'" type="button" class="btn btn-primary"><i class="nav-icon fas fa-pencil-alt "></i></button>
                         `;
                     }
                 },

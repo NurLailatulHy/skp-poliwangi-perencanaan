@@ -20,7 +20,7 @@
             'umpan_balik' => ''
         ]
     ];
-    $pejabatPenilai = $anggota->timKerjaAnggota[0];
+    $pejabatPenilai = $anggota->timKerjaAnggota[0] ?? null;
 @endphp
 @section('content')
     <div class="row">
@@ -79,7 +79,7 @@
                           <tr>
                             <th scope="row">5</th>
                             <td>Unit Kerja</td>
-                            <td>{{ $pejabatPenilai->unit->nama }}</td>
+                            <td>{{ $pejabatPenilai->unit->nama ?? null }}</td>
                           </tr>
                         </tbody>
                     </table>
@@ -94,7 +94,7 @@
                             <tr>
                               <th scope="row">1</th>
                               <td>Nama</td>
-                              <td>{{ $pejabatPenilai->ketua->pegawai }}</td>
+                              <td>{{ $pejabatPenilai->ketua->pegawai ?? null }}</td>
                             </tr>
                             <tr>
                               <th scope="row">2</th>
@@ -109,12 +109,12 @@
                             <tr>
                               <th scope="row">4</th>
                               <td>Jabatan</td>
-                              <td>{{ $pejabatPenilai->ketua->jabatan->nama_jabatan }}</td>
+                              <td>{{ $pejabatPenilai->ketua->jabatan->nama_jabatan ?? null }}</td>
                             </tr>
                             <tr>
                               <th scope="row">5</th>
                               <td>Unit Kerja</td>
-                              <td>{{ $pejabatPenilai->unit->nama }}</td>
+                              <td>{{ $pejabatPenilai->unit->nama ?? null }}</td>
                             </tr>
                         </tbody>
                     </table>
