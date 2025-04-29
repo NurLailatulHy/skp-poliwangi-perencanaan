@@ -2,7 +2,6 @@
     $(document).ready(function() {
         $('#table-pegawai').DataTable({
             responsive: true,
-            // autoWidth: false,
             scrollX: true,
             processing: true,
             serverSide: true,

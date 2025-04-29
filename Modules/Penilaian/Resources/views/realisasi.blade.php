@@ -94,12 +94,12 @@
                             <tr>
                               <th scope="row">1</th>
                               <td>Nama</td>
-                              <td>{{ $pejabatPenilai->ketua->pegawai ?? null }}</td>
+                              <td>{{ $pejabatPenilai->ketua->pegawai->nama ?? null }}</td>
                             </tr>
                             <tr>
                               <th scope="row">2</th>
                               <td>NIP</td>
-                              <td></td>
+                              <td>{{ $pejabatPenilai->ketua->pegawai->nip ?? null }}</td>
                             </tr>
                             <tr>
                               <th scope="row">3</th>

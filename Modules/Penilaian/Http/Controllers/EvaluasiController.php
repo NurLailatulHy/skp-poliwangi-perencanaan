@@ -13,6 +13,35 @@ use Modules\Pengaturan\Entities\Pejabat;
 
 class EvaluasiController extends Controller
 {
+
+    public function predikatKinerja(Request $request) {
+        $hasilKerja = (int) $request->input('hasil_kerja');
+        $perilaku   = (int) $request->input('perilaku');
+
+        $matrix = [
+            1 => [
+                1 => 'Sangat Kurang',
+                2 => 'Butuh perbaikan',
+                3 => 'Butuh perbaikan',
+            ],
+            2 => [
+                1 => 'Kurang/misconduct',
+                2 => 'Baik',
+                3 => 'Baik',
+            ],
+            3 => [
+                1 => 'Kurang/misconduct',
+                2 => 'Baik',
+                3 => 'Sangat Baik',
+            ],
+        ];
+        $result = $matrix[$hasilKerja][$perilaku] ?? 'Data tidak valid';
+        return response()->json([
+            'rating_hasil_kerja' => $hasilKerja,
+            'perilaku' => $perilaku,
+            'result' => $result
+        ]);
+    }
     /**
      * Display a listing of the resource.
      * @return Response
@@ -25,7 +54,7 @@ class EvaluasiController extends Controller
         $params = $request->query('params');
         $pegawai = Pegawai::find($id);
         $pegawaiYangDinilai = Pegawai::with([
-            'timKerjaAnggota.ketua.jabatan',
+            'timKerjaAnggota.ketua.pegawai',
             'timKerjaAnggota.unit',
             'anggota.timKerja.unit'
         ])->where('id', '=', $pegawai->id)->first();
@@ -39,7 +68,7 @@ class EvaluasiController extends Controller
         try {
             $authUser = Auth::user();
             $pegawai = $authUser->pegawai;
-            $ketua = Pejabat::where('pegawai', '=', $pegawai->nama)->first();
+            $ketua = Pejabat::where('pegawai_id', '=', $pegawai->id)->first();
             if($ketua != null) {
                 $bawahan = Pegawai::with(['timKerjaAnggota'])
                 ->whereHas('timKerjaAnggota', function ($query) use ($ketua) {
