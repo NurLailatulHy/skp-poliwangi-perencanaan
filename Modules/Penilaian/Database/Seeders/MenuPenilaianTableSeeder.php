@@ -75,13 +75,13 @@ class MenuPenilaianTableSeeder extends Seeder
         ]);
         Menu::create([
             'modul' => 'Penilaian',
-            'label' => 'Tim Kerja',
-            'url' => 'penilaian/tim-kerja',
+            'label' => 'Periode SKP',
+            'url' => 'penilaian/periode',
             'can' => serialize(['admin']),
             'icon' => 'far fa-circle',
             'urut' => 1,
             'parent_id' => $menu->id,
-            'active' => serialize(['penilaian/tim-kerja', 'penilaian/tim-kerja*']),
+            'active' => serialize(['penilaian/periode', 'penilaian/periode*']),
         ]);
     }
 }

@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateIndikatorsTable extends Migration
+class CreatePeriodesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,15 +13,14 @@ class CreateIndikatorsTable extends Migration
      */
     public function up()
     {
-        Schema::disableForeignKeyConstraints();
-        Schema::dropIfExists('skp_indikators');
-        Schema::create('skp_indikators', function (Blueprint $table) {
+        Schema::create('periodes', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('hasil_kerja_id')->nullable();
-            $table->text('deskripsi');
+            $table->date('start_date');
+            $table->date('end_date');
+            $table->year('tahun');
+            $table->string('jenis_periode');
             $table->timestamps();
         });
-        Schema::enableForeignKeyConstraints();
     }
 
     /**
@@ -31,6 +30,6 @@ class CreateIndikatorsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('skp_indikators');
+        Schema::dropIfExists('periodes');
     }
 }

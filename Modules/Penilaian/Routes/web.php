@@ -22,11 +22,15 @@ Route::group(['middleware' => ['auth', 'permission']], function() {
             Route::get('/', 'PenilaianController@realisasi');
             Route::post('/update-realisasi/{id}', 'PenilaianController@updateRealisasi');
         });
-        Route::get('/rencana', 'PenilaianController@rencana');
+        Route::prefix('rencana')->group(function() {
+            Route::get('/', 'RencanaController@index');
+            Route::post('/store', 'RencanaController@store');
+            Route::post('/store-hasil-kerja/{id}', 'RencanaController@storeHasilKerja');
+        });
         Route::get('/kinerja-organisasi', 'PenilaianController@kinerjaOrganisasi');
-        Route::prefix('tim-kerja')->group(function() {
-            Route::get('/', 'PenilaianController@timKerja');
-            Route::post('/store', 'PenilaianController@storeTimKerja');
+        Route::prefix('periode')->group(function() {
+            Route::get('/', 'PeriodeController@index');
+            Route::post('/store', 'PeriodeController@store');
         });
     });
 });

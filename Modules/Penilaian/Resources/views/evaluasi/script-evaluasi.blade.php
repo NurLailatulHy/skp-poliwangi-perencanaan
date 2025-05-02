@@ -9,6 +9,7 @@
                 url: '/penilaian/data-pegawai',
                 type: 'GET',
                 dataSrc: function (response) {
+                    console.log(response)
                     try {
                         return response.data.map((pegawai) => {
                             return {

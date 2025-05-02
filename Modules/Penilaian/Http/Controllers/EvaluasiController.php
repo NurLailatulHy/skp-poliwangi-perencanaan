@@ -10,6 +10,7 @@ use Modules\Pengaturan\Entities\Pegawai;
 use Modules\Pengaturan\Entities\Anggota;
 use Modules\Pengaturan\Entities\TimKerja;
 use Modules\Pengaturan\Entities\Pejabat;
+use Modules\Penilaian\Entities\RencanaKerja;
 
 class EvaluasiController extends Controller
 {
@@ -76,6 +77,8 @@ class EvaluasiController extends Controller
                 })
                 ->paginate(10);
 
+                // $bawahan = RencanaKerja::with(['hasilKerja', 'pegawai.timKerjaAnggota'])->get();
+                // return response()->json($bawahan);
                 return response()->json([
                     'status' => 'success',
                     'draw' => $request->draw,

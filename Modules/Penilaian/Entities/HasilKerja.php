@@ -12,7 +12,7 @@ class HasilKerja extends Model
     protected $guarded = ['id'];
 
     public function rencanakerja() {
-        return $this->belongsTo(RencanaKerja::class);
+        return $this->belongsTo(RencanaKerja::class, 'rencana_id');
     }
 
     public function indikator(){

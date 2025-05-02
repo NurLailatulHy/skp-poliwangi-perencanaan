@@ -52,11 +52,6 @@ class PenilaianController extends Controller
 
     }
 
-    public function rencana(){
-        $rencana = RencanaKerja::all();
-        return view('penilaian::rencana', compact('rencana'));
-    }
-
     public function kinerjaOrganisasi() {
         return view('penilaian::kinerjaOrganisasi');
     }

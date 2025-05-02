@@ -17,7 +17,7 @@ class PenilaianDatabaseSeeder extends Seeder
         Model::unguard();
 
         $this->call(MenuPenilaianTableSeeder::class);
-        $this->call(RencanaTableSeeder::class);
+        // $this->call(RencanaTableSeeder::class);
         // $this->call(UserTableSeeder::class);
 
     }

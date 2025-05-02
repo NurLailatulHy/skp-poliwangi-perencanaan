@@ -65,17 +65,11 @@
                             break;
                     }
                 @endphp
-                {{-- @include('penilaian::components.set-periode') --}}
-                <div class="w-100 d-flex justify-content-between align-items-center px-4">
-                    {{-- <span class="badge m-2 {{ $badgeClass }}" style="width: fit-content">Belum Diajukan</span> --}}
-                    @if (is_null($rencana))
-                        <form method="POST" action="{{ url('/penilaian/rencana/store') }}">
-                            @csrf
-                            <button type="submit" class="btn btn-primary">Buat SKP</button>
-                        </form>
-                    @endif
+                <div class="w-100 d-flex justify-content-between align-items-center p-2">
+                    <span class="badge m-2 {{ $badgeClass }}" style="width: fit-content">Belum Diajukan</span>
+                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#cetakEvaluasiModal">Cetak Evaluasi</button>
+                    @include('penilaian::components.modal-cetak-evaluasi')
                 </div>
-
                 <div class="bg-white d-flex p-4">
                     <table class="table" style="table-layout: fixed; width: 100%;">
                         <thead>
@@ -88,27 +82,27 @@
                           <tr>
                             <th scope="row">1</th>
                             <td>Nama</td>
-                            <td>-</td>
+                            <td>Mark</td>
                           </tr>
                           <tr>
                             <th scope="row">2</th>
                             <td>NIP</td>
-                            <td>-</td>
+                            <td>362155401190</td>
                           </tr>
                           <tr>
                             <th scope="row">3</th>
                             <td>Pangkat / Gol</td>
-                            <td>-</td>
+                            <td>362155401190</td>
                           </tr>
                           <tr>
                             <th scope="row">4</th>
                             <td>Jabatan</td>
-                            <td>-</td>
+                            <td>362155401190</td>
                           </tr>
                           <tr>
                             <th scope="row">5</th>
                             <td>Unit Kerja</td>
-                            <td>-</td>
+                            <td>362155401190</td>
                           </tr>
                         </tbody>
                     </table>
@@ -123,27 +117,27 @@
                             <tr>
                               <th scope="row">1</th>
                               <td>Nama</td>
-                              <td>-</td>
+                              <td>Mark</td>
                             </tr>
                             <tr>
                               <th scope="row">2</th>
                               <td>NIP</td>
-                              <td>-</td>
+                              <td>362155401190</td>
                             </tr>
                             <tr>
                               <th scope="row">3</th>
                               <td>Pangkat / Gol</td>
-                              <td>-</td>
+                              <td>362155401190</td>
                             </tr>
                             <tr>
                               <th scope="row">4</th>
                               <td>Jabatan</td>
-                              <td>-</td>
+                              <td>362155401190</td>
                             </tr>
                             <tr>
                               <th scope="row">5</th>
                               <td>Unit Kerja</td>
-                              <td>-</td>
+                              <td>362155401190</td>
                             </tr>
                         </tbody>
                     </table>
@@ -153,9 +147,11 @@
                     <table class="table mb-0" style="width: 100%;">
                         <thead>
                           <tr>
-                            <th colspan="4">Hasil Kerja</th>
-                            <th colspan="1">
-                                @include('penilaian::components.modal-create-hasil-kerja')
+                            <th colspan="4">HASIL KERJA</th>
+                            <th>
+                                <button type="button" class="btn btn-primary">
+                                    <i class="nav-icon fas fa-plus "></i>
+                                </button>
                             </th>
                           </tr>
                           <tr>
@@ -163,8 +159,67 @@
                           </tr>
                         </thead>
                         <tbody>
-                            @if ($rencana && $rencana->hasilKerja)
-                                @foreach ($rencana->hasilKerja as $index => $item)
+                            {{-- @foreach ($hasilKerja as $index => $item)
+                                <tr>
+                                    <th scope="row">{{ $index + 1 }}</th>
+                                    <td>
+                                        <p>{{ $item['capaian'] }}</p>
+                                        <span>Ukuran keberhasilan / Indikator Kinerja Individu, dan Target :</span>
+                                        <ul>
+                                            @foreach ($item['indikator'] as $indikator)
+                                                <li>{{ $indikator['teks'] }}</li>
+                                            @endforeach
+                                        </ul>
+                                    </td>
+                                    <td>
+                                        <span>Realisasi :</span>
+                                        <p>{{ $item['realisasi'] }}</p>
+                                    </td>
+                                    <td>
+                                        <span>Umpan Balik :</span>
+                                        <p>{{ $item['umpan_balik'] }}</p>
+                                    </td>
+                                    <td>
+                                        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModalCenter">
+                                            <i class="nav-icon fas fa-pencil-alt "></i>
+                                        </button>
+                                        <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                                            <div class="modal-dialog modal-dialog-centered" role="document">
+                                                <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title" id="exampleModalLongTitle">Isi Realisasi</h5>
+                                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                    <span aria-hidden="true">&times;</span>
+                                                    </button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <form>
+                                                        <div class="d-flex align-items-center">
+                                                            <div class="mr-1" style="width:30%">Hasil Kerja</div>
+                                                            <div class="flex-grow" style="width: 100%">
+                                                            <input type="text" class="form-control" id="inputPassword" placeholder="Hasil Kerja">
+                                                            </div>
+                                                        </div>
+                                                        <div class="d-flex align-items-start">
+                                                            <div class="mr-1" style="width:30%">Realisasi</div>
+                                                            <div class="" style="width: 100%">
+                                                                <textarea placeholder="Realisasi" style="height: 70px; width: 100%; padding: 10px; overflow-y: auto; resize: vertical;"></textarea>
+                                                            </div>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                                    <button type="button" class="btn btn-primary">Save changes</button>
+                                                </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            @endforeach --}}
+                            @if ($rencana ?? null)
+                                @foreach ($rencana[0]->hasilKerja as $index => $item)
                                     <tr>
                                         <th scope="row">{{ $index + 1 }}</th>
                                         <td>
@@ -224,10 +279,6 @@
                                         </td>
                                     </tr>
                                 @endforeach
-                            @else
-                                <tr>
-                                    <td colspan="5">Not Found</td>
-                                </tr>
                             @endif
                         </tbody>
                     </table>
