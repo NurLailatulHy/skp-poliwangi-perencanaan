@@ -22,7 +22,7 @@ Route::group(['middleware' => ['auth', 'permission']], function() {
         });
         Route::prefix('cetak')->group(function() {
             Route::get('/evaluasi', 'PenilaianController@cetakEvaluasi');
-            Route::get('/dok-evaluasi', 'PenilaianController@cetakEvaluasi');
+            Route::get('/dok-evaluasi', 'PenilaianController@cetakDokEvaluasi');
         });
         Route::prefix('evaluasi')->group(function() {
             Route::get('/', 'EvaluasiController@evaluasi');

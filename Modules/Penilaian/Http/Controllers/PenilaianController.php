@@ -10,6 +10,7 @@ use Modules\Penilaian\Entities\HasilKerja;
 use Modules\Pengaturan\Entities\Pegawai;
 use Modules\Penilaian\Entities\Cascading;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Dompdf\Dompdf;
 
 class PenilaianController extends Controller
 {
@@ -138,5 +139,17 @@ class PenilaianController extends Controller
         ->setPaper('a4', 'potrait');
 
         return $pdf->download('laporan.pdf');
+    }
+
+    public function cetakDokEvaluasi(){
+        $html = view('penilaian::cetak-dokevaluasi-page')->render();
+
+        $pdf = new Dompdf();
+        $pdf->loadHtml($html);
+        $pdf->render();
+
+        return response($pdf->output(), 200)
+            ->header('Content-Type', 'application/pdf')
+            ->header('Content-Disposition', 'inline; filename="laporan.pdf"');
     }
 }
