@@ -1,19 +1,26 @@
-<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#cetakEvaluasiModal">Cetak Evaluasi</button>
-<div class="modal fade" id="cetakEvaluasiModal" tabindex="-1" role="dialog" aria-labelledby="cetakEvaluasiModalTitle" aria-hidden="true">
+<button type="button" class="ml-2 btn btn-primary" data-toggle="modal" data-target="#cetakDokEvaluasiModal">Cetak Dok. Evaluasi</button>
+<div class="modal fade" id="cetakDokEvaluasiModal" tabindex="-1" role="dialog" aria-labelledby="cetakDokEvaluasiModalTitle" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
-        <form class="modal-content" method="GET" action="{{ url('/penilaian/cetak/evaluasi') }}">
-            <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLongTitle">Pengaturan Halaman</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLongTitle">Pengaturan Halaman</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+            <form>
                 <div class="d-flex align-items-center">
-                    <div class="mr-1" style="width:30%">Tanggal Cetak</div>
-                    <div class="flex-grow" style="width: 100%">
-                    <input type="text" class="form-control" id="inputPassword" placeholder="Contoh: Jakarta, 6 Mei 2025">
-                    </div>
+                  <div class="mr-1" style="width:30%">Tanggal TTD Pegawai</div>
+                  <div class="flex-grow" style="width: 100%">
+                    <input type="text" class="form-control" id="inputPassword" placeholder="Contoh: Banyuwangi, 6 Mei 2025">
+                  </div>
+                </div>
+                <div class="d-flex align-items-center">
+                  <div class="mr-1" style="width:30%">Tanggal TTD Pejabat</div>
+                  <div class="flex-grow" style="width: 100%">
+                    <input type="text" class="form-control" id="inputPassword" placeholder="Contoh: Banyuwangi, 6 Mei 2025">
+                  </div>
                 </div>
                 <div class="d-flex align-items-center">
                     <div class="mr-1" style="width:30%">Margin Atas</div>
@@ -45,23 +52,24 @@
                         <div class="form-check mr-1">
                             <input class="form-check-input" type="radio" name="exampleRadios" id="radio1" value="option1" checked>
                             <label class="form-check-label" for="radio1">
-                                Potrait
+                              Potrait
                             </label>
                         </div>
 
                         <div class="form-check">
                             <input class="form-check-input" type="radio" name="exampleRadios" id="radio2" value="option2">
                             <label class="form-check-label" for="radio2">
-                                Landscape
+                              Landscape
                             </label>
                         </div>
                     </div>
                 </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
-                <button type="submit" target="_blank" class="btn btn-primary">Cetak</button>
-            </div>
-        </form>
+            </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+          <button type="button" class="btn btn-primary">Cetak</button>
+        </div>
+      </div>
     </div>
 </div>

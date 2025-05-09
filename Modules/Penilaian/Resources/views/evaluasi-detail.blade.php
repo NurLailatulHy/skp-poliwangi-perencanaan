@@ -11,19 +11,34 @@
         <div class="col-12">
             <div class="card">
                 <div class="w-100 d-flex justify-content-between align-items-center p-4">
-                    <button id="proses-umpan-balik-button" class="btn btn-primary ml-1">Batalkan Evaluasi</button>
+                    @php
+                        switch ($rencana->predikat_akhir) {
+                            case 'Sangat Baik':
+                            case 'Baik':
+                                $badgeClass = 'badge-success';
+                                break;
+                            case 'Butuh Perbaikan':
+                                $badgeClass = 'badge-danger';
+                                break;
+                            default:
+                                $badgeClass = 'badge-light';
+                                break;
+                        }
+                    @endphp
+                    <span class="badge m-2 {{ $badgeClass }}" style="width: fit-content">{{ $rencana->predikat_akhir }}</span>
+                    <button id="proses-umpan-balik-button" class="btn btn-primary ml-1 {{ $rencana->predikat_akhir == null ? 'd-none' : '' }}">Batalkan Evaluasi</button>
                 </div>
                 <div class="bg-white d-flex p-4">
-                    <table class="table" style="table-layout: auto; width: 100%;">
+                    <table class="table">
                         <thead>
                           <tr>
                             <th scope="col">No</th>
-                            <th colspan="2">Pegawai yang dinilai</th>
+                            <th colspan="2" style="width: 50%;">Pegawai yang dinilai</th>
                           </tr>
                         </thead>
                         <tbody>
                           <tr>
-                            <th scope="row">1</th>
+                            <td>1</td>
                             <td>Nama</td>
                             <td>{{ $pegawai->nama }}</td>
                           </tr>
@@ -45,11 +60,13 @@
                           <tr>
                             <th scope="row">5</th>
                             <td>Unit Kerja</td>
-                            <td>{{ $pegawai->anggota->timKerja->unit->nama }}</td>
+                            <td style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                {{ $pegawai->anggota->timKerja->unit->nama }}
+                            </td>
                           </tr>
                         </tbody>
                     </table>
-                    <table class="table" style="table-layout: auto; width: 100%;">
+                    <table class="table">
                         <thead>
                           <tr>
                             <th scope="col">No</th>
@@ -198,49 +215,48 @@
                             </tbody>
                         </table>
                         {{-- perilaku --}}
-                        <table class="table mb-0" style="table-layout: fixed; width: 100%;">
+                        <table class="table mb-0" style="table-layout: auto; width: 100%;">
                             <thead>
                               <tr>
                                 <th colspan="4">PERILAKU KERJA</th>
                               </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td colspan="4">No data</td>
-                                </tr>
                                 {{-- <tr>
+                                    <td colspan="4">No data</td>
+                                </tr> --}}
+                                <tr>
                                     <th scope="row">1</th>
                                     <td>
                                         <p>
-                                            Manual book penggunaan aplikasi modul penyusunan SKP yang lengkap dan informatif (Penugasan dari Ketua Tim Perencanaan dan Sistem Informasi)
+                                            Berorientasi Pelayanan
                                         </p>
-                                        <span>Ukuran keberhasilan / Indikator Kinerja Individu, dan Target :</span>
                                         <ul>
-                                            <li>Draft manual book penggunaan aplikasi modul penyusunan rencana SKP yang lengkap sesuai dengan ketentuan dan diselesaikan maksimal satu bulan sebelum kegiatan sosialisasi</li>
+                                            <li>Memahami dan memenuhi kebutuhan masyarakat</li>
+                                            <li>Ramah, cekatan, solutif, dan dapat diandalkan</li>
+                                            <li>Melakukan perbaikan tiada henti</li>
                                         </ul>
                                     </td>
                                     <td>
-                                        <span>Realisasi :</span>
-                                        <p>Draft manual book aplikasi untuk modul penyusunan rencana SKP telah selesai pada bulan April sesuai dengan proses bisnis aplikasi</p>
+                                        <span>Ekspektasi Khusus Pimpinan:</span>
+                                        <p>Memberikan pelayanan penilaian kinerja secara maksimal kepada pegawai</p>
                                     </td>
                                     <td>
                                         <span>Umpan Balik :</span>
                                         <div class="input-group">
-                                            <select class="custom-select" id="inputGroupSelect04">
-                                            <option selected>Choose...</option>
-                                            <option value="1">One</option>
-                                            <option value="2">Two</option>
-                                            <option value="3">Three</option>
+                                            <input type="hidden" name="">
+                                            <select class="custom-select" id="perilaku_kerja_id" name="perilaku_kerja">
+                                                @include('penilaian::components.predikat-dropdown', ['jenis' => 'Predikat'])
                                             </select>
                                             <div class="input-group-append">
-                                            <button class="btn btn-outline-secondary" type="button">
-                                                <i class="nav-icon fas fa-copy "></i>
-                                            </button>
+                                                <button class="btn btn-outline-secondary" type="button">
+                                                    <i class="nav-icon fas fa-copy "></i>
+                                                </button>
                                             </div>
                                         </div>
                                         <textarea style="height: 150px; width: 100%; padding: 10px; overflow-y: auto; resize: vertical;"></textarea>
                                     </td>
-                                </tr> --}}
+                                </tr>
                             </tbody>
                         </table>
                         @php

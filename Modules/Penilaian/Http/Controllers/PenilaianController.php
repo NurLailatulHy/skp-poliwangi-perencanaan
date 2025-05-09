@@ -9,6 +9,7 @@ use Modules\Penilaian\Entities\RencanaKerja;
 use Modules\Penilaian\Entities\HasilKerja;
 use Modules\Pengaturan\Entities\Pegawai;
 use Modules\Penilaian\Entities\Cascading;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class PenilaianController extends Controller
 {
@@ -129,5 +130,13 @@ class PenilaianController extends Controller
                 'error' => $th->getMessage()
             ]);
         }
+    }
+
+    public function cetakEvaluasi(){
+        $data = ['title' => 'Laporan Kinerja'];
+        $pdf = Pdf::loadView('penilaian::cetak-evaluasi-page', $data)
+        ->setPaper('a4', 'potrait');
+
+        return $pdf->download('laporan.pdf');
     }
 }

@@ -20,7 +20,6 @@
             'umpan_balik' => ''
         ]
     ];
-    $pejabatPenilai = $anggota->timKerjaAnggota[0] ?? null;
 @endphp
 @section('content')
     <div class="row">
@@ -44,8 +43,12 @@
                 @endphp
                 <div class="w-100 d-flex justify-content-between align-items-center p-2">
                     <span class="badge m-2 {{ $badgeClass }}" style="width: fit-content">{{ $rencana->status_realisasi }}</span>
-                    {{-- <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#cetakEvaluasiModal">Cetak Evaluasi</button> --}}
-                    {{-- @include('penilaian::components.modal-cetak-evaluasi') --}}
+                    @if ($rencana->predikat_akhir !== null)
+                        <div class="d-flex">
+                            @include('penilaian::components.modal-cetak-evaluasi')
+                            @include('penilaian::components.modal-cetak-dokevaluasi')
+                        </div>
+                    @endif
                 </div>
                 <div class="bg-white d-flex p-4">
                     <table class="table" style="table-layout: fixed; width: 100%;">
@@ -94,12 +97,12 @@
                             <tr>
                               <th scope="row">1</th>
                               <td>Nama</td>
-                              <td>{{ $pejabatPenilai->ketua->pegawai->nama ?? null }}</td>
+                              <td>{{ optional($pegawai->timKerjaAnggota[0]->parentUnit?->ketua?->pegawai)->nama ?? '-' }}</td>
                             </tr>
                             <tr>
                               <th scope="row">2</th>
                               <td>NIP</td>
-                              <td>{{ $pejabatPenilai->ketua->pegawai->nip ?? null }}</td>
+                              <td>{{ optional($pegawai->timKerjaAnggota[0]->parentUnit?->ketua?->pegawai)->nip ?? '-' }}</td>
                             </tr>
                             <tr>
                               <th scope="row">3</th>
@@ -109,12 +112,14 @@
                             <tr>
                               <th scope="row">4</th>
                               <td>Jabatan</td>
-                              <td>{{ $pejabatPenilai->ketua->jabatan->nama_jabatan ?? null }}</td>
+                              <td>-</td>
                             </tr>
                             <tr>
-                              <th scope="row">5</th>
-                              <td>Unit Kerja</td>
-                              <td>{{ $pejabatPenilai->unit->nama ?? null }}</td>
+                                <th scope="row">5</th>
+                                <td>Unit Kerja</td>
+                                <td style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                    {{ $pegawai->timKerjaAnggota[0]->parentUnit?->unit?->nama ?? '-' }}
+                                </td>
                             </tr>
                         </tbody>
                     </table>
@@ -307,9 +312,5 @@
 @stop
 
 @push('js')
-<script>
-    const prosesUmpanBalikButton = document.querySelector('#proses-umpan-balik-button');
-    const rencanaData = @json($rencana);
-    console.log(rencanaData);
-</script>
+
 @endpush

@@ -53,9 +53,11 @@
               </tr>
             </tbody>
         </table>
-        <div class="w-100 mt-4 d-flex justify-content-end">
-            <button id="proses-umpan-balik-button" class="btn btn-primary mr-1">Ubah Umpan Balik</button>
-            <button type="submit" id="proses-umpan-balik-button" class="btn btn-primary ml-1">Simpan Hasil Evaluasi</button>
-        </div>
+        @if ($rencana->predikat_akhir == null)
+            <div class="w-100 mt-4 d-flex justify-content-end">
+                <button id="proses-umpan-balik-button" class="btn btn-primary mr-1">Ubah Umpan Balik</button>
+                <button type="submit" id="proses-umpan-balik-button" class="btn btn-primary ml-1">Simpan Hasil Evaluasi</button>
+            </div>
+        @endif
     </form>
 </div>
