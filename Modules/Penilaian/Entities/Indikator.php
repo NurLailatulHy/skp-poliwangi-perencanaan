@@ -12,6 +12,10 @@ class Indikator extends Model
     protected $guarded = ['id'];
 
     public function hasilkerja() {
-        return $this->belongsTo(HasilKerja::class);
+        return $this->belongsTo(HasilKerja::class, 'hasil_kerja_id');
+    }
+
+    public function cascading(){
+        return $this->hasMany(Cascading::class);
     }
 }

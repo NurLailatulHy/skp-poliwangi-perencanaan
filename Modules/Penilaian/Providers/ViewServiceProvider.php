@@ -25,15 +25,17 @@ class ViewServiceProvider extends ServiceProvider
             $authUser = Auth::user();
             $pegawaiId = $authUser->pegawai->id;
             $pegawai = Pegawai::with([
-                'timKerjaAnggota.ketua.pegawai',
+                'timKerjaAnggota',
                 'timKerjaAnggota.unit',
-                'pejabat.unit',
-                'pejabat.jabatan',
+                'timKerjaAnggota.subUnits.unit',
+                'timKerjaAnggota.parentUnit.unit',
             ])->where('id', '=', $pegawaiId)->first();
 
+            $timKerja = $pegawai->timKerjaAnggota;
             $view->with([
                 'periode' => Periode::all(),
-                'pegawai' => $pegawai
+                'pegawai' => $pegawai,
+                'timKerja' => $timKerja
             ]);
         });
     }

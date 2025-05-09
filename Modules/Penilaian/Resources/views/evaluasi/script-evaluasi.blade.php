@@ -9,12 +9,14 @@
                 url: '/penilaian/data-pegawai',
                 type: 'GET',
                 dataSrc: function (response) {
-                    console.log(response)
+                    console.log(response.data)
                     try {
-                        return response.data.map((pegawai) => {
+                        return response.data.map((data) => {
                             return {
-                                id: pegawai.id,
-                                nama: pegawai.nama,
+                                id: data.pegawai.id,
+                                nama: data.pegawai.nama,
+                                username: data.pegawai.username,
+                                rencanakerja: data.pegawai.rencanakerja
                             }
                         })
                     } catch (error) {
@@ -41,7 +43,15 @@
                 {
                     data: null,
                     name: 'status',
-                    orderable: true
+                    orderable: true,
+                    render: (data, type, row) => {
+                        const arrayRencana = row.rencanakerja
+                        if(arrayRencana.length != 0) {
+                            return `<span class="badge ${row.rencanakerja[0].status_realisasi == 'Sudah Diajukan' ? 'badge-success' : 'badge-secondary'}" style="width: fit-content">${row.rencanakerja[0].status_realisasi}</span>`
+                        }else {
+                            return `<span class="badge badge-danger">Belum Buat SKP</span>`
+                        }
+                    }
                 },
                 {
                     data: null,
@@ -54,7 +64,7 @@
                     searchable: false,
                     render: function(data, type, row) {
                         return `
-                            <button onclick="window.location.href='/penilaian/evaluasi/${row.id}/detail'" type="button" class="btn btn-primary"><i class="nav-icon fas fa-pencil-alt "></i></button>
+                            <button onclick="window.location.href='/penilaian/evaluasi/${row.username}/detail'" type="button" class="btn btn-primary"><i class="nav-icon fas fa-pencil-alt "></i></button>
                         `;
                     }
                 },

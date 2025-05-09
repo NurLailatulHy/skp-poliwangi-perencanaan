@@ -6,17 +6,20 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Modules\Pengaturan\Entities\Pegawai;
 
-class RencanaKerja extends Model
+class Cascading extends Model
 {
     use HasFactory;
-    protected $table = 'skp_rencana_kerja';
+
+    protected $table = 'cascading';
     protected $guarded = ['id'];
 
-    public function hasilkerja() {
-        return $this->hasMany(HasilKerja::class, 'rencana_id');
+    public function indikator()
+    {
+        return $this->belongsTo(Indikator::class);
     }
 
-    public function pegawai(){
+    public function pegawai()
+    {
         return $this->belongsTo(Pegawai::class, 'pegawai_username', 'username');
     }
 }

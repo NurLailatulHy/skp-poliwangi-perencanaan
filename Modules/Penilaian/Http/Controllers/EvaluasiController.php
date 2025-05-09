@@ -15,70 +15,84 @@ use Modules\Penilaian\Entities\RencanaKerja;
 class EvaluasiController extends Controller
 {
 
-    public function predikatKinerja(Request $request) {
-        $hasilKerja = (int) $request->input('hasil_kerja');
-        $perilaku   = (int) $request->input('perilaku');
+    public function predikatKinerja($hasilKerja, $perilaku) {
+        // $hasilKerja = (int) $request->input('hasil_kerja');
+        // $perilaku   = (int) $request->input('perilaku');
+        $hasilKerjaMap = [ 'Dibawah Ekspektasi' => 1, 'Sesuai Ekspektasi' => 2, 'Diatas Ekspektasi' => 3 ];
+        $perilakuMap = [ 'Dibawah Ekspektasi' => 1, 'Sesuai Ekspektasi' => 2, 'Diatas Ekspektasi' => 3 ];
+
+        $hasilKerjaValue = $hasilKerjaMap[$hasilKerja] ?? null;
+        $perilakuValue = $perilakuMap[$perilaku] ?? null;
 
         $matrix = [
             1 => [
                 1 => 'Sangat Kurang',
-                2 => 'Butuh perbaikan',
-                3 => 'Butuh perbaikan',
+                2 => 'Butuh Perbaikan',
+                3 => 'Butuh Perbaikan',
             ],
             2 => [
-                1 => 'Kurang/misconduct',
+                1 => 'Kurang',
                 2 => 'Baik',
                 3 => 'Baik',
             ],
             3 => [
-                1 => 'Kurang/misconduct',
+                1 => 'Kurang',
                 2 => 'Baik',
                 3 => 'Sangat Baik',
             ],
         ];
-        $result = $matrix[$hasilKerja][$perilaku] ?? 'Data tidak valid';
-        return response()->json([
-            'rating_hasil_kerja' => $hasilKerja,
-            'perilaku' => $perilaku,
-            'result' => $result
-        ]);
+
+        $result = ($hasilKerjaValue && $perilakuValue) ? ($matrix[$hasilKerjaValue][$perilakuValue] ?? 'Data tidak valid') : 'Data tidak valid';
+
+        return $result;
     }
-    /**
-     * Display a listing of the resource.
-     * @return Response
-     */
+
     public function evaluasi() {
         return view('penilaian::evaluasi');
     }
 
-    public function evaluasiDetail(Request $request, $id) {
+    public function evaluasiDetail(Request $request, $username) {
         $params = $request->query('params');
-        $pegawai = Pegawai::find($id);
-        $pegawaiYangDinilai = Pegawai::with([
-            'timKerjaAnggota.ketua.pegawai',
+        $pegawai = Pegawai::with([
+            'timKerjaAnggota',
+            'rencanaKerja.hasilKerja',
             'timKerjaAnggota.unit',
-            'anggota.timKerja.unit'
-        ])->where('id', '=', $pegawai->id)->first();
+            'timKerjaAnggota.subUnits.unit',
+            'timKerjaAnggota.parentUnit.unit',
+        ])->where('username', '=', $username)->first();
 
-        if($params == 'json') return response()->json($pegawaiYangDinilai);
-        else return view('penilaian::evaluasi-detail', compact('id', 'pegawaiYangDinilai'));
+        $rencana = RencanaKerja::with('hasilKerja')->where('pegawai_username', '=', $username)->first();
+        if($params == 'json') return response()->json($rencana);
+        else return view('penilaian::evaluasi-detail', compact('pegawai', 'rencana'));
     }
 
-    public function index(Request $request)
-    {
+    public function index(Request $request){
         try {
             $authUser = Auth::user();
             $pegawai = $authUser->pegawai;
-            $ketua = Pejabat::where('pegawai_id', '=', $pegawai->id)->first();
+            $username = $pegawai->username;
+            $ketua = Pejabat::where('pegawai_username', '=', $username)->first();
+            $timKerjaId = $pegawai->timKerjaAnggota[0]->id;
+
             if($ketua != null) {
-                $bawahan = Pegawai::with(['timKerjaAnggota'])
-                ->whereHas('timKerjaAnggota', function ($query) use ($ketua) {
-                    $query->where('unit_id', $ketua->unit_id);
+                $bawahan = Anggota::with(['timKerja', 'pegawai.rencanakerja'])
+                ->where(function ($query) use ($timKerjaId) {
+                    $query->where(function ($q) use ($timKerjaId) {
+                            $q->whereHas('timKerja', function ($sub) use ($timKerjaId) {
+                                $sub->where('parent_id', $timKerjaId);
+                            })->where('peran', 'Ketua');
+                        })
+                        ->orWhere(function ($q) use ($timKerjaId) {
+                            $q->whereHas('timKerja', function ($sub) use ($timKerjaId) {
+                                $sub->where('id', $timKerjaId);
+                            })->where('peran', 'Anggota');
+                        });
+                })
+                ->whereHas('pegawai', function ($q) use ($username) {
+                    $q->where('username', '!=', $username);
                 })
                 ->paginate(10);
 
-                // $bawahan = RencanaKerja::with(['hasilKerja', 'pegawai.timKerjaAnggota'])->get();
-                // return response()->json($bawahan);
                 return response()->json([
                     'status' => 'success',
                     'draw' => $request->draw,
@@ -99,46 +113,5 @@ class EvaluasiController extends Controller
         } catch (\Throwable $th) {
             return response()->json($th->getMessage());
         }
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     * @param Request $request
-     * @return Response
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Show the specified resource.
-     * @param int $id
-     * @return Response
-     */
-    public function show($id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     * @param Request $request
-     * @param int $id
-     * @return Response
-     */
-    public function update(Request $request, $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     * @param int $id
-     * @return Response
-     */
-    public function destroy($id)
-    {
-        //
     }
 }

@@ -6,30 +6,6 @@
     <h1 class="m-0 text-dark">Rencana</h1>
 @stop
 @php
-    $users = [
-        [
-            'id' => 1,
-            'name' => 'Widura Sasangka',
-            'jabatan' => 'Analis Kinerja',
-            'status' => 'Belum Dievaluasi',
-            'predikatKinerja' => '-',
-        ],
-        [
-            'id' => 2,
-            'name' => 'Hasta Sasangka',
-            'jabatan' => 'Pimpinana',
-            'status' => 'Belum Ajukan Realisasi',
-            'predikatKinerja' => '-',
-        ],
-        [
-            'id' => 3,
-            'name' => 'Widura Hasta',
-            'jabatan' => 'Pimpinana',
-            'status' => 'Sudah Dievaluasi',
-            'predikatKinerja' => '-',
-        ],
-    ];
-
     $hasilKerja = [
         [
             'id' => 1,
@@ -65,7 +41,7 @@
                             break;
                     }
                 @endphp
-                {{-- @include('penilaian::components.set-periode') --}}
+                @include('penilaian::components.set-periode')
                 <div class="w-100 d-flex justify-content-between align-items-center px-4">
                     {{-- <span class="badge m-2 {{ $badgeClass }}" style="width: fit-content">Belum Diajukan</span> --}}
                     @if (is_null($rencana))
@@ -88,12 +64,12 @@
                           <tr>
                             <th scope="row">1</th>
                             <td>Nama</td>
-                            <td>-</td>
+                            <td>{{ $pegawai->nama }}</td>
                           </tr>
                           <tr>
                             <th scope="row">2</th>
                             <td>NIP</td>
-                            <td>-</td>
+                            <td>{{ $pegawai->nip }}</td>
                           </tr>
                           <tr>
                             <th scope="row">3</th>
@@ -108,7 +84,9 @@
                           <tr>
                             <th scope="row">5</th>
                             <td>Unit Kerja</td>
-                            <td>-</td>
+                            <td style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                {{ $pegawai->timKerjaAnggota[0]->unit->nama }}
+                            </td>
                           </tr>
                         </tbody>
                     </table>
@@ -123,12 +101,12 @@
                             <tr>
                               <th scope="row">1</th>
                               <td>Nama</td>
-                              <td>-</td>
+                              <td>{{ optional($pegawai->timKerjaAnggota[0]->parentUnit?->ketua?->pegawai)->nama ?? '-' }}</td>
                             </tr>
                             <tr>
                               <th scope="row">2</th>
                               <td>NIP</td>
-                              <td>-</td>
+                              <td>{{ optional($pegawai->timKerjaAnggota[0]->parentUnit?->ketua?->pegawai)->nip ?? '-' }}</td>
                             </tr>
                             <tr>
                               <th scope="row">3</th>
@@ -141,9 +119,11 @@
                               <td>-</td>
                             </tr>
                             <tr>
-                              <th scope="row">5</th>
-                              <td>Unit Kerja</td>
-                              <td>-</td>
+                                <th scope="row">5</th>
+                                <td>Unit Kerja</td>
+                                <td style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                    {{ $pegawai->timKerjaAnggota[0]->parentUnit?->unit?->nama ?? '-' }}
+                                </td>
                             </tr>
                         </tbody>
                     </table>
@@ -155,7 +135,10 @@
                           <tr>
                             <th colspan="4">Hasil Kerja</th>
                             <th colspan="1">
-                                @include('penilaian::components.modal-create-hasil-kerja')
+                                @if (!is_null($rencana))
+                                    @include('penilaian::components.modal-create-hasil-kerja')
+                                    {{-- @include('penilaian::components.modal-matriks-peran-hasil') --}}
+                                @endif
                             </th>
                           </tr>
                           <tr>

@@ -1,5 +1,6 @@
 <div class="mt-4">
-    <form id="form-umpan-balik">
+    <form method="POST" action="{{ url('/penilaian/evaluasi/simpan-hasil-evaluasi/' . $pegawai->username) }}">
+        @csrf
         <table class="table mb-0" style="table-layout: fixed; width: 100%;">
             <thead>
               <tr>
@@ -9,18 +10,15 @@
             <tbody>
               <tr>
                 <td>Rekomendasi</td>
-                <td>Diatas Ekspektasi</td>
+                <td><input id="rekomendasi-rating-hasil-kerja" value="Diatas Ekspektasi" type="text" class="form-control" disabled></td>
               </tr>
               <tr>
                 <td>Rating Hasil Kerja</td>
                 <td>
-                    <select class="custom-select" id="rating-hasil-kerja" name="hasil_kerja">
-                        <option selected>-- Pilih Rating --</option>
-                        <option value="3">Diatas Ekspektasi</option>
-                        <option value="2">Sesuai Ekspektasi</option>
-                        <option value="1">Dibawah Ekspektasi</option>
+                    <select class="custom-select" id="rating-hasil-kerja-select" name="rating_hasil_kerja">
+                        @include('penilaian::components.predikat-dropdown', ['jenis' => 'Rating Hasil Kerja'])
                     </select>
-                    <textarea style="height: 150px; width: 100%; padding: 10px; overflow-y: auto; resize: vertical;"></textarea>
+                    <textarea name="deskripsi_rating_hasil_kerja" class="d-none" id="textarea-rating-hasil-kerja" style="height: 150px; width: 100%; padding: 10px; overflow-y: auto; resize: vertical;"></textarea>
                 </td>
               </tr>
             </tbody>
@@ -34,18 +32,15 @@
             <tbody>
               <tr>
                 <td>Rekomendasi</td>
-                <td>Diatas Ekspektasi</td>
+                <td><input value="Diatas Ekspektasi" id="rekomendasi-rating-perilaku" type="text" class="form-control" placeholder="wedeh" disabled></td>
               </tr>
               <tr>
                 <td>Rating Perilaku</td>
                 <td>
-                    <select class="custom-select" id="rating-perilaku" name="perilaku">
-                        <option selected>-- Pilih Rating --</option>
-                        <option value="3">Diatas Ekspektasi</option>
-                        <option value="2">Sesuai Ekspektasi</option>
-                        <option value="1">Dibawah Ekspektasi</option>
+                    <select class="custom-select" id="rating-perilaku-select" name="rating_perilaku">
+                        @include('penilaian::components.predikat-dropdown', ['jenis' => 'Rating Perilaku'])
                     </select>
-                    <textarea style="height: 150px; width: 100%; padding: 10px; overflow-y: auto; resize: vertical;"></textarea>
+                    <textarea name="deskripsi_rating_perilaku" class="d-none" id="textarea-rating-perilaku" style="height: 150px; width: 100%; padding: 10px; overflow-y: auto; resize: vertical;"></textarea>
                 </td>
               </tr>
             </tbody>
@@ -54,7 +49,7 @@
             <tbody>
               <tr>
                 <td>Predikat Kinerja Pegawai</td>
-                <td>-</td>
+                <td>{{ $rencana->predikat_akhir }}</td>
               </tr>
             </tbody>
         </table>

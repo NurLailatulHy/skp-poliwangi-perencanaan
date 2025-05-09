@@ -16,12 +16,11 @@ class CreateSkpHasilKerjaTable extends Migration
         Schema::create('skp_hasil_kerja', function (Blueprint $table) {
             $table->id();
             $table->foreignId('rencana_id');
-            $table->unsignedInteger('role_id')->nullable();
-            $table->unsignedInteger('permission_id')->nullable();
             $table->unsignedInteger('parent_hasil_kerja_id')->nullable();
             $table->unsignedInteger('kategori_id')->nullable();
             $table->text('realisasi')->nullable();
-            $table->text('umpan_balik')->nullable();
+            $table->string('umpan_balik_predikat')->nullable();
+            $table->text('umpan_balik_deskripsi')->nullable();
             $table->text('deskripsi')->nullable();
             $table->unsignedInteger('kriteria_id')->nullable();
             $table->timestamps();

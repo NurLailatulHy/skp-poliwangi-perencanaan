@@ -61,5 +61,5 @@
 @stop
 
 @push('js')
-@include('penilaian::evaluasi.script-evaluasi')
+    @include('penilaian::evaluasi.script-evaluasi')
 @endpush

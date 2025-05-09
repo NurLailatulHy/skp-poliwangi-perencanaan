@@ -1,11 +1,11 @@
-<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#hasilKerjaModal">
+<button type="button" class="btn btn-success" data-toggle="modal" data-target="#matriksPeranHasilModal" title="Tambah Matriks Peran hasil">
     <i class="nav-icon fas fa-plus "></i>
 </button>
-<div class="modal fade" id="hasilKerjaModal" tabindex="-1" role="dialog" aria-labelledby="hasilKerjaModalTitle" aria-hidden="true">
+<div class="modal fade" id="matriksPeranHasilModal" tabindex="-1" role="dialog" aria-labelledby="matriksPeranHasilModalTitle" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
         <form method="POST" class="modal-content" action="{{ url('/penilaian/rencana/store-hasil-kerja/' . (is_null($rencana) ? '' : $rencana->id)) }}">
             @csrf
-            <div class="modal-header">Tambah Hasil Kerja Utama</div>
+            <div class="modal-header">Matriks Peran Hasil</div>
             <div class="modal-body">
                 <div class="form-group">
                     <label for="peran-select">Peran</label>
@@ -18,13 +18,11 @@
 
                 <div class="form-group">
                   <label for="hasil-kerja-diintervensi">Hasil Kerja yang diintervensi</label>
-                  <select class="form-control" id="hasil-kerja-diintervensi" name="parent_hasil_kerja_id">
+                  <select class="form-control" id="hasil-kerja-diintervensi" name="hasil_kerja_diintevensi">
                     <option value="">-- Pilih hasil kerja yang diintervensi --</option>
-                    @if (!is_null($indikatorIntervensi))
-                        @foreach ($indikatorIntervensi as $parent => $item)
-                            <option value="{{ $item->indikator->id }}">{{ $item->indikator->deskripsi }}</option>
-                        @endforeach
-                    @endif
+                    {{-- @foreach ($parentHasilKerja as $parent => $item)
+                        <option value="{{ $item->rencana_id }}">{{ $item->deskripsi }}</option>
+                    @endforeach --}}
                   </select>
                 </div>
 

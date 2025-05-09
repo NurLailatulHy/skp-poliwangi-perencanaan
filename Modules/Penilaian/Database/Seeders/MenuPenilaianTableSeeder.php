@@ -83,5 +83,15 @@ class MenuPenilaianTableSeeder extends Seeder
             'parent_id' => $menu->id,
             'active' => serialize(['penilaian/periode', 'penilaian/periode*']),
         ]);
+        Menu::create([
+            'modul' => 'Penilaian',
+            'label' => 'Matriks Peran Hasil',
+            'url' => 'penilaian/matriks-peran-hasil',
+            'can' => serialize(['terdaftar']),
+            'icon' => 'far fa-circle',
+            'urut' => 1,
+            'parent_id' => $menu->id,
+            'active' => serialize(['penilaian/matriks-peran-hasil', 'penilaian/matriks-peran-hasil*']),
+        ]);
     }
 }

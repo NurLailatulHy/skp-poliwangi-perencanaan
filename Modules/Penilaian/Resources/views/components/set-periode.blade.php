@@ -14,21 +14,15 @@
                 @endforeach
             </select>
             <select name="" id="" class="form-control mr-2">
-                <option selected>Choose</option>
-                @if ($pegawai && $pegawai->pejabat)
-                    <option value="">{{ $pegawai->pejabat->jabatan->nama_jabatan }}</option>
-                @endif
+                <option value="">Choose</option>
                 @foreach ($pegawai->timKerjaAnggota as $p)
-                    <option value="{{ $p->id }}">{{ $p->pejabat->unit->nama }}</option>
+                    <option value="{{ $p->id }}">{{ $p->unit->nama }}</option>
                 @endforeach
             </select>
             <select name="" id="" class="form-control mr-2">
-                <option selected>Choose...</option>
-                @if ($pegawai && $pegawai->pejabat)
-                    <option value="">{{ $pegawai->pejabat->jabatan->nama_jabatan }}</option>
-                @endif
+                <option value="">Choose</option>
                 @foreach ($pegawai->timKerjaAnggota as $p)
-                    <option value="{{ $p->id }}">{{ $p->pejabat->unit->nama }}</option>
+                    <option value="{{ $p->id }}">{{ $p->pivot->peran }}</option>
                 @endforeach
             </select>
             <button class="btn btn-primary" type="submit">Set</button>

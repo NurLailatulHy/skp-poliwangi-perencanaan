@@ -27,25 +27,25 @@
         <div class="col-12">
             <div class="card">
                 @php
-                    switch (true) {
-                        case 'Belum Dievaluasi':
-                            $badgeClass = 'badge-secondary';
-                            break;
-                        case 'Belum Ajukan Realisasi':
-                            $badgeClass = 'badge-danger';
-                            break;
-                        case 'Sudah Dievaluasi':
+                    switch ($rencana->status_realisasi) {
+                        case 'Sudah Diajukan':
                             $badgeClass = 'badge-success';
                             break;
-                        default:
+                        case 'Belum Diajukan':
                             $badgeClass = 'badge-secondary';
                             break;
+                        // case 'Sudah Dievaluasi':
+                        //     $badgeClass = 'badge-success';
+                        //     break;
+                        // default:
+                        //     $badgeClass = 'badge-secondary';
+                        //     break;
                     }
                 @endphp
                 <div class="w-100 d-flex justify-content-between align-items-center p-2">
-                    <span class="badge m-2 {{ $badgeClass }}" style="width: fit-content">Belum Diajukan</span>
-                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#cetakEvaluasiModal">Cetak Evaluasi</button>
-                    @include('penilaian::components.modal-cetak-evaluasi')
+                    <span class="badge m-2 {{ $badgeClass }}" style="width: fit-content">{{ $rencana->status_realisasi }}</span>
+                    {{-- <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#cetakEvaluasiModal">Cetak Evaluasi</button> --}}
+                    {{-- @include('penilaian::components.modal-cetak-evaluasi') --}}
                 </div>
                 <div class="bg-white d-flex p-4">
                     <table class="table" style="table-layout: fixed; width: 100%;">
@@ -190,8 +190,8 @@
                                     </td>
                                 </tr>
                             @endforeach --}}
-                            @if ($rencana ?? null)
-                                @foreach ($rencana[0]->hasilKerja as $index => $item)
+                            @if ($rencana && $rencana->hasilKerja)
+                                @foreach ($rencana->hasilKerja as $index => $item)
                                     <tr>
                                         <th scope="row">{{ $index + 1 }}</th>
                                         <td>
@@ -212,10 +212,10 @@
                                             <p>{{ $item['umpan_balik'] }}</p>
                                         </td>
                                         <td>
-                                            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModalCenter">
+                                            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#realisasi-{{ $item->id }}">
                                                 <i class="nav-icon fas fa-pencil-alt "></i>
                                             </button>
-                                            <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                                            <div class="modal fade" id="realisasi-{{ $item->id }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
                                                 <div class="modal-dialog modal-dialog-centered" role="document">
                                                     <form class="modal-content" action="{{ url('penilaian/realisasi/update-realisasi/' . $item['id']) }}" method="POST">
                                                         @csrf
@@ -281,7 +281,12 @@
                         </tbody>
                     </table>
                     <div class="w-100 mt-4 d-flex justify-content-end">
-                        <button id="proses-umpan-balik-button" class="btn btn-primary">Ajukan Realisasi</button>
+                        @if ($rencana->status_realisasi == 'Belum Diajukan')
+                            <form method="POST" action="{{ url('/penilaian/realisasi/ajukan-realisasi/' . $rencana->id) }}">
+                                @csrf
+                                <button id="proses-umpan-balik-button" class="btn btn-primary">Ajukan Realisasi</button>
+                            </form>
+                        @endif
                     </div>
                 </div>
             </div>

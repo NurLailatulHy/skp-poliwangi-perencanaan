@@ -1,42 +1,59 @@
 <?php
 
 namespace Modules\Penilaian\Http\Controllers;
-
-use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
-use Modules\Penilaian\Entities\RencanaKerja;
-use Illuminate\Support\Facades\Redirect;
-use Modules\Penilaian\Entities\HasilKerja;
-use Modules\Penilaian\Entities\TimKerja;
-use Illuminate\Support\Str;
 use Modules\Pengaturan\Entities\Anggota;
+use Modules\Penilaian\Entities\RencanaKerja;
+use Modules\Penilaian\Entities\HasilKerja;
 use Modules\Pengaturan\Entities\Pegawai;
-use Modules\Pengaturan\Entities\Pejabat;
+use Modules\Penilaian\Entities\Cascading;
 
 class PenilaianController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     * @return Renderable
-     */
-    public function index()
-    {
+    public function index(){
         return view('penilaian::index');
     }
 
     public function realisasi(){
         $authUser = Auth::user();
-        $userId = $authUser->id;
-        $pegawai = $authUser->pegawai;
-        $anggota = Pegawai::with([
-            'timKerjaAnggota.ketua.jabatan',
+        $pegawaiUsername = $authUser->pegawai->username;
+        $pegawai = Pegawai::with([
+            'timKerjaAnggota',
+            'rencanaKerja.hasilKerja',
             'timKerjaAnggota.unit',
-        ])->where('id', '=', $pegawai->id)->first();
-        // return response()->json($anggota);
-        $rencana = RencanaKerja::all();
-        return view('penilaian::realisasi', compact('rencana', 'pegawai', 'anggota'));
+            'timKerjaAnggota.subUnits.unit',
+            'timKerjaAnggota.parentUnit.unit',
+        ])->where('username', $pegawaiUsername)->first();
+
+        if($pegawai->timKerjaAnggota[0]->parentUnit != null){
+            $atasan = $pegawai->timKerjaAnggota[0]->parentUnit->ketua->pegawai;
+        }
+
+        $timKerjaId = $pegawai->timKerjaAnggota[0]->id;
+        $bawahan = Anggota::with(['timKerja', 'pegawai'])
+        ->where(function ($query) use ($timKerjaId) {
+            $query->where(function ($q) use ($timKerjaId) {
+                    $q->whereHas('timKerja', function ($sub) use ($timKerjaId) {
+                        $sub->where('parent_id', $timKerjaId);
+                    })->where('peran', 'Ketua');
+                })
+                ->orWhere(function ($q) use ($timKerjaId) {
+                    $q->whereHas('timKerja', function ($sub) use ($timKerjaId) {
+                        $sub->where('id', $timKerjaId);
+                    })->where('peran', 'Anggota');
+                });
+        })
+        ->whereHas('pegawai', function ($q) use ($pegawaiUsername) {
+            $q->where('username', '!=', $pegawaiUsername);
+        })
+        ->get();
+
+        $rencana = RencanaKerja::with('hasilKerja')->where('pegawai_username', '=', $pegawaiUsername)->first();
+        $indikatorIntervensi = Cascading::with('indikator.hasilKerja.rencanakerja')->where('pegawai_username', $pegawaiUsername)->get();
+
+        return view('penilaian::realisasi', compact('rencana', 'pegawai', 'indikatorIntervensi'));
     }
 
     public function updateRealisasi(Request $request, $id) {
@@ -49,91 +66,68 @@ class PenilaianController extends Controller
         } catch (\Throwable $th) {
             return redirect()->back()->with('failed', $th->getMessage());
         }
-
     }
 
     public function kinerjaOrganisasi() {
         return view('penilaian::kinerjaOrganisasi');
     }
 
-    // public function timKerja(){
-    //     $timKerja = TimKerja::all();
-    //     return view('penilaian::tim-kerja', compact('timKerja'));
-    // }
+    public function matriksperanhasil(Request $request){
+        $authuser = Auth::user();
+        $pegawai = $authuser->pegawai;
+        $rencana = Rencanakerja::with('hasilKerja.indikator')->where('pegawai_username', $pegawai->username)->first();
 
-    // public function storeTimKerja(Request $request){
-    //     try {
-    //         TimKerja::create([
-    //             'tim_kerja_id' => (string) Str::uuid(),
-    //             'parent_tim_kerja_id' => $request->parent_tim_kerja_id ?? null,
-    //             'nama_tim_kerja' => $request->nama_tim_kerja
-    //         ]);
-                // dd($timKerja);
-                // return response()->json($timKerja);
-    //         return redirect()->back()->with('success', 'berhasil menyimpan.');
-    //     } catch (\Throwable $th) {
-    //         return redirect()->back()->with('failed', $th->getMessage());
-    //     }
-
-    // }
-
-    /**
-     * Show the form for creating a new resource.
-     * @return Renderable
-     */
-    public function create()
-    {
-        return view('penilaian::create');
+        if($request->query('params') == 'json') return response()->json($rencana);
+        else return view('penilaian::matriksperanhasil', compact('rencana'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     * @param Request $request
-     * @return Renderable
-     */
-    public function store(Request $request)
-    {
-        //
+    public function ajukanRealisasi($id){
+        try {
+            $rencana = RencanaKerja::find($id);
+            $rencana->update([
+                'status_realisasi' => 'Sudah Diajukan'
+            ]);
+            return redirect()->back()->with('success', 'Berhasil ditambahkan');
+        } catch (\Throwable $th) {
+            return redirect()->back()->with('failed', $th->getMessage());
+        }
     }
 
-    /**
-     * Show the specified resource.
-     * @param int $id
-     * @return Renderable
-     */
-    public function show($id)
-    {
-        return view('penilaian::show');
+    public function prosesUmpanBalik(Request $request, $username){
+        try {
+            foreach ($request->feedback as $item) {
+                HasilKerja::where('id', $item['hasil_kerja_id'])
+                ->whereHas('rencanakerja.pegawai', function ($query) use ($username) {
+                    $query->where('username', $username);
+                })->update([
+                    'umpan_balik_predikat' => $item['umpan_balik_predikat'],
+                    'umpan_balik_deskripsi' => $item['umpan_balik_deskripsi'] ?? null,
+                ]);
+            }
+            return redirect()->back()->with('success', 'proses umpan balik berhasil');
+        } catch (\Throwable $th) {
+            return response()->json($th->getMessage);
+        }
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     * @param int $id
-     * @return Renderable
-     */
-    public function edit($id)
-    {
-        return view('penilaian::edit');
-    }
+    public function simpanHasilEvaluasi(Request $request, $username) {
+        $evaluasiController = new EvaluasiController();
 
-    /**
-     * Update the specified resource in storage.
-     * @param Request $request
-     * @param int $id
-     * @return Renderable
-     */
-    public function update(Request $request, $id)
-    {
-        //
-    }
+        $requestEvaluasi = [
+            'rating_hasil_kerja' => $request->rating_hasil_kerja,
+            'deskripsi_rating_hasil_kerja' => $request->deskripsi_rating_hasil_kerja,
+            'rating_perilaku' => $request->rating_perilaku,
+            'deskripsi_rating_perilaku' => $request->deskripsi_rating_perilaku,
+            'predikat_akhir' => $evaluasiController->predikatKinerja($request->rating_hasil_kerja, $request->rating_perilaku)
+        ];
 
-    /**
-     * Remove the specified resource from storage.
-     * @param int $id
-     * @return Renderable
-     */
-    public function destroy($id)
-    {
-        //
+        try {
+            RencanaKerja::where('pegawai_username', $username)->update($requestEvaluasi);
+            return redirect()->back()->with('success', 'berhasil ditambahkan');
+        } catch (\Throwable $th) {
+            return response()->json([
+                'error' => $th->getMessage()
+            ]);
+        }
     }
 }

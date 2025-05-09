@@ -7,55 +7,124 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Modules\Penilaian\Entities\RencanaKerja;
 use Illuminate\Support\Facades\Auth;
+use Modules\Pengaturan\Entities\Anggota;
 use Modules\Pengaturan\Entities\Jabatan;
 use Modules\Pengaturan\Entities\Pegawai;
+use Illuminate\Support\Facades\DB;
+use Modules\Penilaian\Entities\Cascading;
 use Modules\Penilaian\Entities\HasilKerja;
+use Modules\Penilaian\Entities\Indikator;
 
 class RencanaController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     * @return Renderable
-     */
-    public function index(){
+    public function getAnggota(Request $request) {
+        try {
+            $authUser = Auth::user();
+            $username = $authUser->pegawai->username;
+            $pegawai = Pegawai::with([
+                'timKerjaAnggota' => function ($query) {
+                    $query->wherePivot('peran', 'Ketua');
+                },
+                'rencanaKerja.hasilKerja',
+                'timKerjaAnggota',
+                'timKerjaAnggota.unit',
+                'timKerjaAnggota.subUnits.unit',
+                'timKerjaAnggota.parentUnit.unit',
+            ])->where('username', $username)->first();
+
+            if($pegawai->timKerjaAnggota[0]->parentUnit != null){
+                $atasan = $pegawai->timKerjaAnggota[0]->parentUnit->ketua->pegawai;
+            }
+
+            $timKerjaId = $pegawai->timKerjaAnggota[0]->id;
+
+            $bawahan = Anggota::with(['timKerja', 'pegawai'])
+            ->where(function ($query) use ($timKerjaId) {
+                $query->whereHas('timKerja', function ($q) use ($timKerjaId) {
+                        $q->where('parent_id', $timKerjaId);
+                    }
+                )->orWhere(function ($q) use ($timKerjaId) {
+                        $q->whereHas('timKerja', function ($sub) use ($timKerjaId) {
+                            $sub->where('id', $timKerjaId)->orWhereNull('parent_id');
+                        })
+                        ->where('peran', '!=', 'Ketua');
+                    }
+                );
+            })->paginate(10);
+
+            return response()->json([
+                'status' => 'success',
+                'draw' => $request->draw,
+                'recordsTotal' => $bawahan->total(),
+                'recordsFiltered' => $bawahan->total(),
+                'data' => $bawahan->items()
+            ]);
+        } catch (\Throwable $th) {
+            return response()->json($th->getMessage());
+        }
+    }
+
+    public function index(Request $request){
         $authUser = Auth::user();
-        $pegawaiId = $authUser->pegawai->id;
-        $pegawai = Pegawai::with(['timKerjaAnggota.ketua.pegawai', 'timKerjaAnggota.unit', 'pejabat.unit', 'pejabat.jabatan',])
-                    ->where('id', '=', $pegawaiId)->first();
+        $pegawaiUsername = $authUser->pegawai->username;
+        $pegawai = Pegawai::with([
+            'timKerjaAnggota',
+            'rencanaKerja.hasilKerja',
+            'timKerjaAnggota.unit',
+            'timKerjaAnggota.subUnits.unit',
+            'timKerjaAnggota.parentUnit.unit',
+        ])->where('username', $pegawaiUsername)->first();
 
-        // $pejabatPenilai = $pegawai->timKerjaAnggota ?? null;
-        // if($pejabatPenilai != null){
-        //     $parentHasilKerja = HasilKerja::with(['rencanakerja.pegawai'])
-        //     ->whereHas('rencanakerja', function ($query) use ($pejabatPenilai) {
-        //         $query->where('pegawai_id', $pejabatPenilai->ketua->pegawai->id);
-        //     })
-        //     ->get();
-        // }
-        $rencana = RencanaKerja::with('hasilKerja')->where('pegawai_id', '=', $pegawaiId)->first();
-        return response()->json($pegawai);
-        // if($pegawai && $pegawai->timKerjaAnggota){
-        //     // return response()->json($anggota);
-        //     return view('penilaian::rencana', compact('rencana'));
-        // }else {
-        //     // return response()->json($anggota);
-        //     return view('penilaian::rencana', compact('rencana'));
-        // }
+        if($pegawai->timKerjaAnggota[0]->parentUnit != null){
+            $atasan = $pegawai->timKerjaAnggota[0]->parentUnit->ketua->pegawai;
+        }
 
+        $timKerjaId = $pegawai->timKerjaAnggota[0]->id;
+
+        // $bawahan = Anggota::with(['timKerja', 'pegawai'])
+        // ->where(function ($query) use ($timKerjaId) {
+        //     $query->whereHas('timKerja', function ($q) use ($timKerjaId) {
+        //             $q->where('parent_id', $timKerjaId);
+        //         }
+        //     )->orWhere(function ($q) use ($timKerjaId) {
+        //             $q->whereHas('timKerja', function ($sub) use ($timKerjaId) {
+        //                 $sub->where('id', $timKerjaId)->orWhereNull('parent_id');
+        //             })
+        //             ->Where('peran', '!=', 'Ketua');
+        //         }
+        //     );
+        // })->get();
+
+        $bawahan = Anggota::with(['timKerja', 'pegawai'])
+        ->where(function ($query) use ($timKerjaId) {
+            $query->where(function ($q) use ($timKerjaId) {
+                    $q->whereHas('timKerja', function ($sub) use ($timKerjaId) {
+                        $sub->where('parent_id', $timKerjaId);
+                    })->where('peran', 'Ketua');
+                })
+                ->orWhere(function ($q) use ($timKerjaId) {
+                    $q->whereHas('timKerja', function ($sub) use ($timKerjaId) {
+                        $sub->where('id', $timKerjaId);
+                    })->where('peran', 'Anggota');
+                });
+        })
+        ->whereHas('pegawai', function ($q) use ($pegawaiUsername) {
+            $q->where('username', '!=', $pegawaiUsername);
+        })
+        ->get();
+
+        $rencana = RencanaKerja::with('hasilKerja')->where('pegawai_username', '=', $pegawaiUsername)->first();
+        $indikatorIntervensi = Cascading::with('indikator.hasilKerja.rencanakerja')->where('pegawai_username', $pegawaiUsername)->get();
+
+        if($request->query('params') == 'json'){
+            return response()->json([
+                'bawahan' => $bawahan
+            ]);
+        }else {
+            return view('penilaian::rencana', compact('rencana', 'pegawai', 'indikatorIntervensi'));
+        }
     }
 
-    /**
-     * Show the form for creating a new resource.
-     * @return Renderable
-     */
-    public function create() {
-
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     * @param Request $request
-     * @return Renderable
-     */
     public function store(){
         try {
             $authUser = Auth::user();
@@ -63,7 +132,7 @@ class RencanaController extends Controller
             RencanaKerja::create([
                 'status_persetujuan' => 'Belum Ajukan SKP',
                 'status_realisasi' =>  'Belum Diajukan',
-                'pegawai_id' => $pegawai->id
+                'pegawai_username' => $pegawai->username
             ]);
 
             return redirect()->back()->with('success', 'Berhasil Buat SKP');
@@ -73,58 +142,45 @@ class RencanaController extends Controller
     }
 
     public function storeHasilKerja(Request $request, $id) {
-        $indikators = $request->indikators;
         try {
+            $indikators = $request->indikators;
+            $arrayIndikators = array_filter(array_map('trim', explode(';', $indikators)));
+
             $requestHasilKerja = [
                 'rencana_id' => $id,
+                'parent_hasil_kerja_id' => $request->parent_hasil_kerja_id ?? null,
                 'deskripsi' => $request->deskripsi,
                 'indikator' => $indikators
             ];
-            $hasilKerja = HasilKerja::create($requestHasilKerja);
+
+            DB::transaction(function () use ($requestHasilKerja, $arrayIndikators) {
+                $hasilKerja = HasilKerja::create($requestHasilKerja);
+                foreach ($arrayIndikators as $indikator) {
+                    Indikator::create([
+                        'hasil_kerja_id' => $hasilKerja->id,
+                        'deskripsi' => $indikator
+                    ]);
+                }
+            });
+
             return redirect()->back()->with('success', 'Berhasil menambahkan hasil kerja');
         } catch (\Throwable $th) {
             return response()->json($th->getMessage());
         }
     }
 
-    /**
-     * Show the specified resource.
-     * @param int $id
-     * @return Renderable
-     */
-    public function show($id)
-    {
-        return view('penilaian::show');
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     * @param int $id
-     * @return Renderable
-     */
-    public function edit($id)
-    {
-        return view('penilaian::edit');
-    }
-
-    /**
-     * Update the specified resource in storage.
-     * @param Request $request
-     * @param int $id
-     * @return Renderable
-     */
-    public function update(Request $request, $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     * @param int $id
-     * @return Renderable
-     */
-    public function destroy($id)
-    {
-        //
+    public function storeCascading (Request $request, $id) {
+        try {
+            $cascadings = $request->cascading;
+            foreach($cascadings as $cascading) {
+                Cascading::create([
+                    'indikator_id' => $id,
+                    'pegawai_username' => $cascading
+                ]);
+            }
+            return redirect()->back()->with('success', 'Tambah cascading berhasil');
+        } catch (\Throwable $th) {
+            return response()->json($th->getMessage());
+        }
     }
 }
