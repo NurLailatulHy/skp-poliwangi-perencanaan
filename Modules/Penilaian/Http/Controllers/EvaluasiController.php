@@ -10,6 +10,7 @@ use Modules\Pengaturan\Entities\Pegawai;
 use Modules\Pengaturan\Entities\Anggota;
 use Modules\Pengaturan\Entities\TimKerja;
 use Modules\Pengaturan\Entities\Pejabat;
+use Modules\Penilaian\Entities\HasilKerja;
 use Modules\Penilaian\Entities\RencanaKerja;
 
 class EvaluasiController extends Controller
@@ -112,6 +113,44 @@ class EvaluasiController extends Controller
             }
         } catch (\Throwable $th) {
             return response()->json($th->getMessage());
+        }
+    }
+
+    public function prosesUmpanBalik(Request $request, $username){
+        try {
+            foreach ($request->feedback as $item) {
+                HasilKerja::where('id', $item['hasil_kerja_id'])
+                ->whereHas('rencanakerja.pegawai', function ($query) use ($username) {
+                    $query->where('username', $username);
+                })->update([
+                    'umpan_balik_predikat' => $item['umpan_balik_predikat'],
+                    'umpan_balik_deskripsi' => $item['umpan_balik_deskripsi'] ?? null,
+                ]);
+            }
+            return redirect()->back()->with('success', 'proses umpan balik berhasil');
+        } catch (\Throwable $th) {
+            return response()->json($th->getMessage);
+        }
+    }
+
+    public function simpanHasilEvaluasi(Request $request, $id) {
+
+        $requestEvaluasi = [
+            'status_realisasi' => 'Sudah Dievaluasi',
+            'rating_hasil_kerja' => $request->rating_hasil_kerja,
+            'deskripsi_rating_hasil_kerja' => $request->deskripsi_rating_hasil_kerja,
+            'rating_perilaku' => $request->rating_perilaku,
+            'deskripsi_rating_perilaku' => $request->deskripsi_rating_perilaku,
+            'predikat_akhir' => $this->predikatKinerja($request->rating_hasil_kerja, $request->rating_perilaku)
+        ];
+
+        try {
+            RencanaKerja::where('pegawai_id', $id)->update($requestEvaluasi);
+            return redirect()->back()->with('success', 'berhasil ditambahkan');
+        } catch (\Throwable $th) {
+            return response()->json([
+                'error' => $th->getMessage()
+            ]);
         }
     }
 }

@@ -6,8 +6,6 @@ use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Modules\Penilaian\Entities\Periode;
-use Illuminate\Support\Facades\Auth;
-use Modules\Pengaturan\Entities\Pegawai;
 
 class PeriodeController extends Controller
 {
@@ -38,22 +36,5 @@ class PeriodeController extends Controller
         // dd($request->periodetahun);
         session(['selected_periode_id' => $request->periodetahun]);
         return redirect()->to('/penilaian/rencana/');
-    }
-
-    public function previewEvaluasi(){
-        $authUser = Auth::user();
-        $authPegawai = $authUser->pegawai;
-        $pegawaiUsername = $authPegawai->username;
-        $pegawaiId = $authPegawai->id;
-
-        $pegawai = Pegawai::with([
-            'pejabat.jabatan',
-            'timKerjaAnggota',
-            'rencanaKerja.hasilKerja',
-            'timKerjaAnggota.unit',
-            'timKerjaAnggota.subUnits.unit',
-            'timKerjaAnggota.parentUnit.unit',
-        ])->where('username', $pegawaiUsername)->first();
-        return view('penilaian::cetak-evaluasi-page', compact('pegawai'));
     }
 }

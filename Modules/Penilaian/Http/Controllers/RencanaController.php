@@ -162,19 +162,4 @@ class RencanaController extends Controller
             return response()->json($th->getMessage());
         }
     }
-
-    public function storeCascading (Request $request, $id) {
-        try {
-            $cascadings = $request->cascading;
-            foreach($cascadings as $cascading) {
-                Cascading::create([
-                    'indikator_id' => $id,
-                    'pegawai_id' => $cascading
-                ]);
-            }
-            return redirect()->back()->with('success', 'Tambah cascading berhasil');
-        } catch (\Throwable $th) {
-            return response()->json($th->getMessage());
-        }
-    }
 }

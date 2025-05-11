@@ -1,4 +1,14 @@
 <script>
+    const colorStatus = (status) => {
+        if(status == 'Belum Ajukan') {
+            return `danger`
+        }else if (status == 'Belum Dievaluasi') {
+            return `secondary`
+        } else {
+            return `success`
+        }
+    }
+
     $(document).ready(function() {
         $('#table-pegawai').DataTable({
             responsive: true,
@@ -6,10 +16,9 @@
             processing: true,
             serverSide: true,
             ajax: {
-                url: '/penilaian/data-pegawai',
+                url: '/penilaian/evaluasi/data-pegawai',
                 type: 'GET',
                 dataSrc: function (response) {
-                    console.log(response.data)
                     try {
                         return response.data.map((data) => {
                             return {
@@ -47,9 +56,9 @@
                     render: (data, type, row) => {
                         const arrayRencana = row.rencanakerja
                         if(arrayRencana.length != 0) {
-                            return `<span class="badge ${row.rencanakerja[0].status_realisasi == 'Sudah Diajukan' ? 'badge-secondary' : 'badge-secondary'}" style="width: fit-content">
-                                ${row.rencanakerja[0].status_realisasi == 'Sudah Diajukan' ? 'Belum Dievaluasi' : ''}
-                            </span>`
+                            return `<span class="badge badge-${colorStatus(row.rencanakerja[0].status_realisasi)}" style="width: fit-content">
+                                        ${row.rencanakerja[0].status_realisasi}
+                                    </span>`
                         }else {
                             return `<span class="badge badge-danger">Belum Diajukan</span>`
                         }
@@ -58,7 +67,15 @@
                 {
                     data: null,
                     name: 'predikatKinerja',
-                    orderable: true
+                    orderable: true,
+                    render: (data, type, row) => {
+                        const arrayRencana = row.rencanakerja
+                        if(arrayRencana.length != 0) {
+                            return `<span>${row.rencanakerja[0].predikat_akhir}</span>`
+                        }else {
+                            return `-`
+                        }
+                    }
                 },
                 {
                     data: null,
@@ -78,15 +95,4 @@
             stateSave: true,
         });
     });
-
-    // const colorStatus = (status) => {
-    //     if(status == 'Belum Dievaluasi') {
-    //         return `<span class="">${status}</span>`
-    //     }else if (status == 'Belum Ajukan Realisasi') {
-    //         return `<span class="badge badge-danger">${status}</span>`
-    //     } else {
-    //         return `<span class="badge badge-success">${status}</span>`
-    //     }
-    // }
-
 </script>

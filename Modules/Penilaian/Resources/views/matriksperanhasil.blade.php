@@ -88,7 +88,7 @@
                     processing: true,
                     serverSide: true,
                     ajax: {
-                        url: '/penilaian/anggota',
+                        url: '/penilaian/matriks-peran-hasil/anggota',
                         type: 'GET',
                         dataSrc: function (response) {
                             try {
