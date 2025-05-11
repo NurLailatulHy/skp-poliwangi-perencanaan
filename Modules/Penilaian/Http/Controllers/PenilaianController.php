@@ -12,6 +12,20 @@ use Modules\Penilaian\Entities\Cascading;
 
 class PenilaianController extends Controller
 {
+    public function getPegawaiWhoLogin(){
+        $authUser = Auth::user();
+        $username = $authUser->pegawai->username;
+        $pegawai = Pegawai::with([
+            'timKerjaAnggota' => function ($query) {
+                $query->wherePivot('peran', 'Ketua');
+            },
+            'rencanaKerja.hasilKerja', 'timKerjaAnggota', 'timKerjaAnggota.unit',
+            'timKerjaAnggota.subUnits.unit','timKerjaAnggota.parentUnit.unit',
+        ])->where('username', $username)->first();
+
+        return $pegawai;
+    }
+
     public function index(){
         return view('penilaian::index');
     }
@@ -59,6 +73,18 @@ class PenilaianController extends Controller
         return view('penilaian::realisasi', compact('rencana', 'pegawai', 'indikatorIntervensi'));
     }
 
+    public function ajukanRealisasi($id){
+        try {
+            $rencana = RencanaKerja::find($id);
+            $rencana->update([
+                'status_realisasi' => 'Sudah Diajukan'
+            ]);
+            return redirect()->back()->with('success', 'Berhasil ditambahkan');
+        } catch (\Throwable $th) {
+            return redirect()->back()->with('failed', $th->getMessage());
+        }
+    }
+
     public function updateRealisasi(Request $request, $id) {
         try {
             $hasilKerja = HasilKerja::find($id);
@@ -73,17 +99,5 @@ class PenilaianController extends Controller
 
     public function kinerjaOrganisasi() {
         return view('penilaian::kinerjaOrganisasi');
-    }
-
-    public function ajukanRealisasi($id){
-        try {
-            $rencana = RencanaKerja::find($id);
-            $rencana->update([
-                'status_realisasi' => 'Sudah Diajukan'
-            ]);
-            return redirect()->back()->with('success', 'Berhasil ditambahkan');
-        } catch (\Throwable $th) {
-            return redirect()->back()->with('failed', $th->getMessage());
-        }
     }
 }

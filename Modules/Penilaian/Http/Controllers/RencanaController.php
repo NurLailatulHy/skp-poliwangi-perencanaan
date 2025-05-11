@@ -20,18 +20,8 @@ class RencanaController extends Controller
 {
     public function getAnggota(Request $request) {
         try {
-            $authUser = Auth::user();
-            $username = $authUser->pegawai->username;
-            $pegawai = Pegawai::with([
-                'timKerjaAnggota' => function ($query) {
-                    $query->wherePivot('peran', 'Ketua');
-                },
-                'rencanaKerja.hasilKerja',
-                'timKerjaAnggota',
-                'timKerjaAnggota.unit',
-                'timKerjaAnggota.subUnits.unit',
-                'timKerjaAnggota.parentUnit.unit',
-            ])->where('username', $username)->first();
+            $penilaianController = new PenilaianController();
+            $pegawai = $penilaianController->getPegawaiWhoLogin();
 
             if($pegawai->timKerjaAnggota[0]->parentUnit != null){
                 $atasan = $pegawai->timKerjaAnggota[0]->parentUnit->ketua->pegawai;
@@ -66,23 +56,8 @@ class RencanaController extends Controller
     }
 
     public function index(Request $request){
-        $authUser = Auth::user();
-        $authPegawai = $authUser->pegawai;
-        $pegawaiUsername = $authPegawai->username;
-        $pegawaiId = $authPegawai->id;
-
-        $pegawai = Pegawai::with([
-            'pejabat.jabatan',
-            'timKerjaAnggota',
-            'rencanaKerja.hasilKerja',
-            'timKerjaAnggota.unit',
-            'timKerjaAnggota.subUnits.unit',
-            'timKerjaAnggota.parentUnit.unit',
-        ])->where('username', $pegawaiUsername)->first();
-
-        if($pegawai->timKerjaAnggota[0]->parentUnit != null){
-            $atasan = $pegawai->timKerjaAnggota[0]->parentUnit->ketua->pegawai;
-        }
+        $penilaianController = new PenilaianController();
+        $pegawai = $penilaianController->getPegawaiWhoLogin();
 
         $timKerjaId = $pegawai->timKerjaAnggota[0]->id;
 
@@ -99,14 +74,14 @@ class RencanaController extends Controller
                     })->where('peran', 'Anggota');
                 });
         })
-        ->whereHas('pegawai', function ($q) use ($pegawaiId) {
-            $q->where('pegawai_id', '!=', $pegawaiId);
+        ->whereHas('pegawai', function ($q) use ($pegawai) {
+            $q->where('pegawai_id', '!=', $pegawai->id);
         })
         ->get();
 
-        $rencana = RencanaKerja::with('hasilKerja')->where('pegawai_id', '=', $pegawaiId)->first();
+        $rencana = RencanaKerja::with('hasilKerja')->where('pegawai_id', '=', $pegawai->id)->first();
         $periodes = Periode::all();
-        $indikatorIntervensi = Cascading::with('indikator.hasilKerja.rencanakerja')->where('pegawai_id', $pegawaiId)->get();
+        $indikatorIntervensi = Cascading::with('indikator.hasilKerja.rencanakerja')->where('pegawai_id', $pegawai->id)->get();
         $parentHasilKerja = $indikatorIntervensi->pluck('indikator.hasilKerja')->unique('id')->values();
 
         if($request->query('params') == 'json'){
