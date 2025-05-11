@@ -197,5 +197,5 @@
 @stop
 
 @push('js')
-
+    @include('penilaian::evaluasi.script-periode')
 @endpush

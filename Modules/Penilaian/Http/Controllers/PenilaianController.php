@@ -12,14 +12,17 @@ use Modules\Penilaian\Entities\Cascading;
 
 class PenilaianController extends Controller
 {
-    public function getPegawaiWhoLogin(){
+
+    public function getPegawaiWhoLogin($filterTimKerjaId = 2){
         $authUser = Auth::user();
         $username = $authUser->pegawai->username;
         $pegawai = Pegawai::with([
-            'timKerjaAnggota' => function ($query) {
-                $query->wherePivot('peran', 'Ketua');
+            'timKerjaAnggota' => function ($query) use ($filterTimKerjaId) {
+                if ($filterTimKerjaId) {
+                    $query->where('tim_kerja_anggota.tim_kerja_id', $filterTimKerjaId);
+                }
             },
-            'rencanaKerja.hasilKerja', 'timKerjaAnggota', 'timKerjaAnggota.unit',
+            'rencanaKerja.hasilKerja', 'timKerjaAnggota.unit',
             'timKerjaAnggota.subUnits.unit','timKerjaAnggota.parentUnit.unit',
         ])->where('username', $username)->first();
 

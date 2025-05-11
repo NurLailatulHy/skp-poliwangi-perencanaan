@@ -32,9 +32,13 @@ class PeriodeController extends Controller
     public function setPeriode(Request $request){
         $request->validate([
             'periodetahun' => 'required|exists:periodes,id',
+            'unit_id' => 'required',
         ]);
-        // dd($request->periodetahun);
-        session(['selected_periode_id' => $request->periodetahun]);
+        session([
+            'selected_periode_id' => $request->periodetahun,
+            'unit_id' => $request->unit_id
+        ]);
+        // dd(session()->all());
         return redirect()->to('/penilaian/rencana/');
     }
 }

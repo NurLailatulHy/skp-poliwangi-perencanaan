@@ -180,9 +180,5 @@
 @stop
 
 @push('js')
-<script>
-    const prosesUmpanBalikButton = document.querySelector('#proses-umpan-balik-button');
-    const rencanaData = @json($rencana);
-    console.log(rencanaData);
-</script>
+    @include('penilaian::evaluasi.script-periode')
 @endpush

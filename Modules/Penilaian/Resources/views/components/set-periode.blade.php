@@ -30,7 +30,7 @@
                     <option selected value="">-- Pilih Rentang Periode --</option>
                 @endif
             </select>
-            <select name="nama-unit" id="" class="form-control mr-2" {{ count($pegawai->timKerjaAnggota) === 1 ? 'disabled' : ''  }}>
+            <select name="unit_id" id="nama-unit" class="form-control mr-2" {{ count($pegawai->timKerjaAnggota) === 1 ? 'disabled' : ''  }}>
                 @if (count($pegawai->timKerjaAnggota) === 1)
                     @foreach ($pegawai->timKerjaAnggota as $p)
                         <option selected value="{{ $p->id }}">{{ $p->unit->nama }}</option>
@@ -42,7 +42,7 @@
                     @endforeach
                 @endif
             </select>
-            <select name="peran" id="" class="form-control mr-2" {{ count($pegawai->timKerjaAnggota) === 1 ? 'disabled' : '' }}>
+            <select name="peran" id="peran" class="form-control mr-2" {{ count($pegawai->timKerjaAnggota) === 1 ? 'disabled' : '' }}>
                 @if (count($pegawai->timKerjaAnggota) === 1)
                     @foreach ($pegawai->timKerjaAnggota as $p)
                         <option selected value="{{ $p->id }}">{{ $p->pivot->peran }} {{ $p->unit->nama }}</option>

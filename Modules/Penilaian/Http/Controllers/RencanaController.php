@@ -57,39 +57,20 @@ class RencanaController extends Controller
 
     public function index(Request $request){
         $penilaianController = new PenilaianController();
-        $pegawai = $penilaianController->getPegawaiWhoLogin();
+        $pegawai = $penilaianController->getPegawaiWhoLogin(session('unit_id'));
 
-        $timKerjaId = $pegawai->timKerjaAnggota[0]->id;
-
-        $bawahan = Anggota::with(['timKerja', 'pegawai'])
-        ->where(function ($query) use ($timKerjaId) {
-            $query->where(function ($q) use ($timKerjaId) {
-                    $q->whereHas('timKerja', function ($sub) use ($timKerjaId) {
-                        $sub->where('parent_id', $timKerjaId);
-                    })->where('peran', 'Ketua');
-                })
-                ->orWhere(function ($q) use ($timKerjaId) {
-                    $q->whereHas('timKerja', function ($sub) use ($timKerjaId) {
-                        $sub->where('id', $timKerjaId);
-                    })->where('peran', 'Anggota');
-                });
-        })
-        ->whereHas('pegawai', function ($q) use ($pegawai) {
-            $q->where('pegawai_id', '!=', $pegawai->id);
-        })
-        ->get();
 
         $rencana = RencanaKerja::with('hasilKerja')->where('pegawai_id', '=', $pegawai->id)->first();
-        $periodes = Periode::all();
         $indikatorIntervensi = Cascading::with('indikator.hasilKerja.rencanakerja')->where('pegawai_id', $pegawai->id)->get();
         $parentHasilKerja = $indikatorIntervensi->pluck('indikator.hasilKerja')->unique('id')->values();
 
         if($request->query('params') == 'json'){
+            dd(session()->all());
             return response()->json([
-                'parent_hasil_kerja' => $parentHasilKerja
+                'pegawai' => $pegawai
             ]);
         }else {
-            return view('penilaian::rencana', compact('rencana', 'pegawai', 'parentHasilKerja', 'periodes'));
+            return view('penilaian::rencana', compact('rencana', 'pegawai', 'parentHasilKerja'));
         }
     }
 
