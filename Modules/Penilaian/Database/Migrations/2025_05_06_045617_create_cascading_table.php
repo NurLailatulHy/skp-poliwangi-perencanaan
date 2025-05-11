@@ -19,10 +19,10 @@ class CreateCascadingTable extends Migration
             $table->id();
             $table->foreignId('hasil_kerja_id')->nullable();
             $table->foreignId('indikator_id')->nullable();
-            $table->string('pegawai_username')->nullable();
+            $table->unsignedBigInteger('pegawai_id')->nullable();
             $table->timestamps();
 
-            $table->foreign('pegawai_username')->references('username')->on('pegawai')->onDelete('cascade');
+            $table->foreign('pegawai_id')->references('id')->on('pegawai')->onDelete('cascade');
         });
     }
 

@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\DB;
 use Modules\Penilaian\Entities\Cascading;
 use Modules\Penilaian\Entities\HasilKerja;
 use Modules\Penilaian\Entities\Indikator;
+use Modules\Penilaian\Entities\Periode;
 
 class RencanaController extends Controller
 {
@@ -66,8 +67,12 @@ class RencanaController extends Controller
 
     public function index(Request $request){
         $authUser = Auth::user();
-        $pegawaiUsername = $authUser->pegawai->username;
+        $authPegawai = $authUser->pegawai;
+        $pegawaiUsername = $authPegawai->username;
+        $pegawaiId = $authPegawai->id;
+
         $pegawai = Pegawai::with([
+            'pejabat.jabatan',
             'timKerjaAnggota',
             'rencanaKerja.hasilKerja',
             'timKerjaAnggota.unit',
@@ -80,20 +85,6 @@ class RencanaController extends Controller
         }
 
         $timKerjaId = $pegawai->timKerjaAnggota[0]->id;
-
-        // $bawahan = Anggota::with(['timKerja', 'pegawai'])
-        // ->where(function ($query) use ($timKerjaId) {
-        //     $query->whereHas('timKerja', function ($q) use ($timKerjaId) {
-        //             $q->where('parent_id', $timKerjaId);
-        //         }
-        //     )->orWhere(function ($q) use ($timKerjaId) {
-        //             $q->whereHas('timKerja', function ($sub) use ($timKerjaId) {
-        //                 $sub->where('id', $timKerjaId)->orWhereNull('parent_id');
-        //             })
-        //             ->Where('peran', '!=', 'Ketua');
-        //         }
-        //     );
-        // })->get();
 
         $bawahan = Anggota::with(['timKerja', 'pegawai'])
         ->where(function ($query) use ($timKerjaId) {
@@ -108,20 +99,22 @@ class RencanaController extends Controller
                     })->where('peran', 'Anggota');
                 });
         })
-        ->whereHas('pegawai', function ($q) use ($pegawaiUsername) {
-            $q->where('username', '!=', $pegawaiUsername);
+        ->whereHas('pegawai', function ($q) use ($pegawaiId) {
+            $q->where('pegawai_id', '!=', $pegawaiId);
         })
         ->get();
 
-        $rencana = RencanaKerja::with('hasilKerja')->where('pegawai_username', '=', $pegawaiUsername)->first();
-        $indikatorIntervensi = Cascading::with('indikator.hasilKerja.rencanakerja')->where('pegawai_username', $pegawaiUsername)->get();
+        $rencana = RencanaKerja::with('hasilKerja')->where('pegawai_id', '=', $pegawaiId)->first();
+        $periodes = Periode::all();
+        $indikatorIntervensi = Cascading::with('indikator.hasilKerja.rencanakerja')->where('pegawai_id', $pegawaiId)->get();
+        $parentHasilKerja = $indikatorIntervensi->pluck('indikator.hasilKerja')->unique('id')->values();
 
         if($request->query('params') == 'json'){
             return response()->json([
-                'bawahan' => $bawahan
+                'parent_hasil_kerja' => $parentHasilKerja
             ]);
         }else {
-            return view('penilaian::rencana', compact('rencana', 'pegawai', 'indikatorIntervensi'));
+            return view('penilaian::rencana', compact('rencana', 'pegawai', 'parentHasilKerja', 'periodes'));
         }
     }
 
@@ -130,9 +123,10 @@ class RencanaController extends Controller
             $authUser = Auth::user();
             $pegawai = $authUser->pegawai;
             RencanaKerja::create([
+                'periode_id' => session('selected_periode_id'),
                 'status_persetujuan' => 'Belum Ajukan SKP',
                 'status_realisasi' =>  'Belum Diajukan',
-                'pegawai_username' => $pegawai->username
+                'pegawai_id' => $pegawai->id
             ]);
 
             return redirect()->back()->with('success', 'Berhasil Buat SKP');
@@ -175,7 +169,7 @@ class RencanaController extends Controller
             foreach($cascadings as $cascading) {
                 Cascading::create([
                     'indikator_id' => $id,
-                    'pegawai_username' => $cascading
+                    'pegawai_id' => $cascading
                 ]);
             }
             return redirect()->back()->with('success', 'Tambah cascading berhasil');

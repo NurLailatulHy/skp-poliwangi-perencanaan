@@ -47,9 +47,11 @@
                     render: (data, type, row) => {
                         const arrayRencana = row.rencanakerja
                         if(arrayRencana.length != 0) {
-                            return `<span class="badge ${row.rencanakerja[0].status_realisasi == 'Sudah Diajukan' ? 'badge-success' : 'badge-secondary'}" style="width: fit-content">${row.rencanakerja[0].status_realisasi}</span>`
+                            return `<span class="badge ${row.rencanakerja[0].status_realisasi == 'Sudah Diajukan' ? 'badge-secondary' : 'badge-secondary'}" style="width: fit-content">
+                                ${row.rencanakerja[0].status_realisasi == 'Sudah Diajukan' ? 'Belum Dievaluasi' : ''}
+                            </span>`
                         }else {
-                            return `<span class="badge badge-danger">Belum Buat SKP</span>`
+                            return `<span class="badge badge-danger">Belum Diajukan</span>`
                         }
                     }
                 },

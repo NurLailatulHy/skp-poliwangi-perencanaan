@@ -13,12 +13,11 @@ use Illuminate\Support\Facades\Route;
 
 Route::group(['middleware' => ['auth', 'permission']], function() {
     Route::prefix('penilaian')->group(function() {
-        Route::get('/', 'PenilaianController@index');
-        Route::get('/data-pegawai', 'EvaluasiController@index');
-        Route::get('/anggota', 'RencanaController@getAnggota');
-        Route::get('/predikat-kinerja', 'EvaluasiController@predikatKinerja');
-        Route::get('/preview', function () {
-            return view('penilaian::cetak-evaluasi-page');
+        Route::prefix('periode')->group(function() {
+            Route::get('/', 'PeriodeController@index');
+            Route::post('/store', 'PeriodeController@store');
+            Route::post('/store', 'PeriodeController@store');
+            Route::post('/set', 'PeriodeController@setPeriode');
         });
         Route::prefix('cetak')->group(function() {
             Route::get('/evaluasi', 'PenilaianController@cetakEvaluasi');
@@ -28,26 +27,28 @@ Route::group(['middleware' => ['auth', 'permission']], function() {
             Route::get('/', 'EvaluasiController@evaluasi');
             Route::get('/{username}/detail', 'EvaluasiController@evaluasiDetail');
             Route::post('proses-umpan-balik/{username}', 'PenilaianController@prosesUmpanBalik');
-            Route::post('simpan-hasil-evaluasi/{username}', 'PenilaianController@simpanHasilEvaluasi');
+            Route::post('simpan-hasil-evaluasi/{id}', 'PenilaianController@simpanHasilEvaluasi');
         });
         Route::prefix('realisasi')->group(function() {
             Route::get('/', 'PenilaianController@realisasi');
             Route::post('/update-realisasi/{id}', 'PenilaianController@updateRealisasi');
             Route::post('/ajukan-realisasi/{id}', 'PenilaianController@ajukanRealisasi');
+            Route::post('/batalkan-realisasi/{id}', 'PenilaianController@batalkanRealisasi');
         });
         Route::prefix('rencana')->group(function() {
             Route::get('/', 'RencanaController@index');
             Route::post('/store', 'RencanaController@store');
             Route::post('/store-hasil-kerja/{id}', 'RencanaController@storeHasilKerja');
         });
-        Route::get('/kinerja-organisasi', 'PenilaianController@kinerjaOrganisasi');
-        Route::prefix('periode')->group(function() {
-            Route::get('/', 'PeriodeController@index');
-            Route::post('/store', 'PeriodeController@store');
-        });
         Route::prefix('matriks-peran-hasil')->group(function() {
             Route::get('/', 'PenilaianController@matriksperanhasil');
             Route::post('/store/{id}', 'RencanaController@storeCascading');
         });
+        Route::get('/kinerja-organisasi', 'PenilaianController@kinerjaOrganisasi');
+        Route::get('/predikat-kinerja', 'EvaluasiController@predikatKinerja');
+        Route::get('/data-pegawai', 'EvaluasiController@index');
+        Route::get('/anggota', 'RencanaController@getAnggota');
+        Route::get('/', 'PenilaianController@index');
+        Route::get('/preview', 'PeriodeController@previewEvaluasi');
     });
 });

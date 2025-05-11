@@ -61,7 +61,7 @@ class EvaluasiController extends Controller
             'timKerjaAnggota.parentUnit.unit',
         ])->where('username', '=', $username)->first();
 
-        $rencana = RencanaKerja::with('hasilKerja')->where('pegawai_username', '=', $username)->first();
+        $rencana = RencanaKerja::with('hasilKerja')->where('pegawai_id', '=', $pegawai->id)->first();
         if($params == 'json') return response()->json($rencana);
         else return view('penilaian::evaluasi-detail', compact('pegawai', 'rencana'));
     }
@@ -71,7 +71,7 @@ class EvaluasiController extends Controller
             $authUser = Auth::user();
             $pegawai = $authUser->pegawai;
             $username = $pegawai->username;
-            $ketua = Pejabat::where('pegawai_username', '=', $username)->first();
+            $ketua = Pejabat::where('pegawai_id', '=', $pegawai->id)->first();
             $timKerjaId = $pegawai->timKerjaAnggota[0]->id;
 
             if($ketua != null) {

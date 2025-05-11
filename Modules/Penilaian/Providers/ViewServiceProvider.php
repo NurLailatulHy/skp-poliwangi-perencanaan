@@ -25,6 +25,7 @@ class ViewServiceProvider extends ServiceProvider
             $authUser = Auth::user();
             $pegawaiId = $authUser->pegawai->id;
             $pegawai = Pegawai::with([
+                'pejabat.jabatan',
                 'timKerjaAnggota',
                 'timKerjaAnggota.unit',
                 'timKerjaAnggota.subUnits.unit',

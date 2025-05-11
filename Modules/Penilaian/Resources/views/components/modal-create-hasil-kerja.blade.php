@@ -20,9 +20,9 @@
                   <label for="hasil-kerja-diintervensi">Hasil Kerja yang diintervensi</label>
                   <select class="form-control" id="hasil-kerja-diintervensi" name="parent_hasil_kerja_id">
                     <option value="">-- Pilih hasil kerja yang diintervensi --</option>
-                    @if (!is_null($indikatorIntervensi))
-                        @foreach ($indikatorIntervensi as $parent => $item)
-                            <option value="{{ $item->indikator->id }}">{{ $item->indikator->deskripsi }}</option>
+                    @if (!is_null($parentHasilKerja))
+                        @foreach ($parentHasilKerja as $index => $parent)
+                            <option value="{{ $parent->id }}">{{ $parent->deskripsi }}</option>
                         @endforeach
                     @endif
                   </select>

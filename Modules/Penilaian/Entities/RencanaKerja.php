@@ -17,6 +17,6 @@ class RencanaKerja extends Model
     }
 
     public function pegawai(){
-        return $this->belongsTo(Pegawai::class, 'pegawai_username', 'username');
+        return $this->belongsTo(Pegawai::class, 'pegawai_id', 'id');
     }
 }

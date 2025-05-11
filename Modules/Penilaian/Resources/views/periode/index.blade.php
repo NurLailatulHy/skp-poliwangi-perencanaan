@@ -19,14 +19,20 @@
                         <thead>
                             <tr>
                                 <th>No</th>
-                                <th>Nama</th>
-                                <th>Jabatan</th>
-                                <th>Status</th>
-                                <th>Predikat Kinerja</th>
-                                <th>Aksi</th>
+                                <th>Durasi</th>
+                                <th>Tahun</th>
+                                <th>Jenis</th>
                             </tr>
                         </thead>
                         <tbody>
+                            @foreach ($periodes as $index => $periode)
+                                <tr>
+                                    <td>{{ $index + 1 }}</td>
+                                    <td>{{ \Carbon\Carbon::parse($periode->start_date)->translatedFormat('d F Y') }} - {{ \Carbon\Carbon::parse($periode->end_date)->translatedFormat('d F Y') }}</td>
+                                    <td>{{ $periode->tahun }}</td>
+                                    <td>{{ $periode->jenis_periode }}</td>
+                                </tr>
+                            @endforeach
                         </tbody>
                     </table>
                 </div>

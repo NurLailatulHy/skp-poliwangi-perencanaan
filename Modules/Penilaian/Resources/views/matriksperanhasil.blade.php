@@ -35,8 +35,8 @@
                             <table class="table table-bordered">
                                 <thead>
                                 <tr>
-                                    <th colspan="2">{{ $indikator->deskripsi }}</th>
-                                    <th colspan="1">
+                                    <th style="width: 90%" colspan="2">{{ $indikator->deskripsi }}</th>
+                                    <th style="width: 10%" colspan="1">
                                         <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#create-cascading-{{ $indikator->id }}">
                                             <i class="nav-icon fas fa-plus "></i>
                                         </button>
@@ -52,7 +52,7 @@
                                     <td>
                                         <ul>
                                             @foreach ($indikator->cascading as $item)
-                                                <li>{{ $item->pegawai_username }}</li>
+                                                <li>{{ $item->pegawai->nama }}</li>
                                             @endforeach
                                         </ul>
                                     </td>
@@ -110,7 +110,7 @@
                             className: 'select-checkbox',
                             orderable: false,
                             render: (data, type, row) => {
-                                return `<input type="checkbox" name="cascading[]" value="${row.nama}">`
+                                return `<input type="checkbox" name="cascading[]" value="${row.id}">`
                             }
                         },
                         {

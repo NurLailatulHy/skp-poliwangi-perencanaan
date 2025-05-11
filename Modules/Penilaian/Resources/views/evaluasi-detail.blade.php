@@ -10,7 +10,7 @@
     <div class="row">
         <div class="col-12">
             <div class="card">
-                <div class="w-100 d-flex justify-content-between align-items-center p-4">
+                <div class="w-100 justify-content-between align-items-center p-4 {{ $rencana->predikat_akhir == null ? 'd-none' : 'd-flex' }}">
                     @php
                         switch ($rencana->predikat_akhir) {
                             case 'Sangat Baik':
@@ -28,85 +28,9 @@
                     <span class="badge m-2 {{ $badgeClass }}" style="width: fit-content">{{ $rencana->predikat_akhir }}</span>
                     <button id="proses-umpan-balik-button" class="btn btn-primary ml-1 {{ $rencana->predikat_akhir == null ? 'd-none' : '' }}">Batalkan Evaluasi</button>
                 </div>
-                <div class="bg-white d-flex p-4">
-                    <table class="table">
-                        <thead>
-                          <tr>
-                            <th scope="col">No</th>
-                            <th colspan="2" style="width: 50%;">Pegawai yang dinilai</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          <tr>
-                            <td>1</td>
-                            <td>Nama</td>
-                            <td>{{ $pegawai->nama }}</td>
-                          </tr>
-                          <tr>
-                            <th scope="row">2</th>
-                            <td>NIP</td>
-                            <td>{{ $pegawai->nip }}</td>
-                          </tr>
-                          <tr>
-                            <th scope="row">3</th>
-                            <td>Pangkat / Gol</td>
-                            <td>IV</td>
-                          </tr>
-                          <tr>
-                            <th scope="row">4</th>
-                            <td>Jabatan</td>
-                            <td>-</td>
-                          </tr>
-                          <tr>
-                            <th scope="row">5</th>
-                            <td>Unit Kerja</td>
-                            <td style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                                {{ $pegawai->anggota->timKerja->unit->nama }}
-                            </td>
-                          </tr>
-                        </tbody>
-                    </table>
-                    <table class="table">
-                        <thead>
-                          <tr>
-                            <th scope="col">No</th>
-                            <th colspan="2">Pejabat Penilai Kinerja</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <th scope="row">1</th>
-                                <td>Nama</td>
-                                <td>{{ optional($pegawai->timKerjaAnggota[0]->parentUnit?->ketua?->pegawai)->nama ?? '-' }}</td>
-                            </tr>
-                            <tr>
-                                <th scope="row">2</th>
-                                <td>NIP</td>
-                                <td>{{ optional($pegawai->timKerjaAnggota[0]->parentUnit?->ketua?->pegawai)->nip ?? '-' }}</td>
-                            </tr>
-                            <tr>
-                              <th scope="row">3</th>
-                              <td>Pangkat / Gol</td>
-                              <td>-</td>
-                            </tr>
-                            <tr>
-                              <th scope="row">4</th>
-                              <td>Jabatan</td>
-                              <td>-</td>
-                            </tr>
-                            <tr>
-                                <th scope="row">5</th>
-                                <td>Unit Kerja</td>
-                                <td style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                                    {{ $pegawai->timKerjaAnggota[0]->parentUnit?->unit?->nama ?? '-' }}
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
+                @include('penilaian::components.atasan-bawahan-section')
                 <div class="bg-white p-4">
                     <form
-                    {{-- id="umpanBalikForm" --}}
                     method="POST"
                     action="{{ url('/penilaian/evaluasi/proses-umpan-balik/' . $pegawai->username) }}"
                     >
@@ -126,7 +50,7 @@
                                     @foreach ($rencana->hasilKerja as $index => $item)
                                         <tr>
                                             <th scope="row">{{ $index + 1 }}</th>
-                                            <td>
+                                            <td style="width: 50%;">
                                                 <p>{{ $item->deskripsi }}</p>
                                                 <span>Ukuran keberhasilan / Indikator Kinerja Individu, dan Target :</span>
                                                 <ul>
@@ -135,11 +59,11 @@
                                                     @endforeach
                                                 </ul>
                                             </td>
-                                            <td>
+                                            <td style="width: 25%;">
                                                 <span>Realisasi :</span>
                                                 <p>{{ $item['realisasi'] }}</p>
                                             </td>
-                                            <td>
+                                            <td style="width: 25%;">
                                                 <span>Umpan Balik :</span>
                                                 <div class="input-group">
                                                     <input type="hidden" name="feedback[{{ $index }}][hasil_kerja_id]" value="{{ $item->id }}">

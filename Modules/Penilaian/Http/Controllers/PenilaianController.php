@@ -20,7 +20,10 @@ class PenilaianController extends Controller
 
     public function realisasi(){
         $authUser = Auth::user();
-        $pegawaiUsername = $authUser->pegawai->username;
+        $pegawai = $authUser->pegawai;
+        $pegawaiUsername = $pegawai->username;
+        $pegawaiId = $pegawai->id;
+
         $pegawai = Pegawai::with([
             'timKerjaAnggota',
             'rencanaKerja.hasilKerja',
@@ -52,8 +55,8 @@ class PenilaianController extends Controller
         })
         ->get();
 
-        $rencana = RencanaKerja::with('hasilKerja')->where('pegawai_username', '=', $pegawaiUsername)->first();
-        $indikatorIntervensi = Cascading::with('indikator.hasilKerja.rencanakerja')->where('pegawai_username', $pegawaiUsername)->get();
+        $rencana = RencanaKerja::with('hasilKerja')->where('pegawai_id', '=', $pegawaiId)->first();
+        $indikatorIntervensi = Cascading::with('indikator.hasilKerja.rencanakerja')->where('pegawai_id', $pegawaiId)->get();
 
         return view('penilaian::realisasi', compact('rencana', 'pegawai', 'indikatorIntervensi'));
     }
@@ -77,7 +80,7 @@ class PenilaianController extends Controller
     public function matriksperanhasil(Request $request){
         $authuser = Auth::user();
         $pegawai = $authuser->pegawai;
-        $rencana = Rencanakerja::with('hasilKerja.indikator')->where('pegawai_username', $pegawai->username)->first();
+        $rencana = Rencanakerja::with('hasilKerja.indikator')->where('pegawai_id', $pegawai->id)->first();
 
         if($request->query('params') == 'json') return response()->json($rencana);
         else return view('penilaian::matriksperanhasil', compact('rencana'));
@@ -112,10 +115,11 @@ class PenilaianController extends Controller
         }
     }
 
-    public function simpanHasilEvaluasi(Request $request, $username) {
+    public function simpanHasilEvaluasi(Request $request, $id) {
         $evaluasiController = new EvaluasiController();
 
         $requestEvaluasi = [
+            'status_realisasi' => 'Sudah Dievaluasi',
             'rating_hasil_kerja' => $request->rating_hasil_kerja,
             'deskripsi_rating_hasil_kerja' => $request->deskripsi_rating_hasil_kerja,
             'rating_perilaku' => $request->rating_perilaku,
@@ -124,7 +128,7 @@ class PenilaianController extends Controller
         ];
 
         try {
-            RencanaKerja::where('pegawai_username', $username)->update($requestEvaluasi);
+            RencanaKerja::where('pegawai_id', $id)->update($requestEvaluasi);
             return redirect()->back()->with('success', 'berhasil ditambahkan');
         } catch (\Throwable $th) {
             return response()->json([
@@ -134,7 +138,25 @@ class PenilaianController extends Controller
     }
 
     public function cetakEvaluasi(){
-        $data = ['title' => 'Laporan Kinerja'];
+        $authUser = Auth::user();
+        $authPegawai = $authUser->pegawai;
+        $pegawaiUsername = $authPegawai->username;
+        $pegawaiId = $authPegawai->id;
+
+        $pegawai = Pegawai::with([
+            'pejabat.jabatan',
+            'timKerjaAnggota',
+            'rencanaKerja.hasilKerja',
+            'timKerjaAnggota.unit',
+            'timKerjaAnggota.subUnits.unit',
+            'timKerjaAnggota.parentUnit.unit',
+        ])->where('username', $pegawaiUsername)->first();
+
+        $data = [
+            'title' => 'Laporan Kinerja',
+            'pegawai' => $pegawai
+        ];
+
         $pdf = Pdf::loadView('penilaian::cetak-evaluasi-page', $data)
         ->setPaper('a4', 'potrait');
 

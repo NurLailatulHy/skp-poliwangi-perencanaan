@@ -70,24 +70,24 @@
             </thead>
             <tbody>
                 <tr>
-                    <td>1.</td><td>Nama</td><td>ELI NURMALINDA, S.Si.</td>
-                    <td>1.</td><td>Nama</td><td>UCU SUHERMAN, S.I.A., M.EA.</td>
+                    <td>1.</td><td style="width: 5%">Nama</td><td>{{ $pegawai->nama }}</td>
+                    <td>1.</td><td style="width: 5%">Nama</td><td>{{ optional($pegawai->timKerjaAnggota[0]->parentUnit?->ketua?->pegawai)->nama ?? '-' }}</td>
                 </tr>
                 <tr>
-                    <td>2.</td><td>NIP</td><td>198607292020122002</td>
-                    <td>2.</td><td>NIP</td><td>197909302003121001</td>
+                    <td>2.</td><td>NIP</td><td>{{ $pegawai->nip }}</td>
+                    <td>2.</td><td>NIP</td><td>{{ optional($pegawai->timKerjaAnggota[0]->parentUnit?->ketua?->pegawai)->nip ?? '-' }}</td>
                 </tr>
                 <tr>
-                    <td>3.</td><td>Pangkat/Gol</td><td>Penata Muda Tk.I / III.b</td>
-                    <td>3.</td><td>Pangkat/Gol</td><td>Penata / III.c</td>
+                    <td>3.</td><td>Pangkat/Gol</td><td>-</td>
+                    <td>3.</td><td>Pangkat/Gol</td><td>-</td>
                 </tr>
                 <tr>
-                    <td>4.</td><td>Jabatan</td><td>Pranata Humas Ahli Pertama</td>
-                    <td>4.</td><td>Jabatan</td><td>Kepala Subbagian Tata Usaha</td>
+                    <td>4.</td><td>Jabatan</td><td>-</td>
+                    <td>4.</td><td>Jabatan</td><td>-</td>
                 </tr>
                 <tr>
-                    <td>5.</td><td>Unit Kerja</td><td>Bagian Umum dan Kepegawaian, Biro Sumber Daya Manusia</td>
-                    <td>5.</td><td>Unit Kerja</td><td>Biro Sumber Daya Manusia</td>
+                    <td>5.</td><td>Unit Kerja</td><td>{{ $pegawai->timKerjaAnggota[0]->unit->nama }}</td>
+                    <td>5.</td><td>Unit Kerja</td><td>{{ $pegawai->timKerjaAnggota[0]->parentUnit?->unit?->nama ?? '-' }}</td>
                 </tr>
             </tbody>
         </table>
@@ -208,7 +208,7 @@
             <tbody>
                 <tr>
                     <td style="width:50%; background-color: #f2f2f2;">RATING PERILAKU</td>
-                    <td style="width:50%; background-color: #f2f2f2;">SESUAI EKSPEKTASI</td>
+                    <td style="width:50%; background-color: #f2f2f2;">{{ $pegawai->rencanakerja[0]->rating_perilaku }}</td>
                 </tr>
             </tbody>
         </table>
@@ -216,12 +216,12 @@
             <tbody>
                 <tr>
                     <td style="width:50%; background-color: #f2f2f2;">PREDIKAT KINERJA PEGAWAI</td>
-                    <td style="width:50%; background-color: #f2f2f2;">Baik</td>
+                    <td style="width:50%; background-color: #f2f2f2;">{{ $pegawai->rencanakerja[0]->predikat_akhir }}</td>
                 </tr>
             </tbody>
         </table>
 
-        <p class="mb-2"><em>Dokumen milik ELI NURMALINDA (NIP 198607292020122002)</em></p>
+        <p class="mb-2"><em>Dokumen milik {{ $pegawai->nama }} (NIP {{ $pegawai->nip }})</em></p>
     </div>
 </body>
 <script>

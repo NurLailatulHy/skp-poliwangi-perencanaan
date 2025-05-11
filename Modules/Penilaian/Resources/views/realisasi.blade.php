@@ -25,6 +25,13 @@
     <div class="row">
         <div class="col-12">
             <div class="card">
+                @include('penilaian::components.set-periode')
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
                 @php
                     switch ($rencana->status_realisasi) {
                         case 'Sudah Diajukan':
@@ -33,9 +40,9 @@
                         case 'Belum Diajukan':
                             $badgeClass = 'badge-secondary';
                             break;
-                        // case 'Sudah Dievaluasi':
-                        //     $badgeClass = 'badge-success';
-                        //     break;
+                        case 'Sudah Dievaluasi':
+                            $badgeClass = 'badge-success';
+                            break;
                         // default:
                         //     $badgeClass = 'badge-secondary';
                         //     break;
@@ -43,6 +50,17 @@
                 @endphp
                 <div class="w-100 d-flex justify-content-between align-items-center p-2">
                     <span class="badge m-2 {{ $badgeClass }}" style="width: fit-content">{{ $rencana->status_realisasi }}</span>
+                    @if ($rencana->status_realisasi == 'Belum Diajukan')
+                        <form method="POST" action="{{ url('/penilaian/realisasi/ajukan-realisasi/' . $rencana->id) }}">
+                            @csrf
+                            <button id="proses-umpan-balik-button" class="btn btn-primary">Ajukan Realisasi</button>
+                        </form>
+                    @elseif($rencana->status_realisasi == 'Sudah Diajukan')
+                        <form method="POST" action="{{ url('/penilaian/realisasi/batalkan-realisasi/' . $rencana->id) }}">
+                            @csrf
+                            <button id="proses-umpan-balik-button" class="btn btn-danger">Batalkan Pengajuan</button>
+                        </form>
+                    @endif
                     @if ($rencana->predikat_akhir !== null)
                         <div class="d-flex">
                             @include('penilaian::components.modal-cetak-evaluasi')
@@ -50,80 +68,7 @@
                         </div>
                     @endif
                 </div>
-                <div class="bg-white d-flex p-4">
-                    <table class="table" style="table-layout: fixed; width: 100%;">
-                        <thead>
-                          <tr>
-                            <th scope="col">No</th>
-                            <th colspan="2">Pegawai yang dinilai</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          <tr>
-                            <th scope="row">1</th>
-                            <td>Nama</td>
-                            <td>{{ $pegawai->nama }}</td>
-                          </tr>
-                          <tr>
-                            <th scope="row">2</th>
-                            <td>NIP</td>
-                            <td></td>
-                          </tr>
-                          <tr>
-                            <th scope="row">3</th>
-                            <td>Pangkat / Gol</td>
-                            <td>362155401190</td>
-                          </tr>
-                          <tr>
-                            <th scope="row">4</th>
-                            <td>Jabatan</td>
-                            <td>362155401190</td>
-                          </tr>
-                          <tr>
-                            <th scope="row">5</th>
-                            <td>Unit Kerja</td>
-                            <td>{{ $pejabatPenilai->unit->nama ?? null }}</td>
-                          </tr>
-                        </tbody>
-                    </table>
-                    <table class="table" style="table-layout: fixed; width: 100%;">
-                        <thead>
-                          <tr>
-                            <th scope="col">No</th>
-                            <th colspan="2">Pejabat Penilai Kinerja</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                              <th scope="row">1</th>
-                              <td>Nama</td>
-                              <td>{{ optional($pegawai->timKerjaAnggota[0]->parentUnit?->ketua?->pegawai)->nama ?? '-' }}</td>
-                            </tr>
-                            <tr>
-                              <th scope="row">2</th>
-                              <td>NIP</td>
-                              <td>{{ optional($pegawai->timKerjaAnggota[0]->parentUnit?->ketua?->pegawai)->nip ?? '-' }}</td>
-                            </tr>
-                            <tr>
-                              <th scope="row">3</th>
-                              <td>Pangkat / Gol</td>
-                              <td></td>
-                            </tr>
-                            <tr>
-                              <th scope="row">4</th>
-                              <td>Jabatan</td>
-                              <td>-</td>
-                            </tr>
-                            <tr>
-                                <th scope="row">5</th>
-                                <td>Unit Kerja</td>
-                                <td style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                                    {{ $pegawai->timKerjaAnggota[0]->parentUnit?->unit?->nama ?? '-' }}
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
+                @include('penilaian::components.atasan-bawahan-section')
                 <div class="bg-white p-4">
                     {{-- Hasil kerja --}}
                     <table class="table mb-0" style="width: 100%;">
@@ -136,70 +81,11 @@
                           </tr>
                         </thead>
                         <tbody>
-                            {{-- @foreach ($hasilKerja as $index => $item)
-                                <tr>
-                                    <th scope="row">{{ $index + 1 }}</th>
-                                    <td>
-                                        <p>{{ $item['capaian'] }}</p>
-                                        <span>Ukuran keberhasilan / Indikator Kinerja Individu, dan Target :</span>
-                                        <ul>
-                                            @foreach ($item['indikator'] as $indikator)
-                                                <li>{{ $indikator['teks'] }}</li>
-                                            @endforeach
-                                        </ul>
-                                    </td>
-                                    <td>
-                                        <span>Realisasi :</span>
-                                        <p>{{ $item['realisasi'] }}</p>
-                                    </td>
-                                    <td>
-                                        <span>Umpan Balik :</span>
-                                        <p>{{ $item['umpan_balik'] }}</p>
-                                    </td>
-                                    <td>
-                                        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModalCenter">
-                                            <i class="nav-icon fas fa-pencil-alt "></i>
-                                        </button>
-                                        <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-                                            <div class="modal-dialog modal-dialog-centered" role="document">
-                                                <div class="modal-content">
-                                                <div class="modal-header">
-                                                    <h5 class="modal-title" id="exampleModalLongTitle">Isi Realisasi</h5>
-                                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                    <span aria-hidden="true">&times;</span>
-                                                    </button>
-                                                </div>
-                                                <div class="modal-body">
-                                                    <form>
-                                                        <div class="d-flex align-items-center">
-                                                            <div class="mr-1" style="width:30%">Hasil Kerja</div>
-                                                            <div class="flex-grow" style="width: 100%">
-                                                            <input type="text" class="form-control" id="inputPassword" placeholder="Hasil Kerja">
-                                                            </div>
-                                                        </div>
-                                                        <div class="d-flex align-items-start">
-                                                            <div class="mr-1" style="width:30%">Realisasi</div>
-                                                            <div class="" style="width: 100%">
-                                                                <textarea placeholder="Realisasi" style="height: 70px; width: 100%; padding: 10px; overflow-y: auto; resize: vertical;"></textarea>
-                                                            </div>
-                                                        </div>
-                                                    </form>
-                                                </div>
-                                                <div class="modal-footer">
-                                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                                    <button type="button" class="btn btn-primary">Save changes</button>
-                                                </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                </tr>
-                            @endforeach --}}
                             @if ($rencana && $rencana->hasilKerja)
                                 @foreach ($rencana->hasilKerja as $index => $item)
                                     <tr>
                                         <th scope="row">{{ $index + 1 }}</th>
-                                        <td>
+                                        <td style="width: 50%;">
                                             <p>{{ $item['deskripsi'] }}</p>
                                             <span>Ukuran keberhasilan / Indikator Kinerja Individu, dan Target :</span>
                                             <ul>
@@ -208,16 +94,16 @@
                                                 @endforeach
                                             </ul>
                                         </td>
-                                        <td>
+                                        <td style="width: 20%;">
                                             <span>Realisasi :</span>
                                             <p>{{ $item['realisasi'] }}</p>
                                         </td>
-                                        <td>
+                                        <td style="width: 20%;">
                                             <span>Umpan Balik :</span>
-                                            <p>{{ $item['umpan_balik'] }}</p>
+                                            <p>{{ $item['umpan_balik_predikat'] }}</p>
                                         </td>
-                                        <td>
-                                            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#realisasi-{{ $item->id }}">
+                                        <td style="width: 10%;">
+                                            <button {{ $item->rencanakerja->status_realisasi == 'Sudah Dievaluasi' ? 'disabled' : '' }} type="button" class="btn btn-primary" data-toggle="modal" data-target="#realisasi-{{ $item->id }}">
                                                 <i class="nav-icon fas fa-pencil-alt "></i>
                                             </button>
                                             <div class="modal fade" id="realisasi-{{ $item->id }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
@@ -253,6 +139,10 @@
                                                     </form>
                                                 </div>
                                             </div>
+
+                                            <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#realisasi">
+                                                <i class="nav-icon fas fa-ban "></i>
+                                            </button>
                                         </td>
                                     </tr>
                                 @endforeach
@@ -285,14 +175,9 @@
                           <td colspan="5">Not Found</td>
                         </tbody>
                     </table>
-                    <div class="w-100 mt-4 d-flex justify-content-end">
-                        @if ($rencana->status_realisasi == 'Belum Diajukan')
-                            <form method="POST" action="{{ url('/penilaian/realisasi/ajukan-realisasi/' . $rencana->id) }}">
-                                @csrf
-                                <button id="proses-umpan-balik-button" class="btn btn-primary">Ajukan Realisasi</button>
-                            </form>
-                        @endif
-                    </div>
+                    {{-- <div class="w-100 mt-4 d-flex justify-content-end">
+
+                    </div> --}}
                 </div>
             </div>
         </div>
