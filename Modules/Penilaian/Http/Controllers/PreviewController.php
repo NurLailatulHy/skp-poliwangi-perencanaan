@@ -26,7 +26,7 @@ class PreviewController extends Controller {
         return view('penilaian::cetak-evaluasi-page', compact('pegawai'));
     }
 
-    public function previewDokEvaluasi(){
+    public function previewDokEvaluasi(Request $request){
         $authUser = Auth::user();
         $authPegawai = $authUser->pegawai;
         $pegawaiUsername = $authPegawai->username;
@@ -40,6 +40,11 @@ class PreviewController extends Controller {
             'timKerjaAnggota.subUnits.unit',
             'timKerjaAnggota.parentUnit.unit',
         ])->where('username', $pegawaiUsername)->first();
-        return view('penilaian::cetak-dokevaluasi-page', compact('pegawai'));
+
+        if($request->query('params') == 'json'){
+            return response()->json($pegawai);
+        }else {
+            return view('penilaian::cetak-dokevaluasi-page', compact('pegawai'));
+        }
     }
 }

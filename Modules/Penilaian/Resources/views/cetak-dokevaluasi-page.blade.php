@@ -61,10 +61,10 @@
                     <th colspan="3">PEGAWAI YANG DINILAI</th>
                 </tr>
                 <tr>
-                    <td>NAMA</td><td>:</td><td>Widura Hasta Sasangka</td>
+                    <td>NAMA</td><td>:</td><td>{{ $pegawai->nama }}</td>
                 </tr>
                 <tr>
-                    <td>NIP</td><td>:</td><td>198607292020122002</td>
+                    <td>NIP</td><td>:</td><td>{{ $pegawai->nip }}</td>
                 </tr>
                 <tr>
                     <td>Pangkat/Gol</td><td>:</td><td>Penata Muda Tk.I / III.b</td>
@@ -73,7 +73,7 @@
                     <td>Jabatan</td><td>:</td><td>Pranata Humas Ahli Pertama</td>
                 </tr>
                 <tr>
-                    <td>Unit Kerja</td><td>:</td><td>Bagian Umum dan Kepegawaian, Biro Sumber Daya Manusia</td>
+                    <td>Unit Kerja</td><td>:</td><td>{{ $pegawai->timKerjaAnggota[0]->unit->nama }}</td>
                 </tr>
             </tbody>
             <tbody>
@@ -82,10 +82,10 @@
                     <th colspan="3">PEJABAT PENILAI KINERJA</th>
                 </tr>
                 <tr>
-                    <td>NAMA</td><td>:</td><td>Widura Hasta Sasangka</td>
+                    <td>NAMA</td><td>:</td><td>{{ optional($pegawai->timKerjaAnggota[0]->parentUnit?->ketua?->pegawai)->nama ?? '-' }}</td>
                 </tr>
                 <tr>
-                    <td>NIP</td><td>:</td><td>198607292020122002</td>
+                    <td>NIP</td><td>:</td><td>{{ optional($pegawai->timKerjaAnggota[0]->parentUnit?->ketua?->pegawai)->nip ?? '-' }}</td>
                 </tr>
                 <tr>
                     <td>Pangkat/Gol</td><td>:</td><td>Penata Muda Tk.I / III.b</td>
@@ -94,7 +94,7 @@
                     <td>Jabatan</td><td>:</td><td>Pranata Humas Ahli Pertama</td>
                 </tr>
                 <tr>
-                    <td>Unit Kerja</td><td>:</td><td>Bagian Umum dan Kepegawaian, Biro Sumber Daya Manusia</td>
+                    <td>Unit Kerja</td><td>:</td><td>{{ $pegawai->timKerjaAnggota[0]->parentUnit?->unit?->nama ?? '-' }}</td>
                 </tr>
             </tbody>
             <tbody>
@@ -127,7 +127,7 @@
                     <td>CAPAIAN KINERJA ORGANISASI</td><td>:</td><td>ISTIMEWA</td>
                 </tr>
                 <tr>
-                    <td>PREDIKAT KINERJA PEGAWAI</td><td>:</td><td>BAIK</td>
+                    <td>PREDIKAT KINERJA PEGAWAI</td><td>:</td><td>{{ $pegawai->rencanaKerja[0]->predikat_akhir }}</td>
                 </tr>
             </tbody>
             <tbody>
