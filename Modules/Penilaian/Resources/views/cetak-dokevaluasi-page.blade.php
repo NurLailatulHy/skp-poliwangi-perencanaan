@@ -5,6 +5,13 @@
     <title>Evaluasi Kinerja Pegawai</title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <style>
+        @page {
+            margin-top: {{ $margin_top ?? '0mm' }};
+            margin-bottom: {{ $margin_bottom ?? '0mm' }};
+            margin-left: {{ $margin_left ?? '0mm' }};
+            margin-right: {{ $margin_right ?? '0mm' }};
+        }
+
         body {
             font-size: 10px;
         }
@@ -144,8 +151,8 @@
         <table class="mt-4" cellspacing="0" cellpadding="0" width="100%" style="font-size: 10px;">
             <tbody>
                 <tr>
-                    <td class="text-center" style="width: 50%;">Jakarta, 3 Januari 2023</td>
-                    <td class="text-center" style="width: 50%;">Jakarta, 3 Januari 2023</td>
+                    <td class="text-center" style="width: 50%;">{{ $ttd_pegawai_date ?? '-' }}</td>
+                    <td class="text-center" style="width: 50%;">{{ $ttd_pejabat_date ?? '-' }}</td>
                 </tr>
                 <tr>
                     <td class="text-center" style="width: 50%;">Pegawai yang Dinilai</td>
@@ -156,12 +163,12 @@
                     <td class="text-center" style="height:100px;"></td>
                 </tr>
                 <tr>
-                    <td class="text-center" style="width: 50%;">Widura Hasta Sasangka</td>
-                    <td class="text-center" style="width: 50%;">Widura Hasta Sasangka</td>
+                    <td class="text-center" style="width: 50%;">{{ $pegawai->nama }}</td>
+                    <td class="text-center" style="width: 50%;">{{ optional($pegawai->timKerjaAnggota[0]->parentUnit?->ketua?->pegawai)->nama ?? '-' }}</td>
                 </tr>
                 <tr>
-                    <td class="text-center" style="width: 50%;">NIP 362155401190</td>
-                    <td class="text-center" style="width: 50%;">NIP 362155401190</td>
+                    <td class="text-center" style="width: 50%;">{{ $pegawai->nip }}</td>
+                    <td class="text-center" style="width: 50%;">{{ optional($pegawai->timKerjaAnggota[0]->parentUnit?->ketua?->pegawai)->nip ?? '-' }}</td>
                 </tr>
             </tbody>
         </table>

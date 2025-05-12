@@ -11,6 +11,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Dompdf\Dompdf;
 
 class PrintController extends Controller {
+
     public function cetakEvaluasi(Request $request){
         $authUser = Auth::user();
         $authPegawai = $authUser->pegawai;
@@ -38,25 +39,26 @@ class PrintController extends Controller {
 
         $pdf = Pdf::loadView('penilaian::cetak-evaluasi-page', $data);
         $pdf->setPaper('a4', $request->position);
-
-        // return response()->json([
-        //     'a4' => $request->position,
-        //     'isHtml5ParserEnabled' => true,
-        //     'isRemoteEnabled' => true,
-        //     'marginTop'    => $request->margin_atas,    // Top margin
-        //     'marginBottom' => $request->margin_bawah,    // Bottom margin
-        //     'marginLeft'   => $request->margin_kiri,    // Left margin
-        //     'marginRight'  => $request->margin_kanan,    // Right margin
-        // ]);
         return $pdf->download('laporan.pdf');
     }
 
-    public function cetakDokEvaluasi(){
+    public function cetakDokEvaluasi(Request $request){
+        $penilaianController = new PenilaianController();
+        $pegawai = $penilaianController->getPegawaiWhoLogin();
+
         $data = [
             'title' => 'Laporan Kinerja',
+            'pegawai' => $pegawai,
+            'ttd_pegawai_date' => $request->ttd_pegawai_date,
+            'ttd_pejabat_date' => $request->ttd_pejabat_date,
+            'margin_top'    => $request->margin_top,
+            'margin_bottom' => $request->margin_bottom,
+            'margin_left'   => $request->margin_left,
+            'margin_right'  => $request->margin_right,
+            'position' => $request->position
         ];
         $pdf = Pdf::loadView('penilaian::cetak-dokevaluasi-page', $data)
-        ->setPaper('a4', 'potrait');
+        ->setPaper('a4', $request->position);
 
         return $pdf->download('laporan.pdf');
     }
