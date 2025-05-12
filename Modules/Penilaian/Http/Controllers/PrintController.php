@@ -11,7 +11,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Dompdf\Dompdf;
 
 class PrintController extends Controller {
-    public function cetakEvaluasi(){
+    public function cetakEvaluasi(Request $request){
         $authUser = Auth::user();
         $authPegawai = $authUser->pegawai;
         $pegawaiUsername = $authPegawai->username;
@@ -32,7 +32,7 @@ class PrintController extends Controller {
         ];
 
         $pdf = Pdf::loadView('penilaian::cetak-evaluasi-page', $data)
-        ->setPaper('a4', 'potrait');
+        ->setPaper('a4', $request->position);
 
         return $pdf->download('laporan.pdf');
     }

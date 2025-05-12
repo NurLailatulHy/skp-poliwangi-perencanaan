@@ -42,15 +42,34 @@
                 <div class="d-flex align-items-center">
                     <div class="mr-1" style="width:30%">Orientasi Halaman</div>
                     <div class="d-flex justify-content-start">
+                        {{-- @php
+                            $positions = [
+                                [
+                                    'id' => 1,
+                                    'type' => 'potrait',
+                                    'name' => 'Potrait'
+                                ],
+                                [
+                                    'id' => 2,
+                                    'type' => 'landscape',
+                                    'name' => 'Landscape'
+                                ]
+                            ]
+                        @endphp
+                        @foreach ($positions as $item)
+                            <div class="form-check mr-1">
+                                <input class="form-check-input" type="radio" name="radios-{{ $item['name'] }}" id="radio-{{ $item['name'] }}" value="{{ $item['type'] }}">
+                                <label class="form-check-label" for="radio-{{ $item['name'] }}">{{ $item['name'] }}</label>
+                            </div>
+                        @endforeach --}}
                         <div class="form-check mr-1">
-                            <input class="form-check-input" type="radio" name="exampleRadios" id="radio1" value="option1" checked>
+                            <input class="form-check-input" type="radio" name="position" id="radio1" value="potrait" checked>
                             <label class="form-check-label" for="radio1">
                                 Potrait
                             </label>
                         </div>
-
                         <div class="form-check">
-                            <input class="form-check-input" type="radio" name="exampleRadios" id="radio2" value="option2">
+                            <input class="form-check-input" type="radio" name="position" id="radio2" value="landscape">
                             <label class="form-check-label" for="radio2">
                                 Landscape
                             </label>
