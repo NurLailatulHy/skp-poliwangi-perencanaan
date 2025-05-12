@@ -5,22 +5,6 @@
 @section('content_header')
     <h1 class="m-0 text-dark">Realisasi</h1>
 @stop
-@php
-    $hasilKerja = [
-        [
-            'id' => 1,
-            'capaian' => 'Manual book penggunaan aplikasi modul penyusunan SKP yang lengkap dan informatif (Penugasan dari Ketua Tim Perencanaan dan Sistem Informasi)',
-            'indikator' => [
-                [
-                    'id' => 1,
-                    'teks' => 'Draft manual book penggunaan aplikasi modul penyusunan rencana SKP yang lengkap sesuai dengan ketentuan dan diselesaikan maksimal satu bulan sebelum kegiatan sosialisasi'
-                ]
-            ],
-            'realisasi' => 'Draft manual book aplikasi untuk modul penyusunan rencana SKP telah selesai pada bulan April sesuai dengan proses bisnis aplikasi',
-            'umpan_balik' => ''
-        ]
-    ];
-@endphp
 @section('content')
     <div class="row">
         <div class="col-12">
@@ -43,9 +27,6 @@
                         case 'Sudah Dievaluasi':
                             $badgeClass = 'badge-success';
                             break;
-                        // default:
-                        //     $badgeClass = 'badge-secondary';
-                        //     break;
                     }
                 @endphp
                 <div class="w-100 d-flex justify-content-between align-items-center p-2">
@@ -157,11 +138,9 @@
                         </thead>
                         <tbody>
                             <tbody>
-                                @foreach ($hasilKerja as $index => $item)
-                                    <tr>
-                                        <td colspan="5">Not Found</td>
-                                    </tr>
-                                @endforeach
+                                <tr>
+                                    <td colspan="5">Not Found</td>
+                                </tr>
                             </tbody>
                         </tbody>
                     </table>

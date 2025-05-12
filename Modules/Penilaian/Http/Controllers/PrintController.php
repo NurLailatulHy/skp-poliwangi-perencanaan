@@ -38,14 +38,12 @@ class PrintController extends Controller {
     }
 
     public function cetakDokEvaluasi(){
-        $html = view('penilaian::cetak-dokevaluasi-page')->render();
+        $data = [
+            'title' => 'Laporan Kinerja',
+        ];
+        $pdf = Pdf::loadView('penilaian::cetak-dokevaluasi-page', $data)
+        ->setPaper('a4', 'potrait');
 
-        $pdf = new Dompdf();
-        $pdf->loadHtml($html);
-        $pdf->render();
-
-        return response($pdf->output(), 200)
-            ->header('Content-Type', 'application/pdf')
-            ->header('Content-Disposition', 'inline; filename="laporan.pdf"');
+        return $pdf->download('laporan.pdf');
     }
 }
