@@ -28,12 +28,26 @@ class PrintController extends Controller {
 
         $data = [
             'title' => 'Laporan Kinerja',
-            'pegawai' => $pegawai
+            'pegawai' => $pegawai,
+            'print_date' => $request->print_date,
+            'margin_top'    => $request->margin_top,
+            'margin_bottom' => $request->margin_bottom,
+            'margin_left'   => $request->margin_left,
+            'margin_right'  => $request->margin_right,
         ];
 
-        $pdf = Pdf::loadView('penilaian::cetak-evaluasi-page', $data)
-        ->setPaper('a4', $request->position);
+        $pdf = Pdf::loadView('penilaian::cetak-evaluasi-page', $data);
+        $pdf->setPaper('a4', $request->position);
 
+        // return response()->json([
+        //     'a4' => $request->position,
+        //     'isHtml5ParserEnabled' => true,
+        //     'isRemoteEnabled' => true,
+        //     'marginTop'    => $request->margin_atas,    // Top margin
+        //     'marginBottom' => $request->margin_bawah,    // Bottom margin
+        //     'marginLeft'   => $request->margin_kiri,    // Left margin
+        //     'marginRight'  => $request->margin_kanan,    // Right margin
+        // ]);
         return $pdf->download('laporan.pdf');
     }
 
