@@ -13,7 +13,7 @@ use Modules\Penilaian\Entities\Cascading;
 class PenilaianController extends Controller
 {
 
-    public function getPegawaiWhoLogin($filterTimKerjaId = 2){
+    public function getPegawaiWhoLogin($filterTimKerjaId = null){
         $authUser = Auth::user();
         $username = $authUser->pegawai->username;
         $pegawai = Pegawai::with([

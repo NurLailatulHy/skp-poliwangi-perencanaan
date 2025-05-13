@@ -23,10 +23,6 @@ class RencanaController extends Controller
             $penilaianController = new PenilaianController();
             $pegawai = $penilaianController->getPegawaiWhoLogin();
 
-            if($pegawai->timKerjaAnggota[0]->parentUnit != null){
-                $atasan = $pegawai->timKerjaAnggota[0]->parentUnit->ketua->pegawai;
-            }
-
             $timKerjaId = $pegawai->timKerjaAnggota[0]->id;
 
             $bawahan = Anggota::with(['timKerja', 'pegawai'])

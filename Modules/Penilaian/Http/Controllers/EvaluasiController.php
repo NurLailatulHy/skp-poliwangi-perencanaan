@@ -17,8 +17,6 @@ class EvaluasiController extends Controller
 {
 
     public function predikatKinerja($hasilKerja, $perilaku) {
-        // $hasilKerja = (int) $request->input('hasil_kerja');
-        // $perilaku   = (int) $request->input('perilaku');
         $hasilKerjaMap = [ 'Dibawah Ekspektasi' => 1, 'Sesuai Ekspektasi' => 2, 'Diatas Ekspektasi' => 3 ];
         $perilakuMap = [ 'Dibawah Ekspektasi' => 1, 'Sesuai Ekspektasi' => 2, 'Diatas Ekspektasi' => 3 ];
 
@@ -72,8 +70,8 @@ class EvaluasiController extends Controller
             $authUser = Auth::user();
             $pegawai = $authUser->pegawai;
             $username = $pegawai->username;
-            $ketua = Pejabat::where('pegawai_id', '=', $pegawai->id)->first();
             $timKerjaId = $pegawai->timKerjaAnggota[0]->id;
+            $ketua = Pejabat::where('pegawai_id', '=', $pegawai->id)->first();
 
             if($ketua != null) {
                 $bawahan = Anggota::with(['timKerja', 'pegawai.rencanakerja'])
