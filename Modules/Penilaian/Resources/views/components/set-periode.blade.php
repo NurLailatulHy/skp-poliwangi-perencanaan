@@ -16,6 +16,9 @@
                     <option selected value="">-- Pilih Tahun --</option>
                 @endif
             </select>
+            @error('periodetahun')
+                <div style="color: red;">{{ $message }}</div>
+            @enderror
             <select name="periode-range" id="" class="form-control mr-2">
                 @if (count($periode) === 1)
                     @foreach ($periode as $p)
@@ -30,7 +33,7 @@
                     <option selected value="">-- Pilih Rentang Periode --</option>
                 @endif
             </select>
-            <select name="unit_id" id="nama-unit" class="form-control mr-2" {{ count($pegawai->timKerjaAnggota) === 1 ? 'disabled' : ''  }}>
+            <select name="tim_kerja_id" id="nama-unit" class="form-control mr-2" {{ count($pegawai->timKerjaAnggota) === 1 ? '' : ''  }}>
                 @if (count($pegawai->timKerjaAnggota) === 1)
                     @foreach ($pegawai->timKerjaAnggota as $p)
                         <option selected value="{{ $p->id }}">{{ $p->unit->nama }}</option>
@@ -42,6 +45,9 @@
                     @endforeach
                 @endif
             </select>
+            @error('tim_kerja_id')
+                <div style="color: red;">{{ $message }}</div>
+            @enderror
             <select name="peran" id="peran" class="form-control mr-2" {{ count($pegawai->timKerjaAnggota) === 1 ? 'disabled' : '' }}>
                 @if (count($pegawai->timKerjaAnggota) === 1)
                     @foreach ($pegawai->timKerjaAnggota as $p)
