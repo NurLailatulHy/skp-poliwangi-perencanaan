@@ -48,14 +48,14 @@
                             break;
                     }
                 @endphp
-                <div class="w-100 d-flex justify-content-between align-items-center px-4">
-                    @if (is_null($rencana))
+                @if (is_null($rencana))
+                    <div class="w-100 d-flex justify-content-end align-items-center p-4">
                         <form method="POST" action="{{ url('/penilaian/rencana/store') }}">
                             @csrf
                             <button type="submit" class="btn btn-primary">Buat SKP</button>
                         </form>
-                    @endif
-                </div>
+                    </div>
+                @endif
 
                 @include('penilaian::components.atasan-bawahan-section', ['pegawai' => $pegawai])
                 <div class="bg-white p-4">
