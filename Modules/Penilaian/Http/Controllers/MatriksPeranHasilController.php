@@ -65,12 +65,17 @@ class MatriksPeranHasilController extends Controller
                     }
                 )->orWhere(function ($q) use ($timKerjaId) {
                         $q->whereHas('timKerja', function ($sub) use ($timKerjaId) {
-                            $sub->where('id', $timKerjaId)->orWhereNull('parent_id');
-                        })
-                        ->where('peran', '!=', 'Ketua');
+                            $sub->where('id', $timKerjaId);
+                        })->where('peran', '!=', 'Ketua');
                     }
                 );
             })->paginate(10);
+
+            if($request->query('params') == 'json'){
+                return response()->json([
+                    'bawahan' => $bawahan
+                ]);
+            }
 
             return response()->json([
                 'status' => 'success',

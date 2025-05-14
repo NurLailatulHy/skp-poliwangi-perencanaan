@@ -32,13 +32,22 @@ class PeriodeController extends Controller
     public function setPeriode(Request $request){
         $request->validate([
             'periodetahun' => 'required|exists:periodes,id',
-            'unit_id' => 'required',
+            'tim_kerja_id' => 'required',
+        ], [
+            'periodetahun.required' => 'Periode tahun belum di-set.',
+            'periodetahun.exists' => 'Periode tahun tidak ditemukan dalam data.',
+            'unit_id.required' => 'Unit harus diisi.',
         ]);
-        session([
-            'selected_periode_id' => $request->periodetahun,
-            'unit_id' => $request->unit_id
-        ]);
+
         // dd(session()->all());
-        return redirect()->to('/penilaian/rencana/');
+        try {
+            session([
+                'selected_periode_id' => $request->periodetahun,
+                'tim_kerja_id' => $request->tim_kerja_id
+            ]);
+            return redirect()->to('/penilaian/rencana/');
+        } catch (\Throwable $th) {
+            return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $th->getMessage());
+        }
     }
 }

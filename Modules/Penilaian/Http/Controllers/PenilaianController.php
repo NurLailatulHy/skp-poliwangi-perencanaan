@@ -22,6 +22,7 @@ class PenilaianController extends Controller
                     $query->where('tim_kerja_anggota.tim_kerja_id', $filterTimKerjaId);
                 }
             },
+            'timKerjaAnggota.ketua',
             'rencanaKerja.hasilKerja', 'timKerjaAnggota.unit',
             'timKerjaAnggota.subUnits.unit','timKerjaAnggota.parentUnit.unit',
         ])->where('username', $username)->first();
