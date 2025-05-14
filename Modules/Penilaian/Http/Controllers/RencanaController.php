@@ -18,38 +18,38 @@ use Modules\Penilaian\Entities\Periode;
 
 class RencanaController extends Controller
 {
-    // public function getAnggota(Request $request) {
-    //     try {
-    //         $penilaianController = new PenilaianController();
-    //         $pegawai = $penilaianController->getPegawaiWhoLogin();
+    public function getAnggota(Request $request) {
+        try {
+            $penilaianController = new PenilaianController();
+            $pegawai = $penilaianController->getPegawaiWhoLogin();
 
-    //         $timKerjaId = $pegawai->timKerjaAnggota[0]->id;
+            $timKerjaId = $pegawai->timKerjaAnggota[0]->id;
 
-    //         $bawahan = Anggota::with(['timKerja', 'pegawai'])
-    //         ->where(function ($query) use ($timKerjaId) {
-    //             $query->whereHas('timKerja', function ($q) use ($timKerjaId) {
-    //                     $q->where('parent_id', $timKerjaId);
-    //                 }
-    //             )->orWhere(function ($q) use ($timKerjaId) {
-    //                     $q->whereHas('timKerja', function ($sub) use ($timKerjaId) {
-    //                         $sub->where('id', $timKerjaId)->orWhereNull('parent_id');
-    //                     })
-    //                     ->where('peran', '!=', 'Ketua');
-    //                 }
-    //             );
-    //         })->paginate(10);
+            $bawahan = Anggota::with(['timKerja', 'pegawai'])
+            ->where(function ($query) use ($timKerjaId) {
+                $query->whereHas('timKerja', function ($q) use ($timKerjaId) {
+                        $q->where('parent_id', $timKerjaId);
+                    }
+                )->orWhere(function ($q) use ($timKerjaId) {
+                        $q->whereHas('timKerja', function ($sub) use ($timKerjaId) {
+                            $sub->where('id', $timKerjaId);
+                        })
+                        ->where('peran', '!=', 'Ketua');
+                    }
+                );
+            })->paginate(10);
 
-    //         return response()->json([
-    //             'status' => 'success',
-    //             'draw' => $request->draw,
-    //             'recordsTotal' => $bawahan->total(),
-    //             'recordsFiltered' => $bawahan->total(),
-    //             'data' => $bawahan->items()
-    //         ]);
-    //     } catch (\Throwable $th) {
-    //         return response()->json($th->getMessage());
-    //     }
-    // }
+            return response()->json([
+                'status' => 'success',
+                'draw' => $request->draw,
+                'recordsTotal' => $bawahan->total(),
+                'recordsFiltered' => $bawahan->total(),
+                'data' => $bawahan->items()
+            ]);
+        } catch (\Throwable $th) {
+            return response()->json($th->getMessage());
+        }
+    }
 
     public function index(Request $request){
         $penilaianController = new PenilaianController();
