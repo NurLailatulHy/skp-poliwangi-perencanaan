@@ -60,7 +60,7 @@ class EvaluasiController extends Controller
             'timKerjaAnggota.parentUnit.unit',
         ])->where('username', '=', $username)->first();
 
-        $rencana = RencanaKerja::with('hasilKerja')->where('pegawai_id', '=', $pegawai->id)->first();
+        $rencana = RencanaKerja::with(['hasilKerja', 'perilakuKerja'])->where('pegawai_id', '=', $pegawai->id)->first();
         if($params == 'json') return response()->json($rencana);
         else return view('penilaian::evaluasi-detail', compact('pegawai', 'rencana'));
     }

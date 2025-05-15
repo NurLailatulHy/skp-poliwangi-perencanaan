@@ -25,11 +25,12 @@ class CreateSkpRencanaKerjaTable extends Migration
             $table->string('rating_perilaku')->nullable();
             $table->text('deskripsi_rating_perilaku')->nullable();
             $table->enum('predikat_akhir', ['Istimewa', 'Baik', 'Cukup', 'Kurang', 'Sangat Kurang', 'Butuh Perbaikan'])->nullable();
-            $table->foreignId('periode_id')->nullable()->constrained('periodes')->onDelete('cascade');
+            $table->unsignedBigInteger('periode_id')->nullable();
             $table->unsignedBigInteger('pegawai_id')->nullable();
             $table->unsignedBigInteger('lampiran_id')->nullable();
             $table->timestamps();
 
+            $table->foreign('periode_id')->references('id')->on('periodes')->onDelete('cascade');
             $table->foreign('pegawai_id')->references('id')->on('pegawai')->onDelete('cascade');
             $table->foreign('tim_kerja_id')->references('id')->on('tim_kerja')->onDelete('cascade');
         });
@@ -43,5 +44,6 @@ class CreateSkpRencanaKerjaTable extends Migration
     public function down()
     {
         Schema::dropIfExists('skp_rencana_kerja');
+        Schema::dropIfExists('periodes');
     }
 }

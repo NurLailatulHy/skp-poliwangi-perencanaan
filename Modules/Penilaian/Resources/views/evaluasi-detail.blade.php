@@ -103,39 +103,6 @@
                                 <tr>
                                     <td colspan="4">No data</td>
                                 </tr>
-                                {{-- <tr>
-                                    <th scope="row">1</th>
-                                    <td>
-                                        <p>
-                                            Manual book penggunaan aplikasi modul penyusunan SKP yang lengkap dan informatif (Penugasan dari Ketua Tim Perencanaan dan Sistem Informasi)
-                                        </p>
-                                        <span>Ukuran keberhasilan / Indikator Kinerja Individu, dan Target :</span>
-                                        <ul>
-                                            <li>Draft manual book penggunaan aplikasi modul penyusunan rencana SKP yang lengkap sesuai dengan ketentuan dan diselesaikan maksimal satu bulan sebelum kegiatan sosialisasi</li>
-                                        </ul>
-                                    </td>
-                                    <td>
-                                        <span>Realisasi :</span>
-                                        <p>Draft manual book aplikasi untuk modul penyusunan rencana SKP telah selesai pada bulan April sesuai dengan proses bisnis aplikasi</p>
-                                    </td>
-                                    <td>
-                                        <span>Umpan Balik :</span>
-                                        <div class="input-group">
-                                            <select class="custom-select" id="inputGroupSelect04">
-                                            <option selected>Choose...</option>
-                                            <option value="1">One</option>
-                                            <option value="2">Two</option>
-                                            <option value="3">Three</option>
-                                            </select>
-                                            <div class="input-group-append">
-                                            <button class="btn btn-outline-secondary" type="button">
-                                                <i class="nav-icon fas fa-copy "></i>
-                                            </button>
-                                            </div>
-                                        </div>
-                                        <textarea style="height: 150px; width: 100%; padding: 10px; overflow-y: auto; resize: vertical;"></textarea>
-                                    </td>
-                                </tr> --}}
                             </tbody>
                         </table>
                         {{-- perilaku --}}
@@ -146,41 +113,42 @@
                               </tr>
                             </thead>
                             <tbody>
-                                {{-- <tr>
-                                    <td colspan="4">No data</td>
-                                </tr> --}}
-                                <tr>
-                                    <th scope="row">1</th>
-                                    <td>
-                                        <p>
-                                            Berorientasi Pelayanan
-                                        </p>
-                                        <ul>
-                                            <li>Memahami dan memenuhi kebutuhan masyarakat</li>
-                                            <li>Ramah, cekatan, solutif, dan dapat diandalkan</li>
-                                            <li>Melakukan perbaikan tiada henti</li>
-                                        </ul>
-                                    </td>
-                                    <td>
-                                        <span>Ekspektasi Khusus Pimpinan:</span>
-                                        <p>Memberikan pelayanan penilaian kinerja secara maksimal kepada pegawai</p>
-                                    </td>
-                                    <td>
-                                        <span>Umpan Balik :</span>
-                                        <div class="input-group">
-                                            <input type="hidden" name="">
-                                            <select class="custom-select" id="perilaku_kerja_id" name="perilaku_kerja">
-                                                @include('penilaian::components.predikat-dropdown', ['jenis' => 'Predikat'])
-                                            </select>
-                                            <div class="input-group-append">
-                                                <button class="btn btn-outline-secondary" type="button">
-                                                    <i class="nav-icon fas fa-copy "></i>
-                                                </button>
-                                            </div>
-                                        </div>
-                                        <textarea style="height: 150px; width: 100%; padding: 10px; overflow-y: auto; resize: vertical;"></textarea>
-                                    </td>
-                                </tr>
+                                @if ($rencana && $rencana->perilakuKerja)
+                                    @foreach ($rencana->perilakuKerja as $index => $item)
+                                        <tr>
+                                            <th scope="row">{{ $index + 1 }}</th>
+                                            <td>
+                                                <p>
+                                                    {{ $item->deskripsi }}
+                                                </p>
+                                                <ul>
+                                                    <li>Memahami dan memenuhi kebutuhan masyarakat</li>
+                                                    <li>Ramah, cekatan, solutif, dan dapat diandalkan</li>
+                                                    <li>Melakukan perbaikan tiada henti</li>
+                                                </ul>
+                                            </td>
+                                            <td>
+                                                <span>Ekspektasi Khusus Pimpinan:</span>
+                                                <p>{{ $item->ekspektasi_pimpinan }}</p>
+                                            </td>
+                                            <td>
+                                                <span>Umpan Balik :</span>
+                                                <div class="input-group">
+                                                    <input type="hidden" name="">
+                                                    <select class="custom-select" id="perilaku_kerja_id" name="perilaku_kerja">
+                                                        @include('penilaian::components.predikat-dropdown', ['jenis' => 'Predikat'])
+                                                    </select>
+                                                    <div class="input-group-append">
+                                                        <button class="btn btn-outline-secondary" type="button">
+                                                            <i class="nav-icon fas fa-copy "></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                                <textarea style="height: 150px; width: 100%; padding: 10px; overflow-y: auto; resize: vertical;"></textarea>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                @endif
                             </tbody>
                         </table>
                         @php

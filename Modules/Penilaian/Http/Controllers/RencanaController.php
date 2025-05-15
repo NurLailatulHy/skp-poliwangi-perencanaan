@@ -8,13 +8,12 @@ use Illuminate\Routing\Controller;
 use Modules\Penilaian\Entities\RencanaKerja;
 use Illuminate\Support\Facades\Auth;
 use Modules\Pengaturan\Entities\Anggota;
-use Modules\Pengaturan\Entities\Jabatan;
-use Modules\Pengaturan\Entities\Pegawai;
 use Illuminate\Support\Facades\DB;
 use Modules\Penilaian\Entities\Cascading;
 use Modules\Penilaian\Entities\HasilKerja;
 use Modules\Penilaian\Entities\Indikator;
-use Modules\Penilaian\Entities\Periode;
+use Modules\Penilaian\Entities\PerilakuKerja;
+use Modules\Penilaian\Entities\RencanaPerilaku;
 
 class RencanaController extends Controller
 {
@@ -68,10 +67,11 @@ class RencanaController extends Controller
     }
 
     public function store(){
+        DB::beginTransaction();
         try {
             $authUser = Auth::user();
             $pegawai = $authUser->pegawai;
-            RencanaKerja::create([
+            $rencana = RencanaKerja::create([
                 'tim_kerja_id' => session('tim_kerja_id'),
                 'periode_id' => session('selected_periode_id'),
                 'status_persetujuan' => 'Belum Ajukan SKP',
@@ -79,8 +79,20 @@ class RencanaController extends Controller
                 'pegawai_id' => $pegawai->id
             ]);
 
+            $perilakuList = PerilakuKerja::all();
+
+            foreach ($perilakuList as $perilaku) {
+                RencanaPerilaku::create([
+                    'rencana_id' => $rencana->id,
+                    'perilaku_kerja_id' => $perilaku->id,
+                ]);
+            }
+
+            DB::commit();
+
             return redirect()->back()->with('success', 'Berhasil Buat SKP');
         } catch (\Throwable $th) {
+            DB::rollBack();
             return response()->json($th->getMessage());
         }
     }

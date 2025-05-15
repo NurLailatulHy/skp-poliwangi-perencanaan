@@ -5,14 +5,19 @@ namespace Modules\Penilaian\Entities;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class PerilakuKerja extends Model
+class RencanaPerilaku extends Model
 {
     use HasFactory;
-    protected $table = 'skp_perilaku_kerja';
+    protected $table = 'skp_rencana_perilaku';
     protected $guarded = ['id'];
+
+    public function perilakuKerja()
+    {
+        return $this->belongsTo(PerilakuKerja::class);
+    }
 
     public function rencanaKerja()
     {
-        return $this->belongsToMany(RencanaKerja::class, 'skp_rencana_perilaku', 'perilaku_kerja_id', 'rencana_id');
+        return $this->belongsTo(RencanaKerja::class);
     }
 }

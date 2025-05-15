@@ -15,7 +15,8 @@ class CreatePerilakuKerjaTable extends Migration
     {
         Schema::create('skp_perilaku_kerja', function (Blueprint $table) {
             $table->id();
-
+            $table->string('deskripsi');
+            $table->text('kriteria');
             $table->timestamps();
         });
     }
@@ -27,6 +28,6 @@ class CreatePerilakuKerjaTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('perilaku_kerja');
+        Schema::dropIfExists('skp_perilaku_kerja');
     }
 }
