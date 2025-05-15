@@ -1,11 +1,9 @@
 <script>
     const colorStatus = (status) => {
-        if(status == 'Belum Ajukan') {
+        if(status == 'Belum Diajukan') {
             return `danger`
         }else if (status == 'Belum Dievaluasi') {
             return `secondary`
-        } else {
-            return `success`
         }
     }
 
@@ -25,7 +23,8 @@
                                 id: data.pegawai.id,
                                 nama: data.pegawai.nama,
                                 username: data.pegawai.username,
-                                rencanakerja: data.pegawai.rencanakerja
+                                rencanakerja: data.pegawai.rencanakerja,
+                                jabatan: data.pegawai.jabat,
                             }
                         })
                     } catch (error) {
@@ -47,7 +46,10 @@
                 {
                     data: null,
                     name: 'jabatan',
-                    orderable: true
+                    orderable: true,
+                    render: (data, type, row) => {
+                        return '-'
+                    }
                 },
                 {
                     data: null,
@@ -71,9 +73,9 @@
                     render: (data, type, row) => {
                         const arrayRencana = row.rencanakerja
                         if(arrayRencana.length != 0) {
-                            return `<span>${row.rencanakerja[0].predikat_akhir}</span>`
+                            return `<span>${row.rencanakerja?.[0]?.predikat_akhir ?? '-'}</span>`
                         }else {
-                            return `-`
+                            return `<span>-</span>`
                         }
                     }
                 },

@@ -33,12 +33,33 @@
                     <option selected value="">-- Pilih Rentang Periode --</option>
                 @endif
             </select>
-
-            <input name="tim_kerja_id" id="nama-unit" class="form-control mr-2" value="{{ $pegawai->timKerjaAnggota[0]->unit->nama }}" disabled>
+            <select name="tim_kerja_id" id="nama-unit" class="form-control mr-2" {{ count($pegawai->timKerjaAnggota) === 1 ? '' : ''  }}>
+                @if (count($pegawai->timKerjaAnggota) === 1)
+                    @foreach ($pegawai->timKerjaAnggota as $p)
+                        <option selected value="{{ $p->id }}">{{ $p->unit->nama }}</option>
+                    @endforeach
+                @elseif(count($pegawai->timKerjaAnggota) > 1)
+                    <option value="">-- Pilih Unit --</option>
+                    @foreach ($pegawai->timKerjaAnggota as $p)
+                        <option value="{{ $p->id }}">{{ $p->unit->nama }}</option>
+                    @endforeach
+                @endif
+            </select>
             @error('tim_kerja_id')
                 <div style="color: red;">{{ $message }}</div>
             @enderror
-            <input type="text" disabled class="form-control mr-2" value="{{ $pegawai->timKerjaAnggota[0]->pivot->peran }} {{ $pegawai->timKerjaAnggota[0]->unit->nama }}">
+            <select name="peran" id="peran" class="form-control mr-2" {{ count($pegawai->timKerjaAnggota) === 1 ? 'disabled' : '' }}>
+                @if (count($pegawai->timKerjaAnggota) === 1)
+                    @foreach ($pegawai->timKerjaAnggota as $p)
+                        <option selected value="{{ $p->id }}">{{ $p->pivot->peran }} {{ $p->unit->nama }}</option>
+                    @endforeach
+                @elseif(count($pegawai->timKerjaAnggota) > 1)
+                    <option value="">-- Pilih Peran --</option>
+                    @foreach ($pegawai->timKerjaAnggota as $p)
+                        <option value="{{ $p->id }}">{{ $p->pivot->peran }} {{ $p->unit->nama }}</option>
+                    @endforeach
+                @endif
+            </select>
             <button type="submit" class="btn btn-primary">Set</button>
         </div>
     </form>
