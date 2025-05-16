@@ -145,7 +145,7 @@
                             <tbody>
                                 @foreach ($hasilKerja as $index => $item)
                                     <tr>
-                                        <td colspan="5">Not Found</td>
+                                        <td colspan="5">-</td>
                                     </tr>
                                 @endforeach
                             </tbody>
@@ -158,7 +158,7 @@
                           </tr>
                         </thead>
                         <tbody>
-                          <td colspan="5">Not Found</td>
+                          <td colspan="5">-</td>
                         </tbody>
                     </table>
                 </div>
@@ -181,4 +181,5 @@
 
 @push('js')
     @include('penilaian::evaluasi.script-periode')
+    @include('penilaian::evaluasi.script-hasilkerja')
 @endpush

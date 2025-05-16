@@ -54,12 +54,12 @@ class RencanaController extends Controller
         $penilaianController = new PenilaianController();
         $pegawai = $penilaianController->getPegawaiWhoLogin(session('tim_kerja_id'));
         $rencana = RencanaKerja::with('hasilKerja')->where('pegawai_id', '=', $pegawai->id)->first();
-        $indikatorIntervensi = Cascading::with('indikator.hasilKerja.rencanakerja')->where('pegawai_id', $pegawai->id)->get();
+        $indikatorIntervensi = Cascading::with('indikator.hasilKerja.rencanakerja.pegawai.timKerjaAnggota')->where('pegawai_id', $pegawai->id)->get();
         $parentHasilKerja = $indikatorIntervensi->pluck('indikator.hasilKerja')->unique('id')->values();
 
         if($request->query('params') == 'json'){
             return response()->json([
-                'pegawai' => $pegawai
+                'parentHasilKerja' => $parentHasilKerja
             ]);
         }else {
             return view('penilaian::rencana', compact('rencana', 'pegawai', 'parentHasilKerja'));

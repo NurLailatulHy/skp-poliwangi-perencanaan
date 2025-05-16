@@ -2,36 +2,22 @@
     <form method="POST" action="{{ url('/penilaian/periode/set') }}">
         @csrf
         <div class="d-flex align-content-center">
-            <select name="periodetahun" id="" class="form-control mr-2">
-                @if (count($periode) === 1)
-                    @foreach ($periode as $p)
-                        <option selected value="{{ $p->id }}">{{ $p->tahun }}</option>
-                    @endforeach
-                @elseif(count($periode) > 1)
-                    <option value="">-- Pilih Tahun --</option>
-                    @foreach ($periode as $p)
-                        <option value="{{ $p->id }}">{{ $p->tahun }}</option>
-                    @endforeach
-                @elseif(count($periode) == 0)
-                    <option selected value="">-- Pilih Tahun --</option>
-                @endif
+            <select name="periodetahun" id="periode-tahun" class="form-control mr-2">
+                <option value="">-- Pilih Tahun --</option>
+                @foreach ($periode->groupBy(function ($item) {
+                    return \Carbon\Carbon::parse($item->start_date)->year;
+                }) as $tahun => $group)
+                    <option value="{{ $group->first()->id }}" data-tahun="{{ $tahun }}">{{ $tahun }}</option>
+                @endforeach
             </select>
             @error('periodetahun')
                 <div style="color: red;">{{ $message }}</div>
             @enderror
-            <select name="periode-range" id="" class="form-control mr-2">
-                @if (count($periode) === 1)
-                    @foreach ($periode as $p)
-                        <option selected value="{{ $p->id }}">{{ $p->start_date }} - {{ $p->end_date }}</option>
-                    @endforeach
-                @elseif(count($periode) > 1)
-                    <option value="">-- Pilih Rentang Periode --</option>
-                    @foreach ($periode as $p)
-                        <option value="{{ $p->id }}">{{ $p->start_date }} - {{ $p->end_date }}</option>
-                    @endforeach
-                @elseif(count($periode) == 0)
-                    <option selected value="">-- Pilih Rentang Periode --</option>
-                @endif
+            <select name="periode_range" id="periode-range" class="form-control mr-2">
+                <option value="">-- Pilih Periode --</option>
+                @foreach ($periode as $p)
+                    <option data-tahun="{{ \Carbon\Carbon::parse($p->start_date)->year }}" value="{{ $p->id }}">{{ $p->start_date }} - {{ $p->end_date }}</option>
+                @endforeach
             </select>
 
             <input name="tim_kerja_id" id="nama-unit" class="form-control mr-2" value="{{ $pegawai->timKerjaAnggota[0]->unit->nama }}" disabled>

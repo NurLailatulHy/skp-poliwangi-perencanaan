@@ -10,8 +10,11 @@
                 <div class="form-group">
                     <label for="peran-select">Peran</label>
                     <select class="form-control" id="peran-select" name="peran">
+                        <option value="">-- Pilih Peran --</option>
                         @foreach ($pegawai->timKerjaAnggota as $item)
-                            <option value="{{ $item->id }}">{{ $item->pivot->peran }} {{ $item->unit->nama }}</option>
+                            <option value="{{ $item->pivot->peran == 'Ketua' ? $item->parentUnit->id : $item->id  }}">
+                                {{ $item->pivot->peran }} {{ $item->unit->nama }}
+                            </option>
                         @endforeach
                     </select>
                 </div>
@@ -22,7 +25,7 @@
                     <option value="">-- Pilih hasil kerja yang diintervensi --</option>
                     @if (!is_null($parentHasilKerja))
                         @foreach ($parentHasilKerja as $index => $parent)
-                            <option value="{{ $parent->id }}">{{ $parent->deskripsi }}</option>
+                            <option data-peran-id="{{ $parent->rencanakerja->pegawai->timKerjaAnggota[0]->id }}" value="{{ $parent->id }}">{{ $parent->deskripsi }}</option>
                         @endforeach
                     @endif
                   </select>

@@ -22,4 +22,13 @@
         var selectedValue = $(this).val();
         $('#nama-unit').val(selectedValue);
     });
+
+    const allOptions = $('#periode-range option').toArray();
+
+    $('#periode-tahun').on('change', function () {
+        const selectedYear = $(this).find('option:selected').data('tahun'); // ambil tahun dari atribut data-tahun
+        $('#periode-range').empty().append('<option value="">-- Pilih Periode --</option>');
+        const filtered = allOptions.filter(opt => $(opt).data('tahun') == selectedYear);
+        $('#periode-range').append(filtered);
+    });
 </script>
