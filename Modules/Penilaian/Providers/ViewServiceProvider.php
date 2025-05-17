@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\View;
 use Modules\Pengaturan\Entities\Pegawai;
 use Modules\Penilaian\Entities\Periode;
 use Illuminate\Support\Facades\Auth;
+use Modules\Penilaian\Entities\PeriodeAktif;
 
 class ViewServiceProvider extends ServiceProvider
 {
@@ -32,11 +33,14 @@ class ViewServiceProvider extends ServiceProvider
                 'timKerjaAnggota.parentUnit.unit',
             ])->where('id', '=', $pegawaiId)->first();
 
+            $periodeAktif = PeriodeAktif::with('periode')->where('pegawai_id', $pegawai->id)->first();
+
             $timKerja = $pegawai->timKerjaAnggota;
             $view->with([
                 'periode' => Periode::all(),
                 'pegawai' => $pegawai,
-                'timKerja' => $timKerja
+                'timKerja' => $timKerja,
+                'periodeAktif' => $periodeAktif?->periode,
             ]);
         });
     }

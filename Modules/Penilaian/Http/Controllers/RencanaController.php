@@ -13,6 +13,7 @@ use Modules\Penilaian\Entities\Cascading;
 use Modules\Penilaian\Entities\HasilKerja;
 use Modules\Penilaian\Entities\Indikator;
 use Modules\Penilaian\Entities\PerilakuKerja;
+use Modules\Penilaian\Entities\PeriodeAktif;
 use Modules\Penilaian\Entities\RencanaPerilaku;
 
 class RencanaController extends Controller
@@ -52,8 +53,14 @@ class RencanaController extends Controller
 
     public function index(Request $request){
         $penilaianController = new PenilaianController();
-        $pegawai = $penilaianController->getPegawaiWhoLogin(session('tim_kerja_id'));
-        $rencana = RencanaKerja::with('hasilKerja')->where('pegawai_id', '=', $pegawai->id)->first();
+        $pegawai = $penilaianController->getPegawaiWhoLogin();
+
+        $periodeAktif = PeriodeAktif::with('periode')->where('pegawai_id', $pegawai->id)->first();
+        $periodeId = $periodeAktif?->periode_id;
+
+        $rencana = RencanaKerja::with('hasilKerja')
+                    ->where('periode_id', $periodeId)
+                    ->where('pegawai_id', '=', $pegawai->id)->first();
         $indikatorIntervensi = Cascading::with('indikator.hasilKerja.rencanakerja.pegawai.timKerjaAnggota')->where('pegawai_id', $pegawai->id)->get();
         $parentHasilKerja = $indikatorIntervensi->pluck('indikator.hasilKerja')->unique('id')->values();
 
@@ -67,13 +74,15 @@ class RencanaController extends Controller
     }
 
     public function store(){
+        $penilaianController = new PenilaianController();
+        $pegawai = $penilaianController->getPegawaiWhoLogin();
         DB::beginTransaction();
         try {
-            $authUser = Auth::user();
-            $pegawai = $authUser->pegawai;
+            $periodeAktif = PeriodeAktif::with('periode')->where('pegawai_id', $pegawai->id)->first();
+            $periodeId = $periodeAktif?->periode_id;
             $rencana = RencanaKerja::create([
                 'tim_kerja_id' => session('tim_kerja_id'),
-                'periode_id' => session('selected_periode_id'),
+                'periode_id' => $periodeId,
                 'status_persetujuan' => 'Belum Ajukan SKP',
                 'status_realisasi' =>  'Belum Diajukan',
                 'pegawai_id' => $pegawai->id

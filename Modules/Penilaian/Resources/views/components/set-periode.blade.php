@@ -7,7 +7,7 @@
                 @foreach ($periode->groupBy(function ($item) {
                     return \Carbon\Carbon::parse($item->start_date)->year;
                 }) as $tahun => $group)
-                    <option value="{{ $group->first()->id }}" data-tahun="{{ $tahun }}">{{ $tahun }}</option>
+                    <option {{ isset($periodeAktif) && \Carbon\Carbon::parse($periodeAktif->start_date)->year == $tahun ? 'selected' : '' }} value="{{ $group->first()->id }}" data-tahun="{{ $tahun }}">{{ $tahun }}</option>
                 @endforeach
             </select>
             @error('periodetahun')
@@ -16,7 +16,7 @@
             <select name="periode_range" id="periode-range" class="form-control mr-2">
                 <option value="">-- Pilih Periode --</option>
                 @foreach ($periode as $p)
-                    <option data-tahun="{{ \Carbon\Carbon::parse($p->start_date)->year }}" value="{{ $p->id }}">{{ $p->start_date }} - {{ $p->end_date }}</option>
+                    <option {{ $periodeAktif && $periodeAktif->id == $p->id ? 'selected' : '' }} data-tahun="{{ \Carbon\Carbon::parse($p->start_date)->year }}" value="{{ $p->id }}">{{ $p->start_date }} - {{ $p->end_date }}</option>
                 @endforeach
             </select>
 
