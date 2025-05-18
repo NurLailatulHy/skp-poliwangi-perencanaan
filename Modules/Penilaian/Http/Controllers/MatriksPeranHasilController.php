@@ -13,9 +13,16 @@ use Modules\Penilaian\Entities\RencanaKerja;
 
 class MatriksPeranHasilController extends Controller
 {
+    protected $penilaianController;
+    protected $periodeController;
+
+    public function __construct(PenilaianController $penilaianController, PeriodeController $periodeController) {
+        $this->penilaianController = $penilaianController;
+        $this->periodeController = $periodeController;
+    }
+
     public function matriksperanhasil(Request $request){
-        $authuser = Auth::user();
-        $pegawai = $authuser->pegawai;
+        $pegawai = $this->penilaianController->getPegawaiWhoLogin();
         $rencana = RencanaKerja::with('hasilKerja.indikator')->where('pegawai_id', $pegawai->id)->first();
 
         if($request->query('params') == 'json') return response()->json($rencana);
@@ -39,8 +46,8 @@ class MatriksPeranHasilController extends Controller
 
     public function getAnggota(Request $request) {
         try {
-            $authUser = Auth::user();
-            $username = $authUser->pegawai->username;
+            $pegawaiWhoLogin = $this->penilaianController->getPegawaiWhoLogin();
+            $username = $pegawaiWhoLogin->username;
             $pegawai = Pegawai::with([
                 'timKerjaAnggota' => function ($query) {
                     $query->wherePivot('peran', 'Ketua');

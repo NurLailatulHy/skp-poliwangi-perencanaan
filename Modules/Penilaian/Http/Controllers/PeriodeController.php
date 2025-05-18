@@ -2,15 +2,23 @@
 
 namespace Modules\Penilaian\Http\Controllers;
 
-use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Modules\Penilaian\Entities\Periode;
 use Modules\Penilaian\Entities\PeriodeAktif;
-use Modules\Penilaian\Entities\RencanaKerja;
 
 class PeriodeController extends Controller
 {
+
+    public function periode_aktif(){
+        $penilaianController = new PenilaianController();
+        $pegawai = $penilaianController->getPegawaiWhoLogin();
+        $periodeAktif = PeriodeAktif::with('periode')->where('pegawai_id', $pegawai->id)->first();
+        $periodeId = $periodeAktif?->periode_id;
+
+        return $periodeId;
+    }
+
     public function index(){
         $periodes = Periode::all();
         return view('penilaian::periode.index', compact('periodes'));

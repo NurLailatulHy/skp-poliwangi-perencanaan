@@ -14,8 +14,15 @@ use Modules\Penilaian\Entities\HasilKerja;
 use Modules\Penilaian\Entities\RencanaKerja;
 use Modules\Penilaian\Entities\RencanaPerilaku;
 
-class EvaluasiController extends Controller
-{
+class EvaluasiController extends Controller {
+
+    protected $penilaianController;
+    protected $periodeController;
+
+    public function __construct(PenilaianController $penilaianController, PeriodeController $periodeController) {
+        $this->penilaianController = $penilaianController;
+        $this->periodeController = $periodeController;
+    }
 
     public function predikatKinerja($hasilKerja, $perilaku) {
         $hasilKerjaMap = [ 'Dibawah Ekspektasi' => 1, 'Sesuai Ekspektasi' => 2, 'Diatas Ekspektasi' => 3 ];
@@ -68,8 +75,7 @@ class EvaluasiController extends Controller
 
     public function index(Request $request){
         try {
-            $authUser = Auth::user();
-            $pegawai = $authUser->pegawai;
+            $pegawai = $this->penilaianController->getPegawaiWhoLogin();
             $username = $pegawai->username;
             $timKerjaId = $pegawai->timKerjaAnggota[0]->id;
             $ketua = Pejabat::where('pegawai_id', '=', $pegawai->id)->first();

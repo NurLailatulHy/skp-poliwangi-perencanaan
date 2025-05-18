@@ -16,12 +16,19 @@ use Modules\Penilaian\Entities\PerilakuKerja;
 use Modules\Penilaian\Entities\PeriodeAktif;
 use Modules\Penilaian\Entities\RencanaPerilaku;
 
-class RencanaController extends Controller
-{
+class RencanaController extends Controller {
+
+    protected $penilaianController;
+    protected $periodeController;
+
+    public function __construct(PenilaianController $penilaianController, PeriodeController $periodeController) {
+        $this->penilaianController = $penilaianController;
+        $this->periodeController = $periodeController;
+    }
+
     public function getAnggota(Request $request) {
         try {
-            $penilaianController = new PenilaianController();
-            $pegawai = $penilaianController->getPegawaiWhoLogin();
+            $pegawai = $this->penilaianController->getPegawaiWhoLogin();
 
             $timKerjaId = $pegawai->timKerjaAnggota[0]->id;
 
@@ -52,15 +59,11 @@ class RencanaController extends Controller
     }
 
     public function index(Request $request){
-        $penilaianController = new PenilaianController();
-        $pegawai = $penilaianController->getPegawaiWhoLogin();
 
-        $periodeAktif = PeriodeAktif::with('periode')->where('pegawai_id', $pegawai->id)->first();
-        $periodeId = $periodeAktif?->periode_id;
+        $pegawai = $this->penilaianController->getPegawaiWhoLogin();
+        $periodeId = $this->periodeController->periode_aktif();
 
-        $rencana = RencanaKerja::with('hasilKerja')
-                    ->where('periode_id', $periodeId)
-                    ->where('pegawai_id', '=', $pegawai->id)->first();
+        $rencana = RencanaKerja::with('hasilKerja')->where('periode_id', $periodeId)->where('pegawai_id', '=', $pegawai->id)->first();
         $indikatorIntervensi = Cascading::with('indikator.hasilKerja.rencanakerja.pegawai.timKerjaAnggota')->where('pegawai_id', $pegawai->id)->get();
         $parentHasilKerja = $indikatorIntervensi->pluck('indikator.hasilKerja')->unique('id')->values();
 
@@ -74,12 +77,11 @@ class RencanaController extends Controller
     }
 
     public function store(){
-        $penilaianController = new PenilaianController();
-        $pegawai = $penilaianController->getPegawaiWhoLogin();
+        $pegawai = $this->penilaianController->getPegawaiWhoLogin();
+        $periodeId = $this->periodeController->periode_aktif();
+        $perilakuList = PerilakuKerja::all();
         DB::beginTransaction();
         try {
-            $periodeAktif = PeriodeAktif::with('periode')->where('pegawai_id', $pegawai->id)->first();
-            $periodeId = $periodeAktif?->periode_id;
             $rencana = RencanaKerja::create([
                 'tim_kerja_id' => session('tim_kerja_id'),
                 'periode_id' => $periodeId,
@@ -87,8 +89,6 @@ class RencanaController extends Controller
                 'status_realisasi' =>  'Belum Diajukan',
                 'pegawai_id' => $pegawai->id
             ]);
-
-            $perilakuList = PerilakuKerja::all();
 
             foreach ($perilakuList as $perilaku) {
                 RencanaPerilaku::create([
