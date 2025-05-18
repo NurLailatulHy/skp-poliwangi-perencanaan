@@ -12,7 +12,7 @@
                     <select class="form-control" id="peran-select" name="peran">
                         <option value="">-- Pilih Peran --</option>
                         @foreach ($pegawai->timKerjaAnggota as $item)
-                            <option value="{{ $item->pivot->peran == 'Ketua' ? $item->parentUnit->id : $item->id  }}">
+                            <option value="{{ $item->pivot->peran == 'Ketua' ? ($item->parentUnit->id ?? $item->id) : $item->id  }}">
                                 {{ $item->pivot->peran }} {{ $item->unit->nama }}
                             </option>
                         @endforeach
