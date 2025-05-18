@@ -78,8 +78,8 @@ class EvaluasiController extends Controller {
     public function index(Request $request){
         try {
             $pegawai = $this->penilaianController->getPegawaiWhoLogin();
-            $ketua = Pejabat::where('pegawai_id', '=', $pegawai->id)->first();
             $periodeId = $this->periodeController->periode_aktif();
+            $ketua = Pejabat::where('pegawai_id', '=', $pegawai->id)->first();
             $timKerjaId = $pegawai->timKerjaAnggota[0]->id;
             $username = $pegawai->username;
 

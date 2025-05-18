@@ -163,7 +163,7 @@
                             </div>
                         @endif
                     </form>
-                    @if(session('success') || $semuaSudahTerisi)
+                    @if($semuaSudahTerisi && count($rencana->hasilKerja) !== 0)
                         <div>@include('penilaian::components.proses-umpan-balik')</div>
                     @endif
                 </div>
