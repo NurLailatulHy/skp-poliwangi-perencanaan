@@ -46,7 +46,7 @@ class PeriodeController extends Controller
                 ['pegawai_id' => $pegawai->id],
                 ['periode_id' => $request->periode_range]
             );
-            return redirect()->to('/penilaian/rencana/');
+            return redirect()->to(url()->previous());
         } catch (\Throwable $th) {
             return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $th->getMessage());
         }

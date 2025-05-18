@@ -37,7 +37,7 @@ Route::group(['middleware' => ['auth', 'permission']], function() {
             Route::get('/', 'PenilaianController@realisasi');
             Route::post('/update-realisasi/{id}', 'PenilaianController@updateRealisasi');
             Route::post('/ajukan-realisasi/{id}', 'PenilaianController@ajukanRealisasi');
-            Route::post('/batalkan-realisasi/{id}', 'PenilaianController@batalkanRealisasi');
+            Route::post('/batalkan-realisasi/{id}', 'PenilaianController@batalkanPengajuanRealisasi');
         });
         Route::prefix('rencana')->group(function() {
             Route::get('/', 'RencanaController@index');

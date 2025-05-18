@@ -134,8 +134,8 @@
                                             <td>
                                                 <span>Umpan Balik :</span>
                                                 <div class="input-group">
-                                                    <input type="hidden" name="">
-                                                    <select class="custom-select" id="perilaku_kerja_id" name="perilaku_kerja">
+                                                    <input type="hidden" name="feedback_perilaku_kerja[{{ $index }}][perilaku_kerja_id]" value="{{ $item->id }}">
+                                                    <select class="custom-select" id="perilaku_kerja_id" name="feedback_perilaku_kerja[{{ $index }}][perilaku_umpan_balik_predikat]">
                                                         @include('penilaian::components.predikat-dropdown', ['jenis' => 'Predikat'])
                                                     </select>
                                                     <div class="input-group-append">
@@ -144,7 +144,7 @@
                                                         </button>
                                                     </div>
                                                 </div>
-                                                <textarea style="height: 150px; width: 100%; padding: 10px; overflow-y: auto; resize: vertical;"></textarea>
+                                                <textarea name="feedback_perilaku_kerja[{{ $index }}][perilaku_umpan_balik_deskripsi]" style="height: 150px; width: 100%; padding: 10px; overflow-y: auto; resize: vertical;"></textarea>
                                             </td>
                                         </tr>
                                     @endforeach
@@ -156,7 +156,7 @@
                                 return !is_null($hasil->umpan_balik_predikat);
                             });
                         @endphp
-                        @if (!session('success') && !$semuaSudahTerisi)
+                        @if (!$semuaSudahTerisi)
                             {{-- tombol proses umpan balik --}}
                             <div class="w-100 mt-4 d-flex justify-content-end">
                                 <button type="submit" class="btn btn-primary">Proses Umpan Balik</button>

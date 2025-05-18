@@ -29,6 +29,19 @@
                             break;
                     }
                 @endphp
+                @if (session('failed'))
+                    <div id="alert-failed" class="p-2">
+                        <div class="alert alert-danger">
+                            {{ session('failed') }}
+                        </div>
+                    </div>
+                @elseif(session('success'))
+                    <div class="p-2" id="alert-passed">
+                        <div id="alert-passed" class="alert alert-success">
+                            {{ session('success') }}
+                        </div>
+                    </div>
+                @endif
                 <div class="w-100 d-flex justify-content-between align-items-center p-2">
                     <span class="badge m-2 {{ $badgeClass }}" style="width: fit-content">{{ $rencana->status_realisasi }}</span>
                     @if ($rencana->status_realisasi == 'Belum Diajukan')
@@ -84,7 +97,7 @@
                                             <p>{{ $item['umpan_balik_predikat'] }}</p>
                                         </td>
                                         <td style="width: 10%;">
-                                            <button {{ $item->rencanakerja->status_realisasi == 'Sudah Dievaluasi' ? 'disabled' : '' }} type="button" class="btn btn-primary" data-toggle="modal" data-target="#realisasi-{{ $item->id }}">
+                                            <button {{ in_array($item->rencanakerja->status_realisasi, ['Sudah Dievaluasi', 'Sudah Diajukan']) ? 'disabled' : '' }} type="button" class="btn btn-primary" data-toggle="modal" data-target="#realisasi-{{ $item->id }}">
                                                 <i class="nav-icon fas fa-pencil-alt "></i>
                                             </button>
                                             <div class="modal fade" id="realisasi-{{ $item->id }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
@@ -177,4 +190,5 @@
 
 @push('js')
     @include('penilaian::evaluasi.script-periode')
+    @include('penilaian::realisasi.script-realisasi')
 @endpush

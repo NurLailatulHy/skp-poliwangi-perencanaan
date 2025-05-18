@@ -4,6 +4,8 @@
             return `danger`
         }else if (status == 'Belum Dievaluasi') {
             return `secondary`
+        }else if (status == 'Sudah Diajukan' || status == 'Sudah Dievaluasi'){
+            return 'success'
         }
     }
 

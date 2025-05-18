@@ -9,6 +9,13 @@
     <div class="row">
         <div class="col-12">
             <div class="card">
+                @include('penilaian::components.set-periode')
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
                 <div class="card-body">
                     <table id="table-pegawai" class="table table-striped table-bordered" style="width:100%">
                         <thead>

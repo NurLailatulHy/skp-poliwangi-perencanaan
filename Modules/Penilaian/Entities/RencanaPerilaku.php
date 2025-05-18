@@ -18,6 +18,6 @@ class RencanaPerilaku extends Model
 
     public function rencanaKerja()
     {
-        return $this->belongsTo(RencanaKerja::class);
+        return $this->belongsTo(RencanaKerja::class, 'rencana_id');
     }
 }

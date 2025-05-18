@@ -8,10 +8,11 @@ use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Auth;
 use Modules\Pengaturan\Entities\Pegawai;
 use Modules\Pengaturan\Entities\Anggota;
-use Modules\Pengaturan\Entities\TimKerja;
+use Illuminate\Support\Facades\DB;
 use Modules\Pengaturan\Entities\Pejabat;
 use Modules\Penilaian\Entities\HasilKerja;
 use Modules\Penilaian\Entities\RencanaKerja;
+use Modules\Penilaian\Entities\RencanaPerilaku;
 
 class EvaluasiController extends Controller
 {
@@ -115,6 +116,7 @@ class EvaluasiController extends Controller
     }
 
     public function prosesUmpanBalik(Request $request, $username){
+        DB::beginTransaction();
         try {
             foreach ($request->feedback as $item) {
                 HasilKerja::where('id', $item['hasil_kerja_id'])
@@ -125,9 +127,21 @@ class EvaluasiController extends Controller
                     'umpan_balik_deskripsi' => $item['umpan_balik_deskripsi'] ?? null,
                 ]);
             }
+
+            foreach($request->feedback_perilaku_kerja as $item){
+                RencanaPerilaku::where('perilaku_kerja_id', $item['perilaku_kerja_id'])
+                ->whereHas('rencanakerja.pegawai', function ($query) use ($username) {
+                    $query->where('username', $username);
+                })->update([
+                    'umpan_balik_predikat' => $item['perilaku_umpan_balik_predikat'],
+                    'umpan_balik_deskripsi' => $item['perilaku_umpan_balik_deskripsi'] ?? null,
+                ]);
+            }
+            DB::commit();
             return redirect()->back()->with('success', 'proses umpan balik berhasil');
         } catch (\Throwable $th) {
-            return response()->json($th->getMessage);
+            DB::rollBack();
+            return response()->json($th->getMessage());
         }
     }
 

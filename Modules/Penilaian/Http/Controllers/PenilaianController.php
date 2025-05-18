@@ -77,13 +77,18 @@ class PenilaianController extends Controller
         return view('penilaian::realisasi', compact('rencana', 'pegawai', 'indikatorIntervensi'));
     }
 
-    public function ajukanRealisasi($id){
+    public function ajukanRealisasi(Request $request, $id){
         try {
             $rencana = RencanaKerja::find($id);
+            foreach($rencana->hasilKerja as $item){
+                if (is_null($item->realisasi) || $item->realisasi === '') {
+                    return redirect()->back()->with('failed', 'Semua realisasi harus diisi sebelum diajukan.');
+                }
+            }
             $rencana->update([
                 'status_realisasi' => 'Sudah Diajukan'
             ]);
-            return redirect()->back()->with('success', 'Berhasil ditambahkan');
+            return redirect()->back()->with('success', 'Realiasi berhasil diajukan');
         } catch (\Throwable $th) {
             return redirect()->back()->with('failed', $th->getMessage());
         }
@@ -95,7 +100,17 @@ class PenilaianController extends Controller
             $hasilKerja->update([
                 'realisasi' => $request['realisasi']
             ]);
-            return redirect()->back()->with('success', 'Realisasi berhasil diperbarui.');
+            return redirect()->back()->with('berhasil', 'Realisasi berhasil diperbarui.');
+        } catch (\Throwable $th) {
+            return redirect()->back()->with('failed', $th->getMessage());
+        }
+    }
+
+    public function batalkanPengajuanRealisasi($id){
+        try {
+            $rencana = RencanaKerja::find($id);
+            $rencana->update([ 'status_realisasi' => 'Belum Diajukan' ]);
+            return redirect()->back()->with('success', 'Pengajuan Realiasi berhasil dibatalkan');
         } catch (\Throwable $th) {
             return redirect()->back()->with('failed', $th->getMessage());
         }
