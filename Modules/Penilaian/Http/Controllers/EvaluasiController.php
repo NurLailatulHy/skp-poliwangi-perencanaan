@@ -60,6 +60,7 @@ class EvaluasiController extends Controller {
 
     public function evaluasiDetail(Request $request, $username) {
         $params = $request->query('params');
+        $periodeId = $this->periodeController->periode_aktif();
         $pegawai = Pegawai::with([
             'timKerjaAnggota',
             'rencanaKerja.hasilKerja',
@@ -68,7 +69,8 @@ class EvaluasiController extends Controller {
             'timKerjaAnggota.parentUnit.unit',
         ])->where('username', '=', $username)->first();
 
-        $rencana = RencanaKerja::with(['hasilKerja', 'perilakuKerja'])->where('pegawai_id', '=', $pegawai->id)->first();
+        $rencana = RencanaKerja::with(['hasilKerja', 'perilakuKerja'])
+        ->where('periode_id', $periodeId)->where('pegawai_id', '=', $pegawai->id)->first();
         if($params == 'json') return response()->json($rencana);
         else return view('penilaian::evaluasi-detail', compact('pegawai', 'rencana'));
     }
@@ -76,28 +78,27 @@ class EvaluasiController extends Controller {
     public function index(Request $request){
         try {
             $pegawai = $this->penilaianController->getPegawaiWhoLogin();
-            $username = $pegawai->username;
-            $timKerjaId = $pegawai->timKerjaAnggota[0]->id;
             $ketua = Pejabat::where('pegawai_id', '=', $pegawai->id)->first();
+            $periodeId = $this->periodeController->periode_aktif();
+            $timKerjaId = $pegawai->timKerjaAnggota[0]->id;
+            $username = $pegawai->username;
 
             if($ketua != null) {
-                $bawahan = Anggota::with(['timKerja', 'pegawai.rencanakerja'])
-                ->where(function ($query) use ($timKerjaId) {
+                $bawahan = Anggota::with(['timKerja', 'pegawai.rencanakerja' => function ($query) use ($periodeId) {
+                    $query->where('periode_id', $periodeId);
+                }])->where(function ($query) use ($timKerjaId) {
                     $query->where(function ($q) use ($timKerjaId) {
-                            $q->whereHas('timKerja', function ($sub) use ($timKerjaId) {
-                                $sub->where('parent_id', $timKerjaId);
-                            })->where('peran', 'Ketua');
-                        })
-                        ->orWhere(function ($q) use ($timKerjaId) {
-                            $q->whereHas('timKerja', function ($sub) use ($timKerjaId) {
-                                $sub->where('id', $timKerjaId);
-                            })->where('peran', 'Anggota');
-                        });
-                })
-                ->whereHas('pegawai', function ($q) use ($username) {
+                        $q->whereHas('timKerja', function ($sub) use ($timKerjaId) {
+                            $sub->where('parent_id', $timKerjaId);
+                        })->where('peran', 'Ketua');
+                    })->orWhere(function ($q) use ($timKerjaId) {
+                        $q->whereHas('timKerja', function ($sub) use ($timKerjaId) {
+                            $sub->where('id', $timKerjaId);
+                        })->where('peran', 'Anggota');
+                    });
+                })->whereHas('pegawai', function ($q) use ($username) {
                     $q->where('username', '!=', $username);
-                })
-                ->paginate(10);
+                })->paginate(10);
 
                 return response()->json([
                     'status' => 'success',
