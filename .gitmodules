@@ -1,3 +1,6 @@
 [submodule "modules/Pengaturan"]
 	path = modules/Pengaturan
 	url = https://github.com/cutisurattugas/ModulPengaturan.git
+[submodule "Modules/SuratTugas"]
+	path = Modules/SuratTugas
+	url = https://github.com/cutisurattugas/ModulSuratTugas.git
