@@ -10,7 +10,7 @@
             <tbody>
               <tr>
                 <td>Rekomendasi</td>
-                <td><input id="rekomendasi-rating-hasil-kerja" value="Diatas Ekspektasi" type="text" class="form-control" disabled></td>
+                <td><input id="rekomendasi-rating-hasil-kerja" value="{{ $hasiKerjaRecommendation }}" type="text" class="form-control" disabled></td>
               </tr>
               <tr>
                 <td>Rating Hasil Kerja</td>
@@ -32,7 +32,7 @@
             <tbody>
               <tr>
                 <td>Rekomendasi</td>
-                <td><input value="Diatas Ekspektasi" id="rekomendasi-rating-perilaku" type="text" class="form-control" placeholder="wedeh" disabled></td>
+                <td><input value="{{ $perilakuRecommendation }}" id="rekomendasi-rating-perilaku" type="text" class="form-control" disabled></td>
               </tr>
               <tr>
                 <td>Rating Perilaku</td>

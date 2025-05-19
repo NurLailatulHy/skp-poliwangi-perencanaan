@@ -15,4 +15,8 @@ class PerilakuKerja extends Model
     {
         return $this->belongsToMany(RencanaKerja::class, 'skp_rencana_perilaku', 'perilaku_kerja_id', 'rencana_id');
     }
+
+    public function rencanaPerilaku(){
+        return $this->hasOne(RencanaPerilaku::class, 'perilaku_kerja_id', 'id');
+    }
 }

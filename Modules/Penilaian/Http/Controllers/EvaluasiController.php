@@ -61,18 +61,21 @@ class EvaluasiController extends Controller {
     public function evaluasiDetail(Request $request, $username) {
         $params = $request->query('params');
         $periodeId = $this->periodeController->periode_aktif();
-        $pegawai = Pegawai::with([
-            'timKerjaAnggota',
-            'rencanaKerja.hasilKerja',
-            'timKerjaAnggota.unit',
-            'timKerjaAnggota.subUnits.unit',
-            'timKerjaAnggota.parentUnit.unit',
+        $pegawai = Pegawai::with(['timKerjaAnggota','rencanaKerja.hasilKerja',
+            'timKerjaAnggota.unit', 'timKerjaAnggota.subUnits.unit','timKerjaAnggota.parentUnit.unit',
         ])->where('username', '=', $username)->first();
 
-        $rencana = RencanaKerja::with(['hasilKerja', 'perilakuKerja'])
+        $rencana = RencanaKerja::with(['hasilKerja', 'perilakuKerja', 'perilakuKerja.rencanaPerilaku'])
         ->where('periode_id', $periodeId)->where('pegawai_id', '=', $pegawai->id)->first();
-        if($params == 'json') return response()->json($rencana);
-        else return view('penilaian::evaluasi-detail', compact('pegawai', 'rencana'));
+
+        $hasiKerjaRecommendation = $this->hasilKerjaRecommendation($rencana);
+        $perilakuRecommendation = $this->perilakuRecommendation($rencana);
+
+        if($params == 'json') return response()->json([
+            'hasil_kerja_rekomendasi' => $hasiKerjaRecommendation,
+            'perilaku_rekomendasi' => $perilakuRecommendation
+        ]);
+        else return view('penilaian::evaluasi-detail', compact('pegawai', 'rencana', 'hasiKerjaRecommendation', 'perilakuRecommendation'));
     }
 
     public function index(Request $request){
@@ -123,6 +126,7 @@ class EvaluasiController extends Controller {
     }
 
     public function prosesUmpanBalik(Request $request, $username){
+        $periodeId = $this->periodeController->periode_aktif();
         DB::beginTransaction();
         try {
             foreach ($request->feedback as $item) {
@@ -135,14 +139,18 @@ class EvaluasiController extends Controller {
                 ]);
             }
 
-            foreach($request->feedback_perilaku_kerja as $item){
+            foreach ($request->feedback_perilaku_kerja as $item) {
                 RencanaPerilaku::where('perilaku_kerja_id', $item['perilaku_kerja_id'])
-                ->whereHas('rencanakerja.pegawai', function ($query) use ($username) {
-                    $query->where('username', $username);
-                })->update([
-                    'umpan_balik_predikat' => $item['perilaku_umpan_balik_predikat'],
-                    'umpan_balik_deskripsi' => $item['perilaku_umpan_balik_deskripsi'] ?? null,
-                ]);
+                    ->whereHas('rencanakerja', function ($query) use ($username, $periodeId) {
+                        $query->where('periode_id', $periodeId)
+                            ->whereHas('pegawai', function ($q) use ($username) {
+                                $q->where('username', $username);
+                            });
+                    })
+                    ->update([
+                        'umpan_balik_predikat' => $item['perilaku_umpan_balik_predikat'],
+                        'umpan_balik_deskripsi' => $item['perilaku_umpan_balik_deskripsi'] ?? null,
+                    ]);
             }
             DB::commit();
             return redirect()->back()->with('success', 'proses umpan balik berhasil');
@@ -153,7 +161,7 @@ class EvaluasiController extends Controller {
     }
 
     public function simpanHasilEvaluasi(Request $request, $id) {
-
+        $periodeId = $this->periodeController->periode_aktif();
         $requestEvaluasi = [
             'status_realisasi' => 'Sudah Dievaluasi',
             'rating_hasil_kerja' => $request->rating_hasil_kerja,
@@ -164,12 +172,50 @@ class EvaluasiController extends Controller {
         ];
 
         try {
-            RencanaKerja::where('pegawai_id', $id)->update($requestEvaluasi);
+            RencanaKerja::where('pegawai_id', $id)->where('periode_id', $periodeId)->update($requestEvaluasi);
             return redirect()->back()->with('success', 'berhasil ditambahkan');
         } catch (\Throwable $th) {
             return response()->json([
                 'error' => $th->getMessage()
             ]);
         }
+    }
+
+    private function hasilKerjaRecommendation($rencana){
+        $arr = $rencana->hasilKerja->map(function ($item) {
+            return $this->predikatValue($item->umpan_balik_predikat);
+        });
+        $value = $arr->sum();
+        $average = $value / count($arr);
+        return $this->predikatValue($average);
+    }
+
+    private function perilakuRecommendation($rencana = null){
+        $arr = $rencana->perilakuKerja->map(function ($item) {
+            return $this->predikatValue($item->rencanaPerilaku->umpan_balik_predikat);
+        });
+        $value = $arr->sum();
+        $average = $value / count($arr);
+        return $this->predikatValue($average);
+    }
+
+    private function predikatValue($input){
+        $map = [
+            'Dibawah Ekspektasi' => 1,
+            'Sesuai Ekspektasi' => 2,
+            'Diatas Ekspektasi' => 3,
+        ];
+
+        if (is_string($input)) {
+            return $map[$input] ?? 'Status tidak diketahui.';
+        }
+
+        if (is_numeric($input)) {
+            $intValue = round($input);
+            $result = array_search(intval($intValue), $map, true);
+            return $result ?: 'Status tidak diketahui.';
+        }
+
+        return 'Status tidak diketahui.';
     }
 }
