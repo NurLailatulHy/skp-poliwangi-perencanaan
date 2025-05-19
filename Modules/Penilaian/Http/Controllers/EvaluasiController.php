@@ -207,15 +207,15 @@ class EvaluasiController extends Controller {
         ];
 
         if (is_string($input)) {
-            return $map[$input] ?? 'Status tidak diketahui.';
+            return $map[$input] ?? 0;
         }
 
         if (is_numeric($input)) {
             $intValue = round($input);
             $result = array_search(intval($intValue), $map, true);
-            return $result ?: 'Status tidak diketahui.';
+            return $result ?: 0;
         }
 
-        return 'Status tidak diketahui.';
+        return 0;
     }
 }
