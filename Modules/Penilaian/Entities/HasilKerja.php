@@ -27,4 +27,8 @@ class HasilKerja extends Model
     public function indikator(){
         return $this->hasMany(Indikator::class);
     }
+
+    public function penilaianHasilKerja(){
+        return $this->hasMany(PenilaianHasilKerja::class, 'hasil_kerja_id', 'id');
+    }
 }

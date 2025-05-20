@@ -11,6 +11,8 @@ use Modules\Pengaturan\Entities\Anggota;
 use Illuminate\Support\Facades\DB;
 use Modules\Pengaturan\Entities\Pejabat;
 use Modules\Penilaian\Entities\HasilKerja;
+use Modules\Penilaian\Entities\PenilaianHasilKerja;
+use Modules\Penilaian\Entities\PenilaianPerilakuKerja;
 use Modules\Penilaian\Entities\RencanaKerja;
 use Modules\Penilaian\Entities\RencanaPerilaku;
 
@@ -70,7 +72,12 @@ class EvaluasiController extends Controller {
             'hasilKerja.parent.rencanakerja',
             'hasilKerja.parent',
             'perilakuKerja',
-            'hasilKerja' => function ($query) use ($pegawaiWhoLogin) {
+            'hasilKerja.penilaianHasilKerja' => function ($query) use ($pegawaiWhoLogin){
+                $query->where('ketua_tim_id', $pegawaiWhoLogin->id);
+            },
+            'perilakuKerja.rencanaPerilaku.penilaianPerilakuKerja' => function ($query) use ($pegawaiWhoLogin){
+                $query->where('ketua_tim_id', $pegawaiWhoLogin->id);
+            },'hasilKerja' => function ($query) use ($pegawaiWhoLogin) {
                 $query->whereHas('parent.rencanakerja', function ($q) use ($pegawaiWhoLogin) {
                     $q->where('pegawai_id', $pegawaiWhoLogin->id);
                 })->orWhereNull('parent_hasil_kerja_id');
@@ -84,11 +91,11 @@ class EvaluasiController extends Controller {
                 }]);
             }])->where('periode_id', $periodeId)->where('pegawai_id', '=', $pegawai->id)->first();
 
-        $hasiKerjaRecommendation = $this->hasilKerjaRecommendation($rencana);
-        $perilakuRecommendation = $this->perilakuRecommendation($rencana);
+        $hasiKerjaRecommendation = $this->hasilKerjaRecommendation($rencana, $pegawaiWhoLogin->id);
+        $perilakuRecommendation = $this->perilakuRecommendation($rencana->perilakuKerja, $pegawaiWhoLogin->id);
 
-        if($params == 'json') return response()->json([ 'rencana' => $rencana->perilakuKerja ]);
-        else return view('penilaian::evaluasi-detail', compact('pegawai', 'rencana', 'hasiKerjaRecommendation', 'perilakuRecommendation'));
+        if($params == 'json') return response()->json([ 'perilakuKerja' => $rencana->perilakuKerja ]);
+        else return view('penilaian::evaluasi-detail', compact('pegawaiWhoLogin', 'pegawai', 'rencana', 'hasiKerjaRecommendation', 'perilakuRecommendation'));
     }
 
     public function index(Request $request){
@@ -140,27 +147,26 @@ class EvaluasiController extends Controller {
 
     public function prosesUmpanBalik(Request $request, $username){
         $periodeId = $this->periodeController->periode_aktif();
+        $pegawaiWhoLogin = $this->penilaianController->getPegawaiWhoLogin();
         DB::beginTransaction();
         try {
             foreach ($request->feedback as $item) {
-                HasilKerja::where('id', $item['hasil_kerja_id'])
-                ->whereHas('rencanakerja.pegawai', function ($query) use ($username) {
-                    $query->where('username', $username);
-                })->update([
-                    'umpan_balik_predikat' => $item['umpan_balik_predikat'],
-                    'umpan_balik_deskripsi' => $item['umpan_balik_deskripsi'] ?? null,
-                ]);
+                PenilaianHasilKerja::updateOrCreate([
+                        'hasil_kerja_id' => $item['hasil_kerja_id'],
+                        'ketua_tim_id' => $pegawaiWhoLogin->id,
+                    ],
+                    [
+                        'umpan_balik_predikat' => $item['umpan_balik_predikat'],
+                        'umpan_balik_deskripsi' => $item['umpan_balik_deskripsi'] ?? null,
+                    ]
+                );
             }
-
             foreach ($request->feedback_perilaku_kerja as $item) {
-                RencanaPerilaku::where('perilaku_kerja_id', $item['perilaku_kerja_id'])
-                    ->whereHas('rencanakerja', function ($query) use ($username, $periodeId) {
-                        $query->where('periode_id', $periodeId)
-                            ->whereHas('pegawai', function ($q) use ($username) {
-                                $q->where('username', $username);
-                            });
-                    })
-                    ->update([
+                PenilaianPerilakuKerja::updateOrCreate([
+                        'rencana_perilaku_id' => $item['perilaku_kerja_id'],
+                        'ketua_tim_id' => $pegawaiWhoLogin->id,
+                    ],
+                    [
                         'umpan_balik_predikat' => $item['perilaku_umpan_balik_predikat'],
                         'umpan_balik_deskripsi' => $item['perilaku_umpan_balik_deskripsi'] ?? null,
                     ]);
@@ -168,7 +174,7 @@ class EvaluasiController extends Controller {
             DB::commit();
             return redirect()->back()->with('success', 'proses umpan balik berhasil');
         } catch (\Throwable $th) {
-            DB::rollBack();
+            // DB::rollBack();
             return response()->json($th->getMessage());
         }
     }
@@ -194,21 +200,38 @@ class EvaluasiController extends Controller {
         }
     }
 
-    private function hasilKerjaRecommendation($rencana){
-        $arr = $rencana->hasilKerja->map(function ($item) {
-            return $this->predikatValue($item->umpan_balik_predikat);
+    private function hasilKerjaRecommendation($rencana, $ketuaId){
+        $arr = $rencana->hasilKerja->map(function ($item) use ($ketuaId) {
+            $penilaian = $item->penilaianHasilKerja
+                ->firstWhere('ketua_tim_id', $ketuaId);
+            return $this->predikatValue($penilaian->umpan_balik_predikat ?? null);
         });
-        $value = $arr->sum();
-        $average = $value / count($arr);
+
+        $filtered = $arr->filter();
+        if ($filtered->isEmpty()) {
+            return null;
+        }
+
+        $value = $filtered->sum();
+        $average = $value / $filtered->count();
+
         return $this->predikatValue($average);
     }
 
-    private function perilakuRecommendation($rencana = null){
-        $arr = $rencana->perilakuKerja->map(function ($item) {
-            return $this->predikatValue($item->rencanaPerilaku->umpan_balik_predikat);
+    private function perilakuRecommendation($perilakuKerja, $ketuaId){
+        $arr = $perilakuKerja->map(function ($item) use ($ketuaId) {
+            $penilaian = $item->rencanaPerilaku->penilaianPerilakuKerja->firstWhere('ketua_tim_id', $ketuaId);
+            return $this->predikatValue($penilaian->umpan_balik_predikat ?? null);
         });
-        $value = $arr->sum();
-        $average = $value / count($arr);
+
+        $filtered = $arr->filter();
+        if ($filtered->isEmpty()) {
+            return null;
+        }
+
+        $value = $filtered->sum();
+        $average = $value / $filtered->count();
+
         return $this->predikatValue($average);
     }
 

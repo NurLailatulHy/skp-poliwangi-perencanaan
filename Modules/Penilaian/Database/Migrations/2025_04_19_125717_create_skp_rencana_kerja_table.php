@@ -44,6 +44,6 @@ class CreateSkpRencanaKerjaTable extends Migration
     public function down()
     {
         Schema::dropIfExists('skp_rencana_kerja');
-        Schema::dropIfExists('periodes');
+        // Schema::dropIfExists('periodes');
     }
 }

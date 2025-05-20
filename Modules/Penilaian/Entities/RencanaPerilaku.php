@@ -20,4 +20,8 @@ class RencanaPerilaku extends Model
     {
         return $this->belongsTo(RencanaKerja::class, 'rencana_id');
     }
+
+    public function penilaianPerilakuKerja(){
+        return $this->hasMany(PenilaianPerilakuKerja::class, 'rencana_perilaku_id', 'id');
+    }
 }
