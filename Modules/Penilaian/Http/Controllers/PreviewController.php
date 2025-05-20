@@ -9,6 +9,7 @@ use Modules\Pengaturan\Entities\Pegawai;
 
 
 class PreviewController extends Controller {
+
     public function previewEvaluasi(){
         $authUser = Auth::user();
         $authPegawai = $authUser->pegawai;

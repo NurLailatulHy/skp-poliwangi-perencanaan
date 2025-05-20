@@ -15,6 +15,15 @@ class HasilKerja extends Model
         return $this->belongsTo(RencanaKerja::class, 'rencana_id');
     }
 
+    public function parent(){
+        return $this->belongsTo(HasilKerja::class, 'parent_hasil_kerja_id', 'id');
+    }
+
+    public function children()
+    {
+        return $this->hasMany(HasilKerja::class, 'parent_hasil_kerja_id');
+    }
+
     public function indikator(){
         return $this->hasMany(Indikator::class);
     }

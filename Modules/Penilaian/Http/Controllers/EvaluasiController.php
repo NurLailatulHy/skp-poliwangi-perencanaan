@@ -60,21 +60,34 @@ class EvaluasiController extends Controller {
 
     public function evaluasiDetail(Request $request, $username) {
         $params = $request->query('params');
+        $pegawaiWhoLogin = $this->penilaianController->getPegawaiWhoLogin();
         $periodeId = $this->periodeController->periode_aktif();
         $pegawai = Pegawai::with(['timKerjaAnggota','rencanaKerja.hasilKerja',
             'timKerjaAnggota.unit', 'timKerjaAnggota.subUnits.unit','timKerjaAnggota.parentUnit.unit',
         ])->where('username', '=', $username)->first();
 
-        $rencana = RencanaKerja::with(['hasilKerja', 'perilakuKerja', 'perilakuKerja.rencanaPerilaku'])
-        ->where('periode_id', $periodeId)->where('pegawai_id', '=', $pegawai->id)->first();
+        $rencana = RencanaKerja::with([
+            'hasilKerja.parent.rencanakerja',
+            'hasilKerja.parent',
+            'perilakuKerja',
+            'hasilKerja' => function ($query) use ($pegawaiWhoLogin) {
+                $query->whereHas('parent.rencanakerja', function ($q) use ($pegawaiWhoLogin) {
+                    $q->where('pegawai_id', $pegawaiWhoLogin->id);
+                })->orWhereNull('parent_hasil_kerja_id');
+            },
+            'perilakuKerja' => function ($query) use ($periodeId, $pegawai) {
+                $query->with(['rencanaPerilaku' => function ($q) use ($periodeId, $pegawai) {
+                    $q->whereHas('rencanakerja', function ($qr) use ($periodeId, $pegawai) {
+                        $qr->where('periode_id', $periodeId)
+                        ->where('pegawai_id', $pegawai->id);
+                    });
+                }]);
+            }])->where('periode_id', $periodeId)->where('pegawai_id', '=', $pegawai->id)->first();
 
         $hasiKerjaRecommendation = $this->hasilKerjaRecommendation($rencana);
         $perilakuRecommendation = $this->perilakuRecommendation($rencana);
 
-        if($params == 'json') return response()->json([
-            'hasil_kerja_rekomendasi' => $hasiKerjaRecommendation,
-            'perilaku_rekomendasi' => $perilakuRecommendation
-        ]);
+        if($params == 'json') return response()->json([ 'rencana' => $rencana->perilakuKerja ]);
         else return view('penilaian::evaluasi-detail', compact('pegawai', 'rencana', 'hasiKerjaRecommendation', 'perilakuRecommendation'));
     }
 

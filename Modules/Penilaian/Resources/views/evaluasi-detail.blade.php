@@ -10,6 +10,13 @@
     <div class="row">
         <div class="col-12">
             <div class="card">
+                @include('penilaian::components.set-periode')
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
                 <div class="w-100 justify-content-between align-items-center p-4 {{ $rencana->predikat_akhir == null ? 'd-none' : 'd-flex' }}">
                     @php
                         switch ($rencana->predikat_akhir) {
@@ -194,4 +201,5 @@
 
 @push('js')
     @include('penilaian::evaluasi.script-evaluasi-detail')
+    @include('penilaian::evaluasi.script-periode')
 @endpush

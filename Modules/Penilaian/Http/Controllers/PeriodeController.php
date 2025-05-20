@@ -7,8 +7,7 @@ use Illuminate\Routing\Controller;
 use Modules\Penilaian\Entities\Periode;
 use Modules\Penilaian\Entities\PeriodeAktif;
 
-class PeriodeController extends Controller
-{
+class PeriodeController extends Controller {
 
     public function periode_aktif(){
         $penilaianController = new PenilaianController();
