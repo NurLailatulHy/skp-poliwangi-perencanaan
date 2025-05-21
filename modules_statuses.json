@@ -6,5 +6,7 @@
     "Perencanaan": true,
     "Pengaturan": true,
     "SuratTugas": true,
-    "RekapKehadiran": true
+    "RekapKehadiran": true,
+    "Cuti": true,
+    "Setting": true
 }

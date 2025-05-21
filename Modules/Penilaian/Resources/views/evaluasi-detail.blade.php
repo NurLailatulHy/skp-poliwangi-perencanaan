@@ -107,9 +107,18 @@
                               </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td colspan="4">No data</td>
-                                </tr>
+                                @if (count($suratTugas) == null)
+                                    <tr>
+                                        <td colspan="4">No data</td>
+                                    </tr>
+                                @else
+                                    @foreach ($suratTugas as $index => $item)
+                                        <tr>
+                                            <td colspan="">{{ $item->laporan->id }}</td>
+                                            <td colspan="">{{ $item->detail->kegiatan_maksud }}</td>
+                                        </tr>
+                                    @endforeach
+                                @endif
                             </tbody>
                         </table>
                         {{-- perilaku --}}

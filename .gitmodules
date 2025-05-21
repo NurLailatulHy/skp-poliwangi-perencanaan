@@ -7,3 +7,9 @@
 [submodule "Modules/RekapKehadiran"]
 	path = Modules/RekapKehadiran
 	url = https://github.com/wxtcb/ModuleRekapKehadiran.git
+[submodule "modules/Cuti"]
+	path = modules/Cuti
+	url = https://github.com/cutisurattugas/ModulCuti.git
+[submodule "Modules/Setting"]
+	path = Modules/Setting
+	url = https://github.com/wxtcb/ModuleSetting.git

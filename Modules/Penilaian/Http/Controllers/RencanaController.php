@@ -9,6 +9,7 @@ use Modules\Penilaian\Entities\RencanaKerja;
 use Illuminate\Support\Facades\Auth;
 use Modules\Pengaturan\Entities\Anggota;
 use Illuminate\Support\Facades\DB;
+use Modules\Pengaturan\Entities\Pegawai;
 use Modules\Penilaian\Entities\Cascading;
 use Modules\Penilaian\Entities\HasilKerja;
 use Modules\Penilaian\Entities\Indikator;
@@ -24,6 +25,41 @@ class RencanaController extends Controller {
     public function __construct(PenilaianController $penilaianController, PeriodeController $periodeController) {
         $this->penilaianController = $penilaianController;
         $this->periodeController = $periodeController;
+    }
+
+    public function getRencana($username){
+        $pegawaiWhoLogin = $this->penilaianController->getPegawaiWhoLogin();
+        $periodeId = $this->periodeController->periode_aktif();
+
+        $pegawai = Pegawai::with(['timKerjaAnggota','rencanaKerja.hasilKerja',
+            'timKerjaAnggota.unit', 'timKerjaAnggota.subUnits.unit','timKerjaAnggota.parentUnit.unit',
+        ])->where('username', '=', $username)->first();
+
+        $rencana = RencanaKerja::with([
+            'hasilKerja.parent.rencanakerja',
+            'hasilKerja.parent',
+            'perilakuKerja',
+            'hasilKerja.penilaianHasilKerja' => function ($query) use ($pegawaiWhoLogin){
+                $query->where('ketua_tim_id', $pegawaiWhoLogin->id);
+            },
+            'perilakuKerja.rencanaPerilaku.penilaianPerilakuKerja' => function ($query) use ($pegawaiWhoLogin){
+                $query->where('ketua_tim_id', $pegawaiWhoLogin->id);
+            },'hasilKerja' => function ($query) use ($pegawaiWhoLogin) {
+                $query->whereHas('parent.rencanakerja', function ($q) use ($pegawaiWhoLogin) {
+                    $q->where('pegawai_id', $pegawaiWhoLogin->id);
+                })->orWhereNull('parent_hasil_kerja_id');
+            },
+            'perilakuKerja' => function ($query) use ($periodeId, $pegawai) {
+                $query->with(['rencanaPerilaku' => function ($q) use ($periodeId, $pegawai) {
+                    $q->whereHas('rencanakerja', function ($qr) use ($periodeId, $pegawai) {
+                        $qr->where('periode_id', $periodeId)
+                        ->where('pegawai_id', $pegawai->id);
+                    });
+                }]);
+            }])
+        ->where('periode_id', $periodeId)->where('pegawai_id', '=', $pegawai->id)->first();
+
+        return $rencana;
     }
 
     public function getAnggota(Request $request) {

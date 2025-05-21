@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Auth;
 use Modules\Pengaturan\Entities\Pegawai;
 use Modules\Pengaturan\Entities\Anggota;
 use Illuminate\Support\Facades\DB;
+use Modules\Cuti\Services\AtasanService;
 use Modules\Pengaturan\Entities\Pejabat;
 use Modules\Penilaian\Entities\HasilKerja;
 use Modules\Penilaian\Entities\PenilaianHasilKerja;
@@ -18,42 +19,12 @@ use Modules\Penilaian\Entities\RencanaPerilaku;
 
 class EvaluasiController extends Controller {
 
-    protected $penilaianController;
-    protected $periodeController;
+    protected $penilaianController; protected $periodeController; protected $rencanaController;
 
-    public function __construct(PenilaianController $penilaianController, PeriodeController $periodeController) {
+    public function __construct( PenilaianController $penilaianController, PeriodeController $periodeController, RencanaController $rencanaController) {
         $this->penilaianController = $penilaianController;
         $this->periodeController = $periodeController;
-    }
-
-    public function predikatKinerja($hasilKerja, $perilaku) {
-        $hasilKerjaMap = [ 'Dibawah Ekspektasi' => 1, 'Sesuai Ekspektasi' => 2, 'Diatas Ekspektasi' => 3 ];
-        $perilakuMap = [ 'Dibawah Ekspektasi' => 1, 'Sesuai Ekspektasi' => 2, 'Diatas Ekspektasi' => 3 ];
-
-        $hasilKerjaValue = $hasilKerjaMap[$hasilKerja] ?? null;
-        $perilakuValue = $perilakuMap[$perilaku] ?? null;
-
-        $matrix = [
-            1 => [
-                1 => 'Sangat Kurang',
-                2 => 'Butuh Perbaikan',
-                3 => 'Butuh Perbaikan',
-            ],
-            2 => [
-                1 => 'Kurang',
-                2 => 'Baik',
-                3 => 'Baik',
-            ],
-            3 => [
-                1 => 'Kurang',
-                2 => 'Baik',
-                3 => 'Sangat Baik',
-            ],
-        ];
-
-        $result = ($hasilKerjaValue && $perilakuValue) ? ($matrix[$hasilKerjaValue][$perilakuValue] ?? 'Data tidak valid') : 'Data tidak valid';
-
-        return $result;
+        $this->rencanaController = $rencanaController;
     }
 
     public function evaluasi() {
@@ -64,38 +35,20 @@ class EvaluasiController extends Controller {
         $params = $request->query('params');
         $pegawaiWhoLogin = $this->penilaianController->getPegawaiWhoLogin();
         $periodeId = $this->periodeController->periode_aktif();
+        $rencana = $this->rencanaController->getRencana($username);
+        $hasiKerjaRecommendation = $this->hasilKerjaRecommendation($rencana, $pegawaiWhoLogin->id);
+        $perilakuRecommendation = $this->perilakuRecommendation($rencana->perilakuKerja, $pegawaiWhoLogin->id);
         $pegawai = Pegawai::with(['timKerjaAnggota','rencanaKerja.hasilKerja',
             'timKerjaAnggota.unit', 'timKerjaAnggota.subUnits.unit','timKerjaAnggota.parentUnit.unit',
         ])->where('username', '=', $username)->first();
 
-        $rencana = RencanaKerja::with([
-            'hasilKerja.parent.rencanakerja',
-            'hasilKerja.parent',
-            'perilakuKerja',
-            'hasilKerja.penilaianHasilKerja' => function ($query) use ($pegawaiWhoLogin){
-                $query->where('ketua_tim_id', $pegawaiWhoLogin->id);
-            },
-            'perilakuKerja.rencanaPerilaku.penilaianPerilakuKerja' => function ($query) use ($pegawaiWhoLogin){
-                $query->where('ketua_tim_id', $pegawaiWhoLogin->id);
-            },'hasilKerja' => function ($query) use ($pegawaiWhoLogin) {
-                $query->whereHas('parent.rencanakerja', function ($q) use ($pegawaiWhoLogin) {
-                    $q->where('pegawai_id', $pegawaiWhoLogin->id);
-                })->orWhereNull('parent_hasil_kerja_id');
-            },
-            'perilakuKerja' => function ($query) use ($periodeId, $pegawai) {
-                $query->with(['rencanaPerilaku' => function ($q) use ($periodeId, $pegawai) {
-                    $q->whereHas('rencanakerja', function ($qr) use ($periodeId, $pegawai) {
-                        $qr->where('periode_id', $periodeId)
-                        ->where('pegawai_id', $pegawai->id);
-                    });
-                }]);
-            }])->where('periode_id', $periodeId)->where('pegawai_id', '=', $pegawai->id)->first();
+        $suratTugas = $this->penilaianController->getSuratTugas($pegawai->id);
 
-        $hasiKerjaRecommendation = $this->hasilKerjaRecommendation($rencana, $pegawaiWhoLogin->id);
-        $perilakuRecommendation = $this->perilakuRecommendation($rencana->perilakuKerja, $pegawaiWhoLogin->id);
+        $atasanService = new AtasanService();
+        $ketua = $atasanService->getAtasanPegawai($pegawai->id);
 
-        if($params == 'json') return response()->json([ 'perilakuKerja' => $rencana->perilakuKerja ]);
-        else return view('penilaian::evaluasi-detail', compact('pegawaiWhoLogin', 'pegawai', 'rencana', 'hasiKerjaRecommendation', 'perilakuRecommendation'));
+        if($params == 'json') return response()->json([ 'ketua' => $ketua->pegawai ]);
+        else return view('penilaian::evaluasi-detail', compact('suratTugas', 'pegawaiWhoLogin', 'pegawai', 'rencana', 'hasiKerjaRecommendation', 'perilakuRecommendation'));
     }
 
     public function index(Request $request){
@@ -145,8 +98,7 @@ class EvaluasiController extends Controller {
         }
     }
 
-    public function prosesUmpanBalik(Request $request, $username){
-        $periodeId = $this->periodeController->periode_aktif();
+    public function prosesUmpanBalik(Request $request){
         $pegawaiWhoLogin = $this->penilaianController->getPegawaiWhoLogin();
         DB::beginTransaction();
         try {
@@ -161,6 +113,7 @@ class EvaluasiController extends Controller {
                     ]
                 );
             }
+
             foreach ($request->feedback_perilaku_kerja as $item) {
                 PenilaianPerilakuKerja::updateOrCreate([
                         'rencana_perilaku_id' => $item['perilaku_kerja_id'],
@@ -202,15 +155,12 @@ class EvaluasiController extends Controller {
 
     private function hasilKerjaRecommendation($rencana, $ketuaId){
         $arr = $rencana->hasilKerja->map(function ($item) use ($ketuaId) {
-            $penilaian = $item->penilaianHasilKerja
-                ->firstWhere('ketua_tim_id', $ketuaId);
+            $penilaian = $item->penilaianHasilKerja->firstWhere('ketua_tim_id', $ketuaId);
             return $this->predikatValue($penilaian->umpan_balik_predikat ?? null);
         });
 
         $filtered = $arr->filter();
-        if ($filtered->isEmpty()) {
-            return null;
-        }
+        if ($filtered->isEmpty()) return null;
 
         $value = $filtered->sum();
         $average = $value / $filtered->count();
@@ -225,9 +175,7 @@ class EvaluasiController extends Controller {
         });
 
         $filtered = $arr->filter();
-        if ($filtered->isEmpty()) {
-            return null;
-        }
+        if ($filtered->isEmpty()) return null;
 
         $value = $filtered->sum();
         $average = $value / $filtered->count();
@@ -242,10 +190,7 @@ class EvaluasiController extends Controller {
             'Diatas Ekspektasi' => 3,
         ];
 
-        if (is_string($input)) {
-            return $map[$input] ?? 0;
-        }
-
+        if (is_string($input)) return $map[$input] ?? 0;
         if (is_numeric($input)) {
             $intValue = round($input);
             $result = array_search(intval($intValue), $map, true);
@@ -253,5 +198,35 @@ class EvaluasiController extends Controller {
         }
 
         return 0;
+    }
+
+    public function predikatKinerja($hasilKerja, $perilaku) {
+        $hasilKerjaMap = [ 'Dibawah Ekspektasi' => 1, 'Sesuai Ekspektasi' => 2, 'Diatas Ekspektasi' => 3 ];
+        $perilakuMap = [ 'Dibawah Ekspektasi' => 1, 'Sesuai Ekspektasi' => 2, 'Diatas Ekspektasi' => 3 ];
+
+        $hasilKerjaValue = $hasilKerjaMap[$hasilKerja] ?? null;
+        $perilakuValue = $perilakuMap[$perilaku] ?? null;
+
+        $matrix = [
+            1 => [
+                1 => 'Sangat Kurang',
+                2 => 'Butuh Perbaikan',
+                3 => 'Butuh Perbaikan',
+            ],
+            2 => [
+                1 => 'Kurang',
+                2 => 'Baik',
+                3 => 'Baik',
+            ],
+            3 => [
+                1 => 'Kurang',
+                2 => 'Baik',
+                3 => 'Sangat Baik',
+            ],
+        ];
+
+        $result = ($hasilKerjaValue && $perilakuValue) ? ($matrix[$hasilKerjaValue][$perilakuValue] ?? 'Data tidak valid') : 'Data tidak valid';
+
+        return $result;
     }
 }

@@ -9,6 +9,7 @@ use Modules\Penilaian\Entities\RencanaKerja;
 use Modules\Penilaian\Entities\HasilKerja;
 use Modules\Pengaturan\Entities\Pegawai;
 use Modules\Penilaian\Entities\Cascading;
+use Modules\SuratTugas\Entities\SuratTugas;
 
 class PenilaianController extends Controller
 {
@@ -118,5 +119,25 @@ class PenilaianController extends Controller
 
     public function kinerjaOrganisasi() {
         return view('penilaian::kinerjaOrganisasi');
+    }
+
+    public function getSuratTugas($pegawai_id){
+        $pegawaiWhoLogin = $this->getPegawaiWhoLogin();
+        $query = SuratTugas::with(['pejabat','detail','detail.pegawai','anggota.pegawai','laporan']);
+
+        $surat_tugas =  $query->where(function ($q) use ($pegawai_id) {
+                            $q->where('jenis', 'individu')
+                                ->whereHas('detail', function ($q2) use ($pegawai_id) {
+                                    $q2->where('pegawai_id', $pegawai_id);
+                                });
+                            $q->orWhere(function ($q3) use ($pegawai_id) {
+                                $q3->where('jenis', 'tim')
+                                    ->whereHas('detail', function ($q4) use ($pegawai_id) {
+                                        $q4->where('pegawai_id', $pegawai_id);
+                                    });
+                            });
+                        })->latest()->get();
+
+        return $surat_tugas;
     }
 }
