@@ -5,5 +5,6 @@
     "Penilaian": true,
     "Perencanaan": true,
     "Pengaturan": true,
-    "SuratTugas": true
+    "SuratTugas": true,
+    "RekapKehadiran": true
 }
