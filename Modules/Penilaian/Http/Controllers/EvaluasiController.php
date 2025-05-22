@@ -43,7 +43,6 @@ class EvaluasiController extends Controller {
         ])->where('username', '=', $username)->first();
 
         $suratTugas = $this->penilaianController->getSuratTugas($pegawai->id);
-
         $atasanService = new AtasanService();
         $ketua = $atasanService->getAtasanPegawai($pegawai->id);
 
@@ -150,6 +149,23 @@ class EvaluasiController extends Controller {
             return response()->json([
                 'error' => $th->getMessage()
             ]);
+        }
+    }
+
+    public function batalkanEvaluasi($username){
+        $pegawai = Pegawai::where('username', $username)->first();
+        $periodeId = $this->periodeController->periode_aktif();
+        try {
+            RencanaKerja::where('pegawai_id', $pegawai->id)->where('periode_id', $periodeId)->update([
+                'status_realisasi' => 'Sudah Diajukan',
+                'rating_hasil_kerja' => null,
+                'rating_perilaku' => null,
+                'predikat_akhir' => null
+            ]);
+
+            return redirect()->back()->with('success', 'Evaluasi berhasil dibatalkan');
+        } catch (\Throwable $th) {
+            throw $th;
         }
     }
 

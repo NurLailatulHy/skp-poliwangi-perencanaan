@@ -33,7 +33,7 @@
                         }
                     @endphp
                     <span class="badge m-2 {{ $badgeClass }}" style="width: fit-content">{{ $rencana->predikat_akhir }}</span>
-                    <button id="proses-umpan-balik-button" class="btn btn-primary ml-1 {{ $rencana->predikat_akhir == null ? 'd-none' : '' }}">Batalkan Evaluasi</button>
+                    @include('penilaian::components.modal-batalkan-evaluasi')
                 </div>
                 @include('penilaian::components.atasan-bawahan-section')
                 <div class="bg-white p-4">

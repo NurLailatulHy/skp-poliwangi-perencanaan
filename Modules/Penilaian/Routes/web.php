@@ -30,6 +30,7 @@ Route::group(['middleware' => ['auth', 'permission']], function() {
             Route::get('/', 'EvaluasiController@evaluasi');
             Route::get('/data-pegawai', 'EvaluasiController@index');
             Route::get('/{username}/detail', 'EvaluasiController@evaluasiDetail');
+            Route::post('/batalkan-evaluasi/{username}', 'EvaluasiController@batalkanEvaluasi');
             Route::post('proses-umpan-balik/{username}', 'EvaluasiController@prosesUmpanBalik');
             Route::post('simpan-hasil-evaluasi/{id}', 'EvaluasiController@simpanHasilEvaluasi');
         });
