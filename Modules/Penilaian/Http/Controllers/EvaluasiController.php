@@ -27,8 +27,15 @@ class EvaluasiController extends Controller {
         $this->rencanaController = $rencanaController;
     }
 
-    public function evaluasi() {
-        return view('penilaian::evaluasi');
+    public function evaluasi(Request $request) {
+        $atasanService = new AtasanService();
+        $pegawaiWhoLogin = $this->penilaianController->getPegawaiWhoLogin();
+        $bawahan = $this->penilaianController->getBawahan();
+        $pejabat = $atasanService->getAtasanPegawai($pegawaiWhoLogin->id);
+        $rekapKehadiran = $this->penilaianController->getRekapKehadiran();
+
+        if($request->query('params') == 'json') return response()->json($rekapKehadiran);
+        else return view('penilaian::evaluasi');
     }
 
     public function evaluasiDetail(Request $request, $username) {
@@ -38,15 +45,18 @@ class EvaluasiController extends Controller {
         $rencana = $this->rencanaController->getRencana($username);
         $hasiKerjaRecommendation = $this->hasilKerjaRecommendation($rencana, $pegawaiWhoLogin->id);
         $perilakuRecommendation = $this->perilakuRecommendation($rencana->perilakuKerja, $pegawaiWhoLogin->id);
+
         $pegawai = Pegawai::with(['timKerjaAnggota','rencanaKerja.hasilKerja',
-            'timKerjaAnggota.unit', 'timKerjaAnggota.subUnits.unit','timKerjaAnggota.parentUnit.unit',
+        'timKerjaAnggota.unit', 'timKerjaAnggota.subUnits.unit','timKerjaAnggota.parentUnit.unit',
         ])->where('username', '=', $username)->first();
 
-        $suratTugas = $this->penilaianController->getSuratTugas($pegawai->id);
         $atasanService = new AtasanService();
         $ketua = $atasanService->getAtasanPegawai($pegawai->id);
+        $suratTugas = $this->penilaianController->getSuratTugas($pegawai->id);
+        $rekapKehadiran = $this->penilaianController->getRekapKehadiran();
 
-        if($params == 'json') return response()->json([ 'ketua' => $ketua->pegawai ]);
+
+        if($params == 'json') return response()->json([ 'pegawai' => $pegawai ]);
         else return view('penilaian::evaluasi-detail', compact('suratTugas', 'pegawaiWhoLogin', 'pegawai', 'rencana', 'hasiKerjaRecommendation', 'perilakuRecommendation'));
     }
 
@@ -82,7 +92,7 @@ class EvaluasiController extends Controller {
                     'recordsFiltered' => $bawahan->total(),
                     'data' => $bawahan->items()
                 ]);
-            }else {
+            } else {
                 return response()->json([
                     'status' => 'success',
                     'draw' => $request->draw,
@@ -168,6 +178,8 @@ class EvaluasiController extends Controller {
             throw $th;
         }
     }
+
+    public function ubahUmpanBalik(){}
 
     private function hasilKerjaRecommendation($rencana, $ketuaId){
         $arr = $rencana->hasilKerja->map(function ($item) use ($ketuaId) {

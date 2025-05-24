@@ -9,6 +9,7 @@ use Modules\Penilaian\Entities\RencanaKerja;
 use Illuminate\Support\Facades\Auth;
 use Modules\Pengaturan\Entities\Anggota;
 use Illuminate\Support\Facades\DB;
+use Modules\Cuti\Services\AtasanService;
 use Modules\Pengaturan\Entities\Pegawai;
 use Modules\Penilaian\Entities\Cascading;
 use Modules\Penilaian\Entities\HasilKerja;
@@ -103,9 +104,12 @@ class RencanaController extends Controller {
         $indikatorIntervensi = Cascading::with('indikator.hasilKerja.rencanakerja.pegawai.timKerjaAnggota')->where('pegawai_id', $pegawai->id)->get();
         $parentHasilKerja = $indikatorIntervensi->pluck('indikator.hasilKerja')->unique('id')->values();
 
+        $atasanService = new AtasanService();
+        $ketua = $atasanService->getAtasanPegawai($pegawai->id);
+
         if($request->query('params') == 'json'){
             return response()->json([
-                'parentHasilKerja' => $parentHasilKerja
+                'atasan' => $ketua->pegawai
             ]);
         }else {
             return view('penilaian::rencana', compact('rencana', 'pegawai', 'parentHasilKerja'));

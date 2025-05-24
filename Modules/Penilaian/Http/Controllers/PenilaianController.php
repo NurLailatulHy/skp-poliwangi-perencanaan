@@ -5,14 +5,19 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Modules\Pengaturan\Entities\Anggota;
-use Modules\Penilaian\Entities\RencanaKerja;
-use Modules\Penilaian\Entities\HasilKerja;
 use Modules\Pengaturan\Entities\Pegawai;
-use Modules\Penilaian\Entities\Cascading;
+use Modules\Penilaian\Entities\PeriodeAktif;
 use Modules\SuratTugas\Entities\SuratTugas;
+use Carbon\Carbon;
+use Modules\Cuti\Entities\Cuti;
+use Modules\RekapKehadiran\Entities\KehadiranII;
+use Modules\Setting\Entities\Libur;
 
 class PenilaianController extends Controller
 {
+    public function index(){
+        return view('penilaian::index');
+    }
 
     public function getPegawaiWhoLogin($filterTimKerjaId = null){
         $authUser = Auth::user();
@@ -31,90 +36,55 @@ class PenilaianController extends Controller
         return $pegawai;
     }
 
-    public function index(){
-        return view('penilaian::index');
-    }
-
-    public function realisasi(){
-        $authUser = Auth::user();
-        $pegawai = $authUser->pegawai;
-        $pegawaiUsername = $pegawai->username;
-        $pegawaiId = $pegawai->id;
-
-        $pegawai = Pegawai::with([
-            'timKerjaAnggota',
-            'rencanaKerja.hasilKerja',
-            'timKerjaAnggota.unit',
-            'timKerjaAnggota.subUnits.unit',
-            'timKerjaAnggota.parentUnit.unit',
-        ])->where('username', $pegawaiUsername)->first();
-
-        if($pegawai->timKerjaAnggota[0]->parentUnit != null){
-            $atasan = $pegawai->timKerjaAnggota[0]->parentUnit->ketua->pegawai;
-        }
-
+    public function getBawahan(){
+        $periodeController = new PeriodeController();
+        $pegawai = $this->getPegawaiWhoLogin();
+        $periodeId = $periodeController->periode_aktif();
         $timKerjaId = $pegawai->timKerjaAnggota[0]->id;
-        $bawahan = Anggota::with(['timKerja', 'pegawai'])
-        ->where(function ($query) use ($timKerjaId) {
-            $query->where(function ($q) use ($timKerjaId) {
-                    $q->whereHas('timKerja', function ($sub) use ($timKerjaId) {
-                        $sub->where('parent_id', $timKerjaId);
-                    })->where('peran', 'Ketua');
-                })
-                ->orWhere(function ($q) use ($timKerjaId) {
-                    $q->whereHas('timKerja', function ($sub) use ($timKerjaId) {
-                        $sub->where('id', $timKerjaId);
-                    })->where('peran', 'Anggota');
-                });
-        })
-        ->whereHas('pegawai', function ($q) use ($pegawaiUsername) {
-            $q->where('username', '!=', $pegawaiUsername);
-        })
-        ->get();
+        $username = $pegawai->username;
+        $bawahan = Anggota::with(['timKerja', 'pegawai.rencanakerja' => function ($query) use ($periodeId) {
+                        $query->where('periode_id', $periodeId);
+                    }])->where(function ($query) use ($timKerjaId) {
+                        $query->where(function ($q) use ($timKerjaId) {
+                            $q->whereHas('timKerja', function ($sub) use ($timKerjaId) {
+                                $sub->where('parent_id', $timKerjaId);
+                            })->where('peran', 'Ketua');
+                        })
+                        ->orWhere(function ($q) use ($timKerjaId) {
+                            $q->whereHas('timKerja', function ($sub) use ($timKerjaId) {
+                                $sub->where('id', $timKerjaId);
+                            })->where('peran', 'Anggota');
+                        });
+                    })->whereHas('pegawai', function ($q) use ($username) {
+                        $q->where('username', '!=', $username);
+                    })->paginate(10);
 
-        $rencana = RencanaKerja::with('hasilKerja')->where('pegawai_id', '=', $pegawaiId)->first();
-        $indikatorIntervensi = Cascading::with('indikator.hasilKerja.rencanakerja')->where('pegawai_id', $pegawaiId)->get();
-
-        return view('penilaian::realisasi', compact('rencana', 'pegawai', 'indikatorIntervensi'));
+        return $bawahan;
     }
 
-    public function ajukanRealisasi(Request $request, $id){
-        try {
-            $rencana = RencanaKerja::find($id);
-            foreach($rencana->hasilKerja as $item){
-                if (is_null($item->realisasi) || $item->realisasi === '') {
-                    return redirect()->back()->with('failed', 'Semua realisasi harus diisi sebelum diajukan.');
-                }
-            }
-            $rencana->update([
-                'status_realisasi' => 'Sudah Diajukan'
-            ]);
-            return redirect()->back()->with('success', 'Realiasi berhasil diajukan');
-        } catch (\Throwable $th) {
-            return redirect()->back()->with('failed', $th->getMessage());
-        }
-    }
+    public function getBawahan_backup(){
+        $periodeController = new PeriodeController();
+        $pegawai = $this->getPegawaiWhoLogin();
+        $periodeId = $periodeController->periode_aktif();
+        $timKerjaId = $pegawai->timKerjaAnggota[0]->id;
+        $username = $pegawai->username;
+        $bawahan = Anggota::with(['timKerja', 'pegawai.rencanakerja' => function ($query) use ($periodeId) {
+                    $query->where('periode_id', $periodeId);
+                }])->where(function ($query) use ($timKerjaId) {
+                    $query->where(function ($q) use ($timKerjaId) {
+                        $q->whereHas('timKerja', function ($sub) use ($timKerjaId) {
+                            $sub->where('parent_id', $timKerjaId);
+                        })->where('peran', 'Ketua');
+                    })->orWhere(function ($q) use ($timKerjaId) {
+                        $q->whereHas('timKerja', function ($sub) use ($timKerjaId) {
+                            $sub->where('id', $timKerjaId);
+                        })->where('peran', 'Anggota');
+                    });
+                })->whereHas('pegawai', function ($q) use ($username) {
+                    $q->where('username', '!=', $username);
+                })->paginate(10);
 
-    public function updateRealisasi(Request $request, $id) {
-        try {
-            $hasilKerja = HasilKerja::find($id);
-            $hasilKerja->update([
-                'realisasi' => $request['realisasi']
-            ]);
-            return redirect()->back()->with('berhasil', 'Realisasi berhasil diperbarui.');
-        } catch (\Throwable $th) {
-            return redirect()->back()->with('failed', $th->getMessage());
-        }
-    }
-
-    public function batalkanPengajuanRealisasi($id){
-        try {
-            $rencana = RencanaKerja::find($id);
-            $rencana->update([ 'status_realisasi' => 'Belum Diajukan' ]);
-            return redirect()->back()->with('success', 'Pengajuan Realiasi berhasil dibatalkan');
-        } catch (\Throwable $th) {
-            return redirect()->back()->with('failed', $th->getMessage());
-        }
+        return $bawahan;
     }
 
     public function kinerjaOrganisasi() {
@@ -139,5 +109,126 @@ class PenilaianController extends Controller
                         })->latest()->get();
 
         return $surat_tugas;
+    }
+
+    public function getRekapKehadiran(){
+        $pegawai = $this->getPegawaiWhoLogin();
+        $roles = $pegawai->user->getRoleNames()->toArray();
+
+        //get periode aktif
+        $periodeAktif = PeriodeAktif::with(['periode', 'pegawai'])->where('pegawai_id', $pegawai->id)->first();
+        $periode = $periodeAktif->periode;
+
+        $startDate = Carbon::parse($periode->start_date)->startOfDay();
+        $endDate = Carbon::parse($periode->end_date)->endOfDay();
+        $jumlahHari = $startDate->diffInDays($endDate) + 1;
+
+        $pegawaiQuery = Pegawai::query();
+        if (!in_array('admin', $roles) && !in_array('super', $roles)) {
+            if (in_array('mahasiswa', $roles) && !now()->between($startDate, $endDate)) {
+                $pegawaiQuery->whereNull('id');
+            } elseif (in_array('pegawai', $roles) || in_array('dosen', $roles)) {
+                $pegawaiQuery->where('username', $pegawai->user->username);
+            }
+        }
+
+        $pegawaiList = $pegawaiQuery->select('id', 'nama', 'nip', 'username')->get();
+        $pegawaiIDs = $pegawaiList->pluck('id')->toArray();
+
+        $kehadiran = KehadiranII::whereBetween('checktime', [$startDate, $endDate])
+        ->when(!in_array('admin', $roles), fn($q) => $q->whereIn('user_id', $pegawaiIDs))->get()
+        ->groupBy(fn($item) => "{$item->user_id}|" . Carbon::parse($item->checktime)->format('Y-m-d'));
+
+        $liburTanggal = Libur::whereBetween('tanggal', [$startDate, $endDate])
+            ->pluck('tanggal')
+            ->map(fn($tgl) => \Carbon\Carbon::parse($tgl)->format('Y-m-d'))
+            ->toArray();
+
+        $tanggalHari = collect();
+        $liburIndex = [];
+
+        for ($date = $startDate->copy(); $date->lte($endDate); $date->addDay()) {
+            $formatted = $date->format('Y-m-d');
+            $tanggalHari->push($formatted);
+            $liburIndex[] = $date->isWeekend() || in_array($formatted, $liburTanggal);
+        }
+
+        // Ambil data cuti
+        $cutiData = Cuti::where('status', 'Selesai')
+            ->whereIn('pegawai_id', $pegawaiIDs)
+            ->where(function ($query) use ($startDate, $endDate) {
+                $query->whereDate('tanggal_mulai', '<=', $endDate)
+                    ->whereDate('tanggal_selesai', '>=', $startDate);
+            })
+            ->get();
+
+        // Mapping cuti per pegawai dan tanggal
+        $cutiByPegawai = [];
+        foreach ($cutiData as $cuti) {
+            $mulai = Carbon::parse($cuti->tanggal_mulai);
+            $selesai = Carbon::parse($cuti->tanggal_selesai);
+            for ($date = $mulai->copy(); $date->lte($selesai); $date->addDay()) {
+                if ($date->between($startDate, $endDate)) {
+                    $cutiByPegawai[$cuti->pegawai_id][] = $date->format('Y-m-d');
+                }
+            }
+        }
+
+        $data = $pegawaiList->map(function ($pegawai) use ($kehadiran, $tanggalHari, $liburIndex, $cutiByPegawai, $jumlahHari) {
+            $presensi = [];
+            $total = ['D' => 0, 'T' => 0, 'TM' => 0, 'C' => 0, 'DL' => 0];
+
+            foreach ($tanggalHari as $idx => $tanggal) {
+                if ($liburIndex[$idx]) {
+                    $presensi[] = 'L';
+                    continue;
+                }
+
+                if (in_array($tanggal, $cutiByPegawai[$pegawai->id] ?? [])) {
+                    $presensi[] = 'C';
+                    $total['C']++;
+                    continue;
+                }
+
+                $key = $pegawai->id . '|' . $tanggal;
+
+                if ($kehadiran->has($key)) {
+                    $checktypes = $kehadiran[$key]->pluck('checktype')->unique();
+                    $hasI = $checktypes->contains('I');
+                    $hasO = $checktypes->contains('O');
+
+                    if ($hasI && $hasO) {
+                        $presensi[] = 'D';
+                        $total['D']++;
+                    } elseif ($hasI || $hasO) {
+                        $presensi[] = 'T';
+                        $total['T']++;
+                    } else {
+                        $presensi[] = 'TM';
+                        $total['TM']++;
+                    }
+                } else {
+                    $presensi[] = 'TM';
+                    $total['TM']++;
+                }
+            }
+
+            $jumlahHariLibur = collect($presensi)->filter(fn($v) => $v === 'L')->count();
+            $jumlahHariKehadiran_tunjangan = collect($presensi)->filter(fn($v) => $v === 'D')->count();
+            $jumlahHariKehadiran_nontunjangan = collect($presensi)->filter(fn($v) => $v === 'T')->count();
+            $hariKerja = $jumlahHari - $jumlahHariLibur;
+
+            return [
+                'hari_kerja' => $hariKerja,
+                'jumlahHariKehadiran_tunjangan' => $jumlahHariKehadiran_tunjangan,
+                'jumlahHariKehadiran_nontunjangan' => $jumlahHariKehadiran_nontunjangan,
+                'libur' => $jumlahHariLibur,
+                'rerata_kehadiran_tunjangan' => ($jumlahHariKehadiran_tunjangan * 100) / $hariKerja,
+                'rerata_kehadiran_nontunjangan' => ($jumlahHariKehadiran_nontunjangan * 100) / $hariKerja
+            ];
+        });
+
+        return $data[0];
+
     }
 }

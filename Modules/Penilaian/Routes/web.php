@@ -35,10 +35,10 @@ Route::group(['middleware' => ['auth', 'permission']], function() {
             Route::post('simpan-hasil-evaluasi/{id}', 'EvaluasiController@simpanHasilEvaluasi');
         });
         Route::prefix('realisasi')->group(function() {
-            Route::get('/', 'PenilaianController@realisasi');
-            Route::post('/update-realisasi/{id}', 'PenilaianController@updateRealisasi');
-            Route::post('/ajukan-realisasi/{id}', 'PenilaianController@ajukanRealisasi');
-            Route::post('/batalkan-realisasi/{id}', 'PenilaianController@batalkanPengajuanRealisasi');
+            Route::get('/', 'RealisasiController@realisasi');
+            Route::post('/update-realisasi/{id}', 'RealisasiController@updateRealisasi');
+            Route::post('/ajukan-realisasi/{id}', 'RealisasiController@ajukanRealisasi');
+            Route::post('/batalkan-realisasi/{id}', 'RealisasiController@batalkanPengajuanRealisasi');
         });
         Route::prefix('rencana')->group(function() {
             Route::get('/', 'RencanaController@index');

@@ -64,7 +64,7 @@
                                         ${row.rencanakerja[0].status_realisasi}
                                     </span>`
                         }else {
-                            return `<span class="badge badge-danger">Belum Diajukan</span>`
+                            return `<span class="badge badge-danger">Belum Mengajukan SKP</span>`
                         }
                     }
                 },

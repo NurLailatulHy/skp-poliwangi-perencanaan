@@ -37,12 +37,8 @@
                 </div>
                 @include('penilaian::components.atasan-bawahan-section')
                 <div class="bg-white p-4">
-                    <form
-                    method="POST"
-                    action="{{ url('/penilaian/evaluasi/proses-umpan-balik/' . $pegawai->username) }}"
-                    >
+                    <form method="POST" action="{{ url('/penilaian/evaluasi/proses-umpan-balik/' . $pegawai->username) }}">
                         @csrf
-                        {{-- utama --}}
                         <table class="table mb-0" style="table-layout: auto; width: 100%;">
                             <thead>
                               <tr>
@@ -75,11 +71,10 @@
                                                 <div class="input-group">
                                                     <input type="hidden" name="feedback[{{ $index }}][hasil_kerja_id]" value="{{ $item->id }}">
                                                     <select class="custom-select" id="umpan_bali_id" name="feedback[{{ $index }}][umpan_balik_predikat]">
-                                                        @if ($item->penilaianHasilKerja[0]->umpan_balik_predikat == null)
-                                                            @include('penilaian::components.predikat-dropdown', ['jenis' => 'Predikat'])
-                                                        @else
-                                                            <option value="{{ $item->penilaianHasilKerja[0]->umpan_balik_predikat }}">{{ $item->penilaianHasilKerja[0]->umpan_balik_predikat }}</option>
-                                                        @endif
+                                                        @php
+                                                            $predikatTerpilih = $item->penilaianHasilKerja[0]->umpan_balik_predikat ?? null;
+                                                        @endphp
+                                                        @include('penilaian::components.predikat-dropdown', [ 'jenis' => 'Predikat', 'selected' => $predikatTerpilih ])
                                                     </select>
                                                     <div class="input-group-append">
                                                         <button class="btn btn-outline-secondary" type="button">
@@ -87,20 +82,25 @@
                                                         </button>
                                                     </div>
                                                 </div>
+                                                @php
+                                                    $hasilKerja = $item->penilaianHasilKerja[0] ?? null;
+                                                    $predikat = $hasilKerja?->umpan_balik_predikat;
+                                                    $deskripsi = $hasilKerja?->umpan_balik_deskripsi;
+                                                @endphp
+
                                                 <textarea
-                                                class="{{ ($item->penilaianHasilKerja[0]->umpan_balik_predikat !== null && $item->penilaianHasilKerja[0]->umpan_balik_deskripsi === null) ? 'd-none' : '' }}"
-                                                {{ ($item->penilaianHasilKerja[0]->umpan_balik_predikat !== null && $item->penilaianHasilKerja[0]->umpan_balik_deskripsi !== null) ? 'disabled' : '' }}
-                                                name="feedback[{{ $index }}][umpan_balik_deskripsi]"
-                                                placeholder="{{ ($item->penilaianHasilKerja[0]->umpan_balik_predikat !== null && $item->penilaianHasilKerja[0]->umpan_balik_deskripsi !== null) ? $item->penilaianHasilKerja[0]->umpan_balik_deskripsi : '' }}"
-                                                style="height: 150px; width: 100%; padding: 10px; overflow-y: auto; resize: vertical;"></textarea>
+                                                    class="{{ $predikat !== null && $deskripsi === null ? 'd-none' : '' }}"
+                                                    {{ $predikat !== null && $deskripsi !== null ? 'disabled' : '' }}
+                                                    name="feedback[{{ $index }}][umpan_balik_deskripsi]"
+                                                    placeholder="{{ $predikat !== null && $deskripsi !== null ? $deskripsi : '' }}"
+                                                    style="height: 150px; width: 100%; padding: 10px; overflow-y: auto; resize: vertical;"></textarea>
                                             </td>
                                         </tr>
                                     @endforeach
                                 @endif
                             </tbody>
                         </table>
-                        {{-- tambahan --}}
-                        <table class="table mb-0" style="table-layout: fixed; width: 100%;">
+                        <table class="table mb-0" style="table-layout: auto; width: 100%;">
                             <thead>
                               <tr>
                                 <th colspan="4">B. Tambahan</th>
@@ -114,14 +114,32 @@
                                 @else
                                     @foreach ($suratTugas as $index => $item)
                                         <tr>
-                                            <td colspan="">{{ $item->laporan->id }}</td>
-                                            <td colspan="">{{ $item->detail->kegiatan_maksud }}</td>
+                                            <th scope="row">{{ $index + 1 }}</th>
+                                            <td style="width: 65%;">{{ $item->detail->kegiatan_maksud }}</td>
+                                            <td style="width: 25%;">
+                                                <span>Umpan Balik :</span>
+                                                <div class="input-group">
+                                                    <input type="hidden" name="feedback_perilaku_kerja[{{ $index }}][perilaku_kerja_id]" value="">
+                                                    <select class="custom-select" id="perilaku_kerja_id" name="feedback_perilaku_kerja[{{ $index }}][perilaku_umpan_balik_predikat]">
+                                                        @include('penilaian::components.predikat-dropdown', ['jenis' => 'Predikat'])
+                                                    </select>
+                                                    <div class="input-group-append">
+                                                        <button class="btn btn-outline-secondary" type="button">
+                                                            <i class="nav-icon fas fa-copy "></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                                <textarea
+                                                class=""
+                                                name="feedback_perilaku_kerja[{{ $index }}][perilaku_umpan_balik_deskripsi]"
+                                                placeholder=""
+                                                style="height: 150px; width: 100%; padding: 10px; overflow-y: auto; resize: vertical;"></textarea>
+                                            </td>
                                         </tr>
                                     @endforeach
                                 @endif
                             </tbody>
                         </table>
-                        {{-- perilaku --}}
                         <table class="table mb-0" style="table-layout: auto; width: 100%;">
                             <thead>
                               <tr>
@@ -151,25 +169,39 @@
                                                 <span>Umpan Balik :</span>
                                                 <div class="input-group">
                                                     <input type="hidden" name="feedback_perilaku_kerja[{{ $index }}][perilaku_kerja_id]" value="{{ $item->rencanaPerilaku->id }}">
+
                                                     <select class="custom-select" id="perilaku_kerja_id" name="feedback_perilaku_kerja[{{ $index }}][perilaku_umpan_balik_predikat]">
-                                                        @if ($item->rencanaPerilaku->penilaianPerilakuKerja[0]->umpan_balik_predikat == null)
-                                                            @include('penilaian::components.predikat-dropdown', ['jenis' => 'Predikat'])
+                                                        @php
+                                                            $penilaian = $item->rencanaPerilaku->penilaianPerilakuKerja[0] ?? null;
+                                                        @endphp
+
+                                                        @if (!$penilaian || $penilaian->umpan_balik_predikat === null)
+                                                            @include('penilaian::components.predikat-dropdown', [
+                                                                'jenis' => 'Predikat',
+                                                                'options' => ['Sangat Baik', 'Baik', 'Cukup', 'Kurang'],
+                                                                'selected' => null
+                                                            ])
                                                         @else
-                                                            <option value="{{ $item->rencanaPerilaku->penilaianPerilakuKerja[0]->umpan_balik_predikat }}">{{ $item->rencanaPerilaku->penilaianPerilakuKerja[0]->umpan_balik_predikat }}</option>
+                                                            <option value="{{ $penilaian->umpan_balik_predikat }}" selected>
+                                                                {{ $penilaian->umpan_balik_predikat }}
+                                                            </option>
                                                         @endif
                                                     </select>
+
                                                     <div class="input-group-append">
                                                         <button class="btn btn-outline-secondary" type="button">
                                                             <i class="nav-icon fas fa-copy "></i>
                                                         </button>
                                                     </div>
                                                 </div>
+
                                                 <textarea
-                                                class="{{ ($item->rencanaPerilaku->penilaianPerilakuKerja[0]->umpan_balik_predikat !== null && $item->rencanaPerilaku->penilaianPerilakuKerja[0]->umpan_balik_deskripsi === null) ? 'd-none' : '' }}"
-                                                {{ ($item->rencanaPerilaku->penilaianPerilakuKerja[0]->umpan_balik_predikat !== null && $item->rencanaPerilaku->penilaianPerilakuKerja[0]->umpan_balik_deskripsi !== null) ? 'disabled' : '' }}
-                                                name="feedback_perilaku_kerja[{{ $index }}][perilaku_umpan_balik_deskripsi]"
-                                                placeholder="{{ ($item->rencanaPerilaku->penilaianPerilakuKerja[0]->umpan_balik_predikat !== null && $item->rencanaPerilaku->penilaianPerilakuKerja[0]->umpan_balik_deskripsi !== null) ? $item->rencanaPerilaku->umpan_balik_deskripsi : '' }}"
-                                                style="height: 150px; width: 100%; padding: 10px; overflow-y: auto; resize: vertical;"></textarea>
+                                                    class="{{ ($penilaian && $penilaian->umpan_balik_predikat !== null && $penilaian->umpan_balik_deskripsi === null) ? 'd-none' : '' }}"
+                                                    {{ ($penilaian && $penilaian->umpan_balik_predikat !== null && $penilaian->umpan_balik_deskripsi !== null) ? 'disabled' : '' }}
+                                                    name="feedback_perilaku_kerja[{{ $index }}][perilaku_umpan_balik_deskripsi]"
+                                                    placeholder="{{ ($penilaian && $penilaian->umpan_balik_deskripsi) ? $penilaian->umpan_balik_deskripsi : '' }}"
+                                                    style="height: 150px; width: 100%; padding: 10px; overflow-y: auto; resize: vertical;">
+                                                </textarea>
                                             </td>
                                         </tr>
                                     @endforeach
