@@ -28,14 +28,7 @@ class EvaluasiController extends Controller {
     }
 
     public function evaluasi(Request $request) {
-        $atasanService = new AtasanService();
-        $pegawaiWhoLogin = $this->penilaianController->getPegawaiWhoLogin();
-        $bawahan = $this->penilaianController->getBawahan();
-        $pejabat = $atasanService->getAtasanPegawai($pegawaiWhoLogin->id);
-        $rekapKehadiran = $this->penilaianController->getRekapKehadiran();
-
-        if($request->query('params') == 'json') return response()->json($rekapKehadiran);
-        else return view('penilaian::evaluasi');
+        return view('penilaian::evaluasi');
     }
 
     public function evaluasiDetail(Request $request, $username) {
@@ -53,11 +46,14 @@ class EvaluasiController extends Controller {
         $atasanService = new AtasanService();
         $ketua = $atasanService->getAtasanPegawai($pegawai->id);
         $suratTugas = $this->penilaianController->getSuratTugas($pegawai->id);
-        $rekapKehadiran = $this->penilaianController->getRekapKehadiran();
+        $rekapKehadiran = $this->penilaianController->getRekapKehadiran($username);
 
 
-        if($params == 'json') return response()->json([ 'pegawai' => $pegawai ]);
-        else return view('penilaian::evaluasi-detail', compact('suratTugas', 'pegawaiWhoLogin', 'pegawai', 'rencana', 'hasiKerjaRecommendation', 'perilakuRecommendation'));
+        if($params == 'json') return response()->json([ 'rekap_kehadiran' => $rekapKehadiran ]);
+        else return view(
+            'penilaian::evaluasi-detail',
+            compact('suratTugas', 'pegawaiWhoLogin', 'pegawai', 'rencana', 'hasiKerjaRecommendation', 'perilakuRecommendation', 'rekapKehadiran')
+        );
     }
 
     public function index(Request $request){

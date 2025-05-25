@@ -16,7 +16,9 @@
             <select name="periode_range" id="periode-range" class="form-control mr-2">
                 <option value="">-- Pilih Periode --</option>
                 @foreach ($periode as $p)
-                    <option {{ $periodeAktif && $periodeAktif->id == $p->id ? 'selected' : '' }} data-tahun="{{ \Carbon\Carbon::parse($p->start_date)->year }}" value="{{ $p->id }}">{{ $p->start_date }} - {{ $p->end_date }}</option>
+                    <option {{ $periodeAktif && $periodeAktif->id == $p->id ? 'selected' : '' }} data-tahun="{{ \Carbon\Carbon::parse($p->start_date)->year }}" value="{{ $p->id }}">
+                        {{ \Carbon\Carbon::parse($p->start_date)->translatedFormat('j F Y') }} - {{ \Carbon\Carbon::parse($p->end_date)->translatedFormat('j F Y') }}
+                    </option>
                 @endforeach
             </select>
 

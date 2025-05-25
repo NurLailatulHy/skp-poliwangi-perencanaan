@@ -115,7 +115,9 @@
                                     @foreach ($suratTugas as $index => $item)
                                         <tr>
                                             <th scope="row">{{ $index + 1 }}</th>
-                                            <td style="width: 65%;">{{ $item->detail->kegiatan_maksud }}</td>
+                                            <td style="width: 65%;">
+                                                {{ $item->detail->kegiatan_maksud }}
+                                            </td>
                                             <td style="width: 25%;">
                                                 <span>Umpan Balik :</span>
                                                 <div class="input-group">
@@ -154,6 +156,11 @@
                                             <td>
                                                 <p>
                                                     {{ $item->deskripsi }}
+                                                    {{
+                                                        $item->deskripsi == 'Berorientasi Pelayanan'
+                                                        ? '( Sebagai Pertimbangan : ' . number_format($rekapKehadiran['rerata_kehadiran_tunjangan'], 2) . '%)'
+                                                        : ''
+                                                    }}
                                                 </p>
                                                 <ul>
                                                     <li>Memahami dan memenuhi kebutuhan masyarakat</li>

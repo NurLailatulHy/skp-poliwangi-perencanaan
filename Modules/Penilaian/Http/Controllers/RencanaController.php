@@ -45,11 +45,13 @@ class RencanaController extends Controller {
             },
             'perilakuKerja.rencanaPerilaku.penilaianPerilakuKerja' => function ($query) use ($pegawaiWhoLogin){
                 $query->where('ketua_tim_id', $pegawaiWhoLogin->id);
-            },'hasilKerja' => function ($query) use ($pegawaiWhoLogin) {
-                $query->whereHas('parent.rencanakerja', function ($q) use ($pegawaiWhoLogin) {
-                    $q->where('pegawai_id', $pegawaiWhoLogin->id);
-                })->orWhereNull('parent_hasil_kerja_id');
             },
+            'hasilKerja', // aktifkan ini jika hasilKerja ingin ditampilkan walaupun dari intervensi yang berbeda
+            // 'hasilKerja' => function ($query) use ($pegawaiWhoLogin) {
+            //     $query->whereHas('parent.rencanakerja', function ($q) use ($pegawaiWhoLogin) {
+            //         $q->where('pegawai_id', $pegawaiWhoLogin->id);
+            //     })->orWhereNull('parent_hasil_kerja_id');
+            // }, // aktifkan ini jika hasilKerja ingin ditampilkan berdasarkan parent hasil kerja milik pejabat penilai
             'perilakuKerja' => function ($query) use ($periodeId, $pegawai) {
                 $query->with(['rencanaPerilaku' => function ($q) use ($periodeId, $pegawai) {
                     $q->whereHas('rencanakerja', function ($qr) use ($periodeId, $pegawai) {

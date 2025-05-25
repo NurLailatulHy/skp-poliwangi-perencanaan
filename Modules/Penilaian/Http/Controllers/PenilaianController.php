@@ -111,8 +111,11 @@ class PenilaianController extends Controller
         return $surat_tugas;
     }
 
-    public function getRekapKehadiran(){
-        $pegawai = $this->getPegawaiWhoLogin();
+    public function getRekapKehadiran($username){
+        $pegawai = Pegawai::with(['timKerjaAnggota','rencanaKerja.hasilKerja',
+        'timKerjaAnggota.unit', 'timKerjaAnggota.subUnits.unit','timKerjaAnggota.parentUnit.unit',
+        ])->where('username', '=', $username)->first();
+
         $roles = $pegawai->user->getRoleNames()->toArray();
 
         //get periode aktif
@@ -219,10 +222,11 @@ class PenilaianController extends Controller
             $hariKerja = $jumlahHari - $jumlahHariLibur;
 
             return [
-                'hari_kerja' => $hariKerja,
+                'jumlahHari_dalam_periode' => $jumlahHari,
+                'hari_kerja_dalam_periode' => $hariKerja,
+                'hari_libur_dalam_periode' => $jumlahHariLibur,
                 'jumlahHariKehadiran_tunjangan' => $jumlahHariKehadiran_tunjangan,
                 'jumlahHariKehadiran_nontunjangan' => $jumlahHariKehadiran_nontunjangan,
-                'libur' => $jumlahHariLibur,
                 'rerata_kehadiran_tunjangan' => ($jumlahHariKehadiran_tunjangan * 100) / $hariKerja,
                 'rerata_kehadiran_nontunjangan' => ($jumlahHariKehadiran_nontunjangan * 100) / $hariKerja
             ];

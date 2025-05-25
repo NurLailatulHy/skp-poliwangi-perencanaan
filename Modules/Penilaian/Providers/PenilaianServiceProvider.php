@@ -4,6 +4,7 @@ namespace Modules\Penilaian\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Database\Eloquent\Factory;
+use Carbon\Carbon;
 
 class PenilaianServiceProvider extends ServiceProvider
 {
@@ -24,6 +25,7 @@ class PenilaianServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+        Carbon::setLocale('id');
         $this->registerTranslations();
         $this->registerConfig();
         $this->registerViews();
