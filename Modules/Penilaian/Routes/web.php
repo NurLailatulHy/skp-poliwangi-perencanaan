@@ -21,6 +21,8 @@ Route::group(['middleware' => ['auth', 'permission']], function() {
         Route::prefix('preview')->group(function() {
             Route::get('/evaluasi', 'PreviewController@previewEvaluasi');
             Route::get('/dok-evaluasi', 'PreviewController@previewDokEvaluasi');
+            Route::get('/backup-evaluasi', 'PreviewController@backupPreviewEvaluasi');
+            Route::get('/backup-dok-evaluasi', 'PreviewController@backupPreviewDokEvaluasi');
         });
         Route::prefix('cetak')->group(function() {
             Route::get('/evaluasi', 'PrintController@cetakEvaluasi');

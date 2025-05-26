@@ -23,4 +23,8 @@ class RencanaKerja extends Model
     public function perilakuKerja(){
         return $this->belongsToMany(PerilakuKerja::class, 'skp_rencana_perilaku','rencana_id', 'perilaku_kerja_id');
     }
+
+    public function periode(){
+        return $this->belongsTo(Periode::class, 'periode_id', 'id');
+    }
 }
