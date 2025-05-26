@@ -95,7 +95,7 @@
                                 return response.data.map((data) => {
                                     return {
                                         id: data.pegawai.id,
-                                        nama: data.pegawai.username,
+                                        nama: data.pegawai.nama,
                                     }
                                 })
                             } catch (error) {

@@ -4,7 +4,7 @@
 
 <div class="modal fade" id="realisasi-{{ $item->id }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
-        <form class="modal-content" action="{{ url('penilaian/realisasi/update-realisasi/' . $item['id']) }}" method="POST">
+        <form class="modal-content needs-validation" novalidate action="{{ url('penilaian/realisasi/update-realisasi/' . $item['id']) }}" method="POST">
             @csrf
             <div class="modal-header">
                 <h5 class="modal-title" id="exampleModalLongTitle">Isi Realisasi</h5>
@@ -19,12 +19,11 @@
                     <input type="text" class="form-control" id="inputPassword" disabled placeholder="Hasil Kerja" value="{{ $item['deskripsi'] }}">
                     </div>
                 </div>
-                <div class="d-flex align-items-start">
+                <div class="d-flex align-items-start mt-2">
                     <div class="mr-1" style="width:30%">Realisasi</div>
                     <div class="" style="width: 100%">
-                        <textarea name="realisasi"
-                        placeholder="Realisasi"
-                        style="height: 70px; width: 100%; padding: 10px; overflow-y: auto; resize: vertical;"></textarea>
+                        <textarea name="realisasi" class="form-control" placeholder="Realisasi" required style="height: 70px; width: 100%; padding: 10px; overflow-y: auto; resize: vertical;"></textarea>
+                        <div class="invalid-feedback">Realisasi tidak boleh kosong</div>
                     </div>
                 </div>
             </div>

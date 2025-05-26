@@ -79,13 +79,12 @@ class RealisasiController extends Controller {
 
     public function updateRealisasi(Request $request, $id) {
         try {
-            $hasilKerja = HasilKerja::find($id);
-            $hasilKerja->update([
-                'realisasi' => $request['realisasi']
+            HasilKerja::findOrFail($id)->update([
+                'realisasi' => $request->realisasi
             ]);
-            return redirect()->back()->with('berhasil', 'Realisasi berhasil diperbarui.');
+            return redirect()->back()->with('success', 'Realisasi berhasil diperbarui.');
         } catch (\Throwable $th) {
-            return redirect()->back()->with('failed', $th->getMessage());
+            return redirect()->back()->with('error', $th->getMessage());
         }
     }
 

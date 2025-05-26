@@ -33,6 +33,10 @@
                                 $badgeClass = 'badge-success';
                                 break;
                         }
+                        $semuaSudahTerisi = $rencana->hasilKerja->every(function ($item) {
+                            $penilaian = $item->realisasi;
+                            return !is_null($penilaian);
+                        });
                     @endphp
 
                     @if (session('failed'))
@@ -54,7 +58,7 @@
                         @if ($rencana?->status_realisasi == 'Belum Diajukan')
                             <form method="POST" action="{{ url('/penilaian/realisasi/ajukan-realisasi/' . $rencana->id) }}">
                                 @csrf
-                                <button id="proses-umpan-balik-button" class="btn btn-primary">Ajukan Realisasi</button>
+                                <button id="proses-umpan-balik-button" class="btn btn-primary" {{ !$semuaSudahTerisi ? 'disabled' : '' }}>Ajukan Realisasi</button>
                             </form>
                         @elseif($rencana?->status_realisasi == 'Sudah Diajukan')
                             <form method="POST" action="{{ url('/penilaian/realisasi/batalkan-realisasi/' . $rencana->id) }}">

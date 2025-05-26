@@ -222,6 +222,7 @@ class PenilaianController extends Controller
             $hariKerja = $jumlahHari - $jumlahHariLibur;
 
             return [
+                'pegawai' => $pegawai->nama,
                 'jumlahHari_dalam_periode' => $jumlahHari,
                 'hari_kerja_dalam_periode' => $hariKerja,
                 'hari_libur_dalam_periode' => $jumlahHariLibur,

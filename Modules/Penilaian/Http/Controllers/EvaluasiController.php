@@ -3,19 +3,15 @@
 namespace Modules\Penilaian\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
-use Illuminate\Support\Facades\Auth;
 use Modules\Pengaturan\Entities\Pegawai;
 use Modules\Pengaturan\Entities\Anggota;
 use Illuminate\Support\Facades\DB;
 use Modules\Cuti\Services\AtasanService;
 use Modules\Pengaturan\Entities\Pejabat;
-use Modules\Penilaian\Entities\HasilKerja;
 use Modules\Penilaian\Entities\PenilaianHasilKerja;
 use Modules\Penilaian\Entities\PenilaianPerilakuKerja;
 use Modules\Penilaian\Entities\RencanaKerja;
-use Modules\Penilaian\Entities\RencanaPerilaku;
 
 class EvaluasiController extends Controller {
 
@@ -27,7 +23,7 @@ class EvaluasiController extends Controller {
         $this->rencanaController = $rencanaController;
     }
 
-    public function evaluasi(Request $request) {
+    public function evaluasi() {
         return view('penilaian::evaluasi');
     }
 
@@ -57,6 +53,10 @@ class EvaluasiController extends Controller {
     }
 
     public function index(Request $request){
+        $columns = [
+            1 => 'nama'
+        ];
+        $search = $request->input('search.value');
         try {
             $pegawai = $this->penilaianController->getPegawaiWhoLogin();
             $periodeId = $this->periodeController->periode_aktif();
@@ -65,7 +65,7 @@ class EvaluasiController extends Controller {
             $username = $pegawai->username;
 
             if($ketua != null) {
-                $bawahan = Anggota::with(['timKerja', 'pegawai.rencanakerja' => function ($query) use ($periodeId) {
+                $query = Anggota::with(['timKerja', 'pegawai.rencanakerja' => function ($query) use ($periodeId) {
                     $query->where('periode_id', $periodeId);
                 }])->where(function ($query) use ($timKerjaId) {
                     $query->where(function ($q) use ($timKerjaId) {
@@ -77,13 +77,18 @@ class EvaluasiController extends Controller {
                             $sub->where('id', $timKerjaId);
                         })->where('peran', 'Anggota');
                     });
-                })->whereHas('pegawai', function ($q) use ($username) {
+                })->whereHas('pegawai', function ($q) use ($username, $search) {
                     $q->where('username', '!=', $username);
-                })->paginate(10);
+                    if ($search) {
+                        $q->where('nama', 'like', '%' . $search . '%');
+                    }
+                });
+
+                $bawahan = $query->paginate($request->input('length', 10), ['*'], 'page', floor($request->input('start', 0) / $request->input('length', 10)) + 1);
 
                 return response()->json([
                     'status' => 'success',
-                    'draw' => $request->draw,
+                    'draw' => intval($request->input('draw')),
                     'recordsTotal' => $bawahan->total(),
                     'recordsFiltered' => $bawahan->total(),
                     'data' => $bawahan->items()
@@ -99,7 +104,7 @@ class EvaluasiController extends Controller {
                 ]);
             }
         } catch (\Throwable $th) {
-            return response()->json($th->getMessage());
+            throw $th->getMessage();
         }
     }
 
@@ -149,12 +154,13 @@ class EvaluasiController extends Controller {
         ];
 
         try {
-            RencanaKerja::where('pegawai_id', $id)->where('periode_id', $periodeId)->update($requestEvaluasi);
-            return redirect()->back()->with('success', 'berhasil ditambahkan');
+            if($request->rating_hasil_kerja == null && $request->rating_perilaku == null) return redirect()->back()->with('failed', 'Lengkapi rating hasil kerja dan perilaku');
+            else {
+                RencanaKerja::where('pegawai_id', $id)->where('periode_id', $periodeId)->update($requestEvaluasi);
+                return redirect()->back()->with('success', 'Berhasil menyimpan hasil evaluasi');
+            }
         } catch (\Throwable $th) {
-            return response()->json([
-                'error' => $th->getMessage()
-            ]);
+            throw $th->getMessage();
         }
     }
 

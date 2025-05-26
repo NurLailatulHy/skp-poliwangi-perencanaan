@@ -1,5 +1,5 @@
 <div class="mt-4">
-    <form method="POST" action="{{ url('/penilaian/evaluasi/simpan-hasil-evaluasi/' . $pegawai->id) }}">
+    <form class="needs-validation" novalidate method="POST" action="{{ url('/penilaian/evaluasi/simpan-hasil-evaluasi/' . $pegawai->id) }}">
         @csrf
         <table class="table mb-0" style="table-layout: fixed; width: 100%;">
             <thead>
@@ -18,7 +18,10 @@
                     <select class="custom-select" id="rating-hasil-kerja-select" name="rating_hasil_kerja">
                         @include('penilaian::components.predikat-dropdown', ['jenis' => 'Rating Hasil Kerja'])
                     </select>
-                    <textarea name="deskripsi_rating_hasil_kerja" class="d-none" id="textarea-rating-hasil-kerja" style="height: 150px; width: 100%; padding: 10px; overflow-y: auto; resize: vertical;"></textarea>
+                    <textarea
+                    name="deskripsi_rating_hasil_kerja" required
+                    class="form-control d-none mt-2" id="textarea-rating-hasil-kerja" style="height: 150px; width: 100%; padding: 10px; overflow-y: auto; resize: vertical;"></textarea>
+                    <div class="invalid-feedback">Deskripsi tidak boleh kosong</div>
                 </td>
               </tr>
             </tbody>
@@ -40,7 +43,10 @@
                     <select class="custom-select" id="rating-perilaku-select" name="rating_perilaku">
                         @include('penilaian::components.predikat-dropdown', ['jenis' => 'Rating Perilaku'])
                     </select>
-                    <textarea name="deskripsi_rating_perilaku" class="d-none" id="textarea-rating-perilaku" style="height: 150px; width: 100%; padding: 10px; overflow-y: auto; resize: vertical;"></textarea>
+                    <textarea
+                    name="deskripsi_rating_perilaku" required
+                    class="form-control d-none mt-2 border border-2" id="textarea-rating-perilaku" style="height: 150px; width: 100%; padding: 10px; overflow-y: auto; resize: vertical;"></textarea>
+                    <div class="invalid-feedback">Deskripsi tidak boleh kosong</div>
                 </td>
               </tr>
             </tbody>

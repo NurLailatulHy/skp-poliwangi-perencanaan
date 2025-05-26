@@ -10,7 +10,11 @@
     }
 
     $(document).ready(function() {
-        $('#table-pegawai').DataTable({
+        var tablePegawai = $('#table-pegawai').DataTable({
+            language: {
+                search: "",
+                searchPlaceholder: "Cari nama pegawai..."
+            },
             responsive: true,
             scrollX: true,
             processing: true,
@@ -32,6 +36,9 @@
                     } catch (error) {
                         console.log(response)
                     }
+                },
+                data: function(d) {
+                    d.search_value = $('#search-input').val();
                 },
             },
             columns: [
@@ -60,7 +67,7 @@
                     render: (data, type, row) => {
                         const arrayRencana = row.rencanakerja
                         if(arrayRencana.length != 0) {
-                            return `<span class="badge badge-${colorStatus(row.rencanakerja[0].status_realisasi)}" style="width: fit-content">
+                            return `<span class="badge badge-${colorStatus(row.rencanakerja[0]?.status_realisasi)}" style="width: fit-content">
                                         ${row.rencanakerja[0].status_realisasi}
                                     </span>`
                         }else {
@@ -86,8 +93,12 @@
                     orderable: false,
                     searchable: false,
                     render: function(data, type, row) {
+                        const arrayRencana = row.rencanakerja
                         return `
-                            <button onclick="window.location.href='/penilaian/evaluasi/${row.username}/detail'" type="button" class="btn btn-primary"><i class="nav-icon fas fa-pencil-alt "></i></button>
+                            <button ${
+                                row.rencanakerja[0]?.status_realisasi == 'Belum Diajukan' || row.rencanakerja[0]?.status == 'Belum Ajukan SKP' || row.rencanakerja[0] == null
+                                ? 'disabled' : ''
+                            } onclick="window.location.href='/penilaian/evaluasi/${row.username}/detail'" type="button" class="btn btn-primary"><i class="nav-icon fas fa-pencil-alt "></i></button>
                         `;
                     }
                 },
@@ -97,6 +108,10 @@
             processing: true,
             serverSide: true,
             stateSave: true,
+        });
+
+        $('#search-input').on('input', function () {
+            tablePegawai.draw();
         });
     });
 </script>

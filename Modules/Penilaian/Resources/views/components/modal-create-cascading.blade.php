@@ -4,7 +4,9 @@
             @csrf
             <div class="modal-header">Tambah Cascading {{ $indikator->id }}</div>
             <div class="modal-body">
-                <div class="mb-4 border p-2">{{ $indikator->deskripsi }}</div>
+                <div class="mb-4 border p-2">
+                    <p>{{ $indikator->deskripsi }}</p>
+                </div>
                 <table id="table-pegawai-cascading-{{ $indikator->id }}" class="table table-striped table-bordered" style="width:100%">
                     <thead style="width: 100%;">
                         <tr>

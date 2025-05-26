@@ -39,6 +39,34 @@
     //     });
     // });
 
+    (function() {
+    'use strict';
+    window.addEventListener('load', function() {
+        // Fetch all the forms we want to apply custom Bootstrap validation styles to
+        var forms = document.getElementsByClassName('needs-validation');
+        // Loop over them and prevent submission
+        var validation = Array.prototype.filter.call(forms, function(form) {
+        form.addEventListener('submit', function(event) {
+            if (form.checkValidity() === false) {
+            event.preventDefault();
+            event.stopPropagation();
+            }
+            form.classList.add('was-validated');
+        }, false);
+        });
+    }, false);
+    })();
+
+    setTimeout(() => {
+        const alertfailed = document.getElementById('alert-failed');
+        const alertpassed = document.getElementById('alert-passed');
+        if (alertfailed) {
+            alertfailed.style.display = 'none';
+        } else if (alertpassed){
+            alertpassed.style.display = 'none';
+        }
+    }, 3000);
+
     const rekomendasiRatingHasilKerja = document.querySelector('#rekomendasi-rating-hasil-kerja');
     const rekomendasiRatingPerilaku = document.querySelector('#rekomendasi-rating-perilaku');
     const selectRatingHasilKerja = document.querySelector('#rating-hasil-kerja-select');
@@ -54,18 +82,26 @@
 
         if(valSelRatHasilKerja == valRatHasilKerja) {
             textareaRatingHasilKerja.classList.add('d-none')
+            textareaRatingHasilKerja.removeAttribute('required');
+            textareaRatingHasilKerja.value = '';
         } else {
             textareaRatingHasilKerja.classList.remove('d-none')
+            textareaRatingHasilKerja.setAttribute('required', 'required');
         }
     })
+
+    // selectRatingHasilKerja.dispatchEvent(new Event('change'));
 
     selectRatingPerilaku.addEventListener('change', () => {
         const valSelRatPerilaku = selectRatingPerilaku.value;
 
         if(valSelRatPerilaku == valRatPerilaku) {
             textareaRatingPerilaku.classList.add('d-none')
+            textareaRatingPerilaku.removeAttribute('required');
+            textareaRatingPerilaku.value = '';
         } else {
             textareaRatingPerilaku.classList.remove('d-none')
+            textareaRatingPerilaku.setAttribute('required', 'required');
         }
     })
 
