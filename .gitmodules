@@ -8,14 +8,11 @@
 	path = Modules/RekapKehadiran
 	url = https://github.com/wxtcb/ModuleRekapKehadiran.git
 [submodule "modules/Cuti"]
-	path = modules/Cuti
+	path = Modules/Cuti
 	url = https://github.com/cutisurattugas/ModulCuti.git
 [submodule "Modules/Setting"]
 	path = Modules/Setting
 	url = https://github.com/wxtcb/ModuleSetting.git
-[submodule "Modules/ModulPenilaianSKP"]
-	path = Modules/ModulPenilaianSKP
-	url = https://github.com/widura26/ModulPenilaianSKP.git
 [submodule "Modules/Penilaian"]
 	path = Modules/Penilaian
 	url = https://github.com/widura26/ModulPenilaianSKP.git
