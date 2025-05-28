@@ -16,3 +16,6 @@
 [submodule "Modules/Penilaian"]
 	path = Modules/Penilaian
 	url = https://github.com/widura26/ModulPenilaianSKP.git
+[submodule "Modules/ModuleSuratIjin"]
+	path = Modules/ModuleSuratIjin
+	url = https://github.com/wxtcb/ModuleSuratIjin.git

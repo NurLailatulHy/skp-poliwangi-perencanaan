@@ -7,5 +7,6 @@
     "SuratTugas": true,
     "RekapKehadiran": true,
     "Cuti": true,
-    "Setting": true
+    "Setting": true,
+    "SuratIjin": true
 }
