@@ -1,5 +1,5 @@
 [submodule "modules/Pengaturan"]
-	path = modules/Pengaturan
+	path = Modules/Pengaturan
 	url = https://github.com/cutisurattugas/ModulPengaturan.git
 [submodule "Modules/SuratTugas"]
 	path = Modules/SuratTugas
@@ -16,6 +16,6 @@
 [submodule "Modules/Penilaian"]
 	path = Modules/Penilaian
 	url = https://github.com/widura26/ModulPenilaianSKP.git
-[submodule "Modules/ModuleSuratIjin"]
-	path = Modules/ModuleSuratIjin
+[submodule "Modules/SuratIjin"]
+	path = Modules/SuratIjin
 	url = https://github.com/wxtcb/ModuleSuratIjin.git
