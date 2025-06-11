@@ -16,6 +16,6 @@ class PerencanaanDatabaseSeeder extends Seeder
     {
         Model::unguard();
 
-        // $this->call("OthersTableSeeder");
+        $this->call(MenuPerencanaanTableSeeder::class);
     }
 }
