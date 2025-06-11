@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
@@ -16,3 +17,6 @@ use Illuminate\Http\Request;
 Route::middleware('auth:api')->get('/penilaian', function (Request $request) {
     return $request->user();
 });
+Route::get('/user', 'PenilaianController@realisasi');
+Route::get('/data-pegawai', 'EvaluasiController@index');
+

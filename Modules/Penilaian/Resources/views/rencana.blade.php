@@ -3,7 +3,7 @@
 @section('title', 'Dasbor Simlitabmas')
 
 @section('content_header')
-    <h1 class="m-0 text-dark">Realisasi</h1>
+    <h1 class="m-0 text-dark">Rencana</h1>
 @stop
 @php
     $hasilKerja = [
@@ -19,7 +19,7 @@
             'realisasi' => 'Draft manual book aplikasi untuk modul penyusunan rencana SKP telah selesai pada bulan April sesuai dengan proses bisnis aplikasi',
             'umpan_balik' => ''
         ]
-    ];
+    ]
 @endphp
 @section('content')
     <div class="row">
@@ -33,59 +33,53 @@
         <div class="col-12">
             <div class="card">
                 @php
-                    switch ($rencana->status_realisasi) {
-                        case 'Sudah Diajukan':
-                            $badgeClass = 'badge-success';
-                            break;
-                        case 'Belum Diajukan':
+                    switch (true) {
+                        case 'Belum Dievaluasi':
                             $badgeClass = 'badge-secondary';
+                            break;
+                        case 'Belum Ajukan Realisasi':
+                            $badgeClass = 'badge-danger';
                             break;
                         case 'Sudah Dievaluasi':
                             $badgeClass = 'badge-success';
                             break;
-                        // default:
-                        //     $badgeClass = 'badge-secondary';
-                        //     break;
+                        default:
+                            $badgeClass = 'badge-secondary';
+                            break;
                     }
                 @endphp
-                <div class="w-100 d-flex justify-content-between align-items-center p-2">
-                    <span class="badge m-2 {{ $badgeClass }}" style="width: fit-content">{{ $rencana->status_realisasi }}</span>
-                    @if ($rencana->status_realisasi == 'Belum Diajukan')
-                        <form method="POST" action="{{ url('/penilaian/realisasi/ajukan-realisasi/' . $rencana->id) }}">
+                <div class="w-100 d-flex justify-content-between align-items-center px-4">
+                    @if (is_null($rencana))
+                        <form method="POST" action="{{ url('/penilaian/rencana/store') }}">
                             @csrf
-                            <button id="proses-umpan-balik-button" class="btn btn-primary">Ajukan Realisasi</button>
+                            <button type="submit" class="btn btn-primary">Buat SKP</button>
                         </form>
-                    @elseif($rencana->status_realisasi == 'Sudah Diajukan')
-                        <form method="POST" action="{{ url('/penilaian/realisasi/batalkan-realisasi/' . $rencana->id) }}">
-                            @csrf
-                            <button id="proses-umpan-balik-button" class="btn btn-danger">Batalkan Pengajuan</button>
-                        </form>
-                    @endif
-                    @if ($rencana->predikat_akhir !== null)
-                        <div class="d-flex">
-                            @include('penilaian::components.modal-cetak-evaluasi')
-                            @include('penilaian::components.modal-cetak-dokevaluasi')
-                        </div>
                     @endif
                 </div>
-                @include('penilaian::components.atasan-bawahan-section')
+
+                @include('penilaian::components.atasan-bawahan-section', ['pegawai' => $pegawai])
                 <div class="bg-white p-4">
                     {{-- Hasil kerja --}}
                     <table class="table mb-0" style="width: 100%;">
                         <thead>
-                          <tr>
-                            <th colspan="5">HASIL KERJA</th>
-                          </tr>
-                          <tr>
-                            <th colspan="5">A. Utama</th>
-                          </tr>
+                            <tr>
+                                <th colspan="5">Hasil Kerja</th>
+                            </tr>
+                            <tr>
+                                <th colspan="2" style="width: 90%">A. Utama</th>
+                                <th colspan="1" style="width: 10%">
+                                    @if (!is_null($rencana))
+                                        @include('penilaian::components.modal-create-hasil-kerja')
+                                    @endif
+                                </th>
+                            </tr>
                         </thead>
                         <tbody>
                             @if ($rencana && $rencana->hasilKerja)
                                 @foreach ($rencana->hasilKerja as $index => $item)
                                     <tr>
-                                        <th scope="row">{{ $index + 1 }}</th>
-                                        <td style="width: 50%;">
+                                        <th style="width: 0%;" scope="row">{{ $index + 1 }}</th>
+                                        <td>
                                             <p>{{ $item['deskripsi'] }}</p>
                                             <span>Ukuran keberhasilan / Indikator Kinerja Individu, dan Target :</span>
                                             <ul>
@@ -94,19 +88,11 @@
                                                 @endforeach
                                             </ul>
                                         </td>
-                                        <td style="width: 20%;">
-                                            <span>Realisasi :</span>
-                                            <p>{{ $item['realisasi'] }}</p>
-                                        </td>
-                                        <td style="width: 20%;">
-                                            <span>Umpan Balik :</span>
-                                            <p>{{ $item['umpan_balik_predikat'] }}</p>
-                                        </td>
                                         <td style="width: 10%;">
-                                            <button {{ $item->rencanakerja->status_realisasi == 'Sudah Dievaluasi' ? 'disabled' : '' }} type="button" class="btn btn-primary" data-toggle="modal" data-target="#realisasi-{{ $item->id }}">
+                                            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModalCenter">
                                                 <i class="nav-icon fas fa-pencil-alt "></i>
                                             </button>
-                                            <div class="modal fade" id="realisasi-{{ $item->id }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                                            <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
                                                 <div class="modal-dialog modal-dialog-centered" role="document">
                                                     <form class="modal-content" action="{{ url('penilaian/realisasi/update-realisasi/' . $item['id']) }}" method="POST">
                                                         @csrf
@@ -139,13 +125,13 @@
                                                     </form>
                                                 </div>
                                             </div>
-
-                                            <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#realisasi">
-                                                <i class="nav-icon fas fa-ban "></i>
-                                            </button>
                                         </td>
                                     </tr>
                                 @endforeach
+                            @else
+                                <tr>
+                                    <td colspan="5">Not Found</td>
+                                </tr>
                             @endif
                         </tbody>
                     </table>
@@ -175,9 +161,6 @@
                           <td colspan="5">Not Found</td>
                         </tbody>
                     </table>
-                    {{-- <div class="w-100 mt-4 d-flex justify-content-end">
-
-                    </div> --}}
                 </div>
             </div>
         </div>

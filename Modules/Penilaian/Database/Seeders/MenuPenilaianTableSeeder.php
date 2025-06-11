@@ -24,8 +24,8 @@ class MenuPenilaianTableSeeder extends Seeder
             'label' => 'Penilaian SKP',
             'url' => '',
             // 'can' => serialize(['pimpinan', 'pejabat', 'sekretaris', 'kepegawaian', 'dosen']),
-            'can' => serialize(['*']),
-            'icon' => 'fab fa-playstation',
+            'can' => serialize(['terdaftar', 'operator', 'admin']),
+            'icon' => 'far fa-circle',
             'urut' => 1,
             'parent_id' => 0,
             'active' => '',
@@ -35,11 +35,63 @@ class MenuPenilaianTableSeeder extends Seeder
             'label' => 'Evaluasi',
             'url' => 'penilaian/evaluasi',
             // 'can' => serialize(['pimpinan', 'pejabat', 'sekretaris', 'kepegawaian', 'dosen']),
-            'can' => serialize(['*']),
-            'icon' => 'fas fa-home',
+            'can' => serialize(['terdaftar']),
+            'icon' => 'far fa-circle',
             'urut' => 1,
             'parent_id' => $menu->id,
             'active' => serialize(['penilaian/evaluasi', 'penilaian/evaluasi*']),
+        ]);
+        Menu::create([
+            'modul' => 'Penilaian',
+            'label' => 'Realisasi',
+            'url' => 'penilaian/realisasi',
+            // 'can' => serialize(['pimpinan', 'pejabat', 'sekretaris', 'kepegawaian', 'dosen']),
+            'can' => serialize(['terdaftar', 'operator']),
+            'icon' => 'far fa-circle',
+            'urut' => 1,
+            'parent_id' => $menu->id,
+            'active' => serialize(['penilaian/realisasi', 'penilaian/realisasi*']),
+        ]);
+        Menu::create([
+            'modul' => 'Penilaian',
+            'label' => 'Rencana',
+            'url' => 'penilaian/rencana',
+            // 'can' => serialize(['pimpinan', 'pejabat', 'sekretaris', 'kepegawaian', 'dosen']),
+            'can' => serialize(['terdaftar', 'operator']),
+            'icon' => 'far fa-circle',
+            'urut' => 1,
+            'parent_id' => $menu->id,
+            'active' => serialize(['penilaian/rencana', 'penilaian/rencana*']),
+        ]);
+        Menu::create([
+            'modul' => 'Penilaian',
+            'label' => 'Kinerja Organisasi',
+            'url' => 'penilaian/kinerja-organisasi',
+            'can' => serialize(['admin']),
+            'icon' => 'far fa-circle',
+            'urut' => 1,
+            'parent_id' => $menu->id,
+            'active' => serialize(['penilaian/kinerja-organisasi', 'penilaian/kinerja-organisasi*']),
+        ]);
+        Menu::create([
+            'modul' => 'Penilaian',
+            'label' => 'Periode SKP',
+            'url' => 'penilaian/periode',
+            'can' => serialize(['admin']),
+            'icon' => 'far fa-circle',
+            'urut' => 1,
+            'parent_id' => $menu->id,
+            'active' => serialize(['penilaian/periode', 'penilaian/periode*']),
+        ]);
+        Menu::create([
+            'modul' => 'Penilaian',
+            'label' => 'Matriks Peran Hasil',
+            'url' => 'penilaian/matriks-peran-hasil',
+            'can' => serialize(['terdaftar']),
+            'icon' => 'far fa-circle',
+            'urut' => 1,
+            'parent_id' => $menu->id,
+            'active' => serialize(['penilaian/matriks-peran-hasil', 'penilaian/matriks-peran-hasil*']),
         ]);
     }
 }
