@@ -6,19 +6,15 @@ use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 
-class PerencanaanController extends Controller
+class PersetujuanController extends Controller
 {
     /**
      * Display a listing of the resource.
      * @return Renderable
      */
-    public function index()
+    public function persetujuanSkp()
     {
-        return view('perencanaan::index');
-    }
-
-    public function rencanaSkp() {
-        return view('perencanaan::rencana.rencana-skp');
+        return view('perencanaan::persetujuan-skp');
     }
 
     /**

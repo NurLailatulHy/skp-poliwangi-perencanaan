@@ -6,7 +6,7 @@ use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 
-class PerencanaanController extends Controller
+class UnggahController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -17,8 +17,9 @@ class PerencanaanController extends Controller
         return view('perencanaan::index');
     }
 
-    public function rencanaSkp() {
-        return view('perencanaan::rencana.rencana-skp');
+    public function unggahSkp()
+    {
+        return view('perencanaan::unggah-skp');
     }
 
     /**
@@ -27,7 +28,7 @@ class PerencanaanController extends Controller
      */
     public function create()
     {
-        return view('perencanaan::create');
+        // return view('perencanaan::unggah-skp');
     }
 
     /**
@@ -37,7 +38,7 @@ class PerencanaanController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        
     }
 
     /**

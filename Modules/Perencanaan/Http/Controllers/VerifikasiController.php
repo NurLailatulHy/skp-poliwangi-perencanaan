@@ -6,7 +6,7 @@ use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 
-class PerencanaanController extends Controller
+class VerifikasiController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -16,9 +16,10 @@ class PerencanaanController extends Controller
     {
         return view('perencanaan::index');
     }
-
-    public function rencanaSkp() {
-        return view('perencanaan::rencana.rencana-skp');
+    
+    public function verifikasiSkp()
+    {
+        return view('perencanaan::verifikasi-skp');
     }
 
     /**
