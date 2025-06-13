@@ -15,9 +15,13 @@ use Illuminate\Support\Facades\Route;
 
 
 Route::prefix('perencanaan')->group(function () {
-    Route::get('/', 'PerencanaanController@index');
-    Route::get('/rencana-skp', 'PerencanaanController@rencanaSkp');
-    
+    Route::prefix('rencana-skp')->group(function () {
+        Route::get('/', 'PerencanaanController@rencanaSkp');
+        Route::get('/', 'PerencanaanController@index');
+        Route::post('/store', 'PerencanaanController@store');
+        Route::post('/store-hasil-kerja-utama/{id}', 'PerencanaanController@storeHasilKerjaUtama')->name('hasil-kerja.store');
+        Route::post('/store-hasil-kerja-tambahan/{id}', 'PerencanaanController@storeHasilKerjaTambahan');
+    });
     Route::prefix('verifikasi-skp')->group(function () {
         Route::get('/', 'VerifikasiController@verifikasiSkp');
     });
@@ -28,5 +32,10 @@ Route::prefix('perencanaan')->group(function () {
         Route::get('/', 'UnggahController@unggahSkp');
         // Route::get('/create', 'UnggahController@create');
         // Route::post('/store', 'UnggahController@store');
+    });
+    Route::prefix('matriks-peran-hasil')->group(function() {
+        Route::get('/', 'MatriksPeranHasilController@matriksperanhasil');
+        Route::post('/store/{id}', 'MatriksPeranHasilController@storeCascading');
+        Route::get('/anggota', 'MatriksPeranHasilController@getAnggota');
     });
 });
