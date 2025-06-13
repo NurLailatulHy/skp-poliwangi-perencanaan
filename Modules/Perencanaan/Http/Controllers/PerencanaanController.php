@@ -10,6 +10,7 @@ use Modules\Cuti\Services\AtasanService;
 use Modules\Pengaturan\Entities\Anggota;
 use Modules\Pengaturan\Entities\Pegawai;
 use Modules\Penilaian\Entities\RencanaKerja;
+use Modules\Penilaian\Entities\Lampiran;
 use Modules\Penilaian\Entities\Cascading;
 use Modules\Penilaian\Entities\HasilKerja;
 use Modules\Penilaian\Entities\Indikator;
@@ -233,6 +234,11 @@ class PerencanaanController extends Controller
         } catch (\Throwable $th) {
             return response()->json($th->getMessage());
         }
+    }
+
+    public function storeLampiran(Request $request, $id)
+    {
+        
     }
 
 }

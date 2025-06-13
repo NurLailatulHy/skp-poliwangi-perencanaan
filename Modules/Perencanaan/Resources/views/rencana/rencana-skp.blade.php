@@ -53,15 +53,21 @@
           <a href="#" class="btn btn-primary">Buat SKP</a>
         </div> -->
 
-                <div class="d-flex justify-content-end p-2 border-bottom align-items-center gap-2" id="skp-container">
+                <!-- <div class="d-flex justify-content-end p-2 border-bottom align-items-center gap-2" id="skp-container">
                     <button id="skp-button" class="btn btn-primary">Buat SKP</button>
+                    <button id="skp-button" class="btn btn-danger">Reset SKP</button>
+                </div> -->
+                <div class="d-flex justify-content-end p-2 border-bottom align-items-center gap-2" id="skp-container">
+                    <button id="buat-skp" class="btn btn-primary">Buat SKP</button>
+                    <button id="reset-skp" class="btn btn-danger" style="display: none;">Reset SKP</button>
                 </div>
+
 
                 @include('penilaian::components.atasan-bawahan-section', ['pegawai' => $pegawai])
 
                 <div class="mt-3">
 
-                    <table class="table mb-0" style="width: 100%;">
+                    <table class="table  mb-0" style="width: 100%;">
                         <thead>
                             <tr>
                                 <th colspan="5">Hasil Kerja</th>
@@ -79,17 +85,46 @@
                             @if ($hasilKerjaUtama->count())
                             @foreach ($hasilKerjaUtama as $index => $item)
                             <tr>
-                                <th style="width: 0%;" scope="row">{{ $index + 1 }}</th>
-                                <td>
+                                <th class="border-right" style="width: 0%;" scope="row">{{ $index + 1 }}</th>
+                                <td class="col-sm-7 border-right">
                                     <p>{{ $item['deskripsi'] }}</p>
-                                    <span>Ukuran keberhasilan / Indikator Kinerja Individu, dan Target :</span>
-                                    <ul>
-                                        @foreach ($item->indikator as $indikator)
-                                        <li>{{ $indikator['deskripsi'] }}</li>
-                                        @endforeach
-                                    </ul>
                                 </td>
-                                <td style="width: 10%;">
+                                <td class="col-sm-2">
+                                    <button type="button" class="btn btn-success btn-sm">
+                                        <i class="fas fa-pen"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-success btn-sm">
+                                        <i class="fas fa-star"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-danger btn-sm">
+                                        <i class="fas fa-ban"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-danger btn-sm">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="border-right"></td>
+                                <td class="col-sm-7 border-right" scope="row">
+                                    <span>Ukuran keberhasilan / Indikator Kinerja Individu, dan Target :</span>
+                                </td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td class="border-right"></td>
+                                <td class="col-sm-7 border-right" scope="row">
+                                    @foreach ($item->indikator as $indikator)
+                                    <li>{{ $indikator['deskripsi'] }}</li>
+                                    @endforeach
+                                </td>
+                                <td>
+                                    <button type="button" class="btn btn-success btn-sm">
+                                        <i class="fas fa-pen"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-danger btn-sm">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
                                 </td>
                             </tr>
                             @endforeach
@@ -100,11 +135,11 @@
                             @endif
                         </tbody>
                     </table>
-                    <table class="table mb-0" style="width: 100%;">
+                    <table class="table  mb-0">
                         <thead>
                             <tr>
-                                <th colspan="2" style="width: 90%">B. Tambahan</th>
-                                <th colspan="1" style="width: 10%">
+                                <th colspan="2" class="col-sm-7 border-right">B. Tambahan</th>
+                                <th colspan="1" class="col-sm-2">
                                     <!-- @if (!is_null($rencana)) -->
                                     @include('penilaian::components.modal-create-hasil-kerja-tambahan')
                                     <!-- @endif -->
@@ -117,17 +152,39 @@
                             @foreach ($hasilKerjaTambahan as $indexTambahan => $item)
                             <tr>
                                 <th style="width: 0%;" scope="row">{{ $indexTambahan + 1 }}</th>
-                                <td>
+                                <td class="col-sm-7 border-right">
                                     <p>{{ $item['deskripsi'] }}</p>
-                                    <span>Ukuran keberhasilan / Indikator Kinerja Individu, dan Target :</span>
+                                </td>
+                                <td class="col-sm-2">
+                                    <button type="button" class="btn btn-success btn-sm">
+                                        <i class="fas fa-pen"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-success btn-sm">
+                                        <i class="fas fa-star"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-danger btn-sm">
+                                        <i class="fas fa-ban"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-danger btn-sm">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td class="col-sm-7 border-right"><span>Ukuran keberhasilan / Indikator Kinerja Individu, dan Target :</span></td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td class="col-sm-7 border-right">
                                     <ul>
                                         @foreach ($item->indikator as $indikator)
                                         <li>{{ $indikator['deskripsi'] }}</li>
                                         @endforeach
                                     </ul>
                                 </td>
-                                <td style="width: 10%;">
-                                </td>
+                                <td class="col-sm-2"></td>
                             </tr>
                             @endforeach
 
@@ -139,19 +196,19 @@
                         </tbody>
                         </tbody>
                     </table>
-                    <table class="table mb-0" style="width: 100%;">
+                    <table class="table  mb-0">
                         <thead>
                             <tr>
-                                <th colspan="2" style="width: 90%;">C. Lampiran</th>
-                                <th colspan="1" style="width: 10%">
-                                    
+                                <th colspan="2" class="col-sm-7 border-right">C. Lampiran</th>
+                                <th colspan="1" class="col-sm-2">
                                 </th>
                             </tr>
                         </thead>
                         <tbody>
+                        <tbody>
                             <tr>
-                                <th colspan="2" style="width: 90%;" scope="row">Dukungan Sumber Daya</th>
-                                <th colspan="1" style="width: 10%">
+                                <th colspan="2" class="col-sm-7 border-right" scope="row">Dukungan Sumber Daya</th>
+                                <th colspan="1" class="col-sm-2">
                                     <!-- @if (!is_null($rencana)) -->
                                     @include('perencanaan::rencana.modal-create-dukungan-sumber-daya')
                                     <!-- @endif -->
@@ -161,28 +218,26 @@
                                 <td colspan="5">-</td>
                             </tr>
                             <tr>
-                                <th colspan="2" style="width: 90%;" scope="row">Skema Pertanggung Jawaban</th>
-                                <th colspan="1" style="width: 10%">
-                                    <!-- @if (!is_null($rencana)) -->
+                                <th colspan="2" class="col-sm-7 border-right" scope="row">Skema Pertanggung Jawaban</th>
+                                <th colspan="1" class="col-sm-2">
                                     @include('perencanaan::rencana.modal-create-skema-pertanggung-jawaban')
-                                    <!-- @endif -->
                                 </th>
                             </tr>
                             <tr>
                                 <td colspan="5">-</td>
                             </tr>
                             <tr>
-                                <th colspan="2" style="width: 90%;" scope="row">Konsekuensi</th>
-                                <th colspan="1" style="width: 10%">
-                                    <!-- @if (!is_null($rencana)) -->
+                                <th colspan="2" class="col-sm-7 border-right" scope="row">Konsekuensi</th>
+                                <th colspan="1" class="col-sm-2">
                                     @include('perencanaan::rencana.modal-create-konsekuensi')
-                                    <!-- @endif -->
                                 </th>
                             </tr>
                             <tr>
                                 <td colspan="5">-</td>
                             </tr>
                         </tbody>
+                        </tbody>
+
                     </table>
 
                 </div>
@@ -194,7 +249,7 @@
 
 @section('css')
 <link rel="stylesheet" href="/assets/css/admin_custom.css">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+<!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"> -->
 @stop
 
 @push('js')
@@ -209,4 +264,21 @@
     // const tdStatus = document.querySelector('#td-status')
     // console.log(tdStatus.innerText)
 </script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const buatBtn = document.getElementById('buat-skp');
+        const resetBtn = document.getElementById('reset-skp');
+
+        buatBtn.addEventListener('click', function() {
+            buatBtn.style.display = 'none';
+            resetBtn.style.display = 'inline-block';
+        });
+
+        resetBtn.addEventListener('click', function() {
+            resetBtn.style.display = 'none';
+            buatBtn.style.display = 'inline-block';
+        });
+    });
+</script>
+
 @endpush
