@@ -12,6 +12,13 @@
 <div class="row">
   <div class="col-12">
     <div class="card">
+      @include('penilaian::components.set-periode')
+    </div>
+  </div>
+</div>
+<div class="row">
+  <div class="col-12">
+    <div class="card">
       <div class="card-body">
         <div class="d-grid gap-2 d-md-flex justify-content-md-end mb-2">
           <button class="btn btn-primary me-md-2" type="button" data-bs-toggle="modal" data-bs-target="#staticBackdrop">Unggah SKP</button>
@@ -61,10 +68,6 @@
 
 @section('css')
 <link rel="stylesheet" href="/assets/css/admin_custom.css">
-<!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"> -->
-<!-- <link rel="stylesheet" href="https://cdn.datatables.net/2.3.1/css/dataTables.dataTables.min.css"> -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.3/css/bootstrap.min.css">
-<link rel="stylesheet" href="https://cdn.datatables.net/2.3.1/css/dataTables.bootstrap5.css">
 @stop
 
 @push('js')
@@ -80,8 +83,8 @@
   // console.log(tdStatus.innerText)
 </script>
 <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.3/js/bootstrap.bundle.min.js"></script>
+<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.3/js/bootstrap.bundle.min.js"></script> -->
 <script src="https://cdn.datatables.net/2.3.1/js/dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/2.3.1/js/dataTables.js"></script>
-<script src="https://cdn.datatables.net/2.3.1/js/dataTables.bootstrap5.js"></script>
+<!-- <script src="https://cdn.datatables.net/2.3.1/js/dataTables.bootstrap5.js"></script> -->
 @endpush
