@@ -33,6 +33,7 @@
         "psr-4": {
             "App\\": "app/",
             "Modules\\": "Modules/",
+            "Modules\\Penilaian\\Database\\Factories\\": "Modules/Penilaian/Database/Factories/",
             "Database\\Factories\\": "database/factories/",
             "Database\\Seeders\\": "database/seeders/"
         },
@@ -42,7 +43,8 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "Tests\\": "tests/"
+            "Tests\\": "tests/",
+            "Modules\\Penilaian\\Tests\\": "Modules/Penilaian/Tests/"
         }
     },
     "scripts": {
