@@ -141,7 +141,7 @@
                                 <th colspan="2" class="col-sm-7 border-right">B. Tambahan</th>
                                 <th colspan="1" class="col-sm-2">
                                     <!-- @if (!is_null($rencana)) -->
-                                    @include('penilaian::components.modal-create-hasil-kerja-tambahan')
+                                    @include('penilaian::rencana.components.modal-create-hasil-kerja-tambahan')
                                     <!-- @endif -->
                                 </th>
                             </tr>
