@@ -3,10 +3,12 @@
     "Skp": true,
     "Perencanaan": true,
     "Penilaian": true,
-    "Pengaturan": true,
+    "Pengaturan": false,
     "SuratTugas": true,
     "RekapKehadiran": true,
     "Cuti": true,
     "Setting": true,
-    "SuratIjin": true
+    "SuratIjin": true,
+    "Jabatan": true,
+    "Kepegawaian": true
 }
